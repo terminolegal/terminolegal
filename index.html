@@ -1,152 +1,110 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Término Legal</title>
-  <style>
-    *{box-sizing:border-box}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Término Legal</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --navy:#c9d6e8;--gold:#d8b877;--ink:#eef1f5;--muted:#95a1b0;--line:#2a3546;
+  --bg:#0b1220;--surface:#111a2c;--surface-alt:#0e1626;--input-bg:#0e1626;
+  --input-border:#2a3546;--btn-text:#0b1220;--shadow:rgba(0,0,0,.35);
+}
+body.light{
+  --navy:#10243e;--gold:#b9964f;--ink:#17202b;--muted:#687383;--line:#e4e8ed;
+  --bg:#f7f8fa;--surface:#ffffff;--surface-alt:#fff2f2;--input-bg:#ffffff;
+  --input-border:#ccd3dc;--btn-text:#ffffff;--shadow:rgba(16,36,62,.06);
+}
+html{font-size:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;transition:background .25s,color .25s}
 
-    /* Tema oscuro (predeterminado) */
-    :root{
-      --navy:#c9d6e8;
-      --gold:#d8b877;
-      --ink:#eef1f5;
-      --muted:#95a1b0;
-      --line:#2a3546;
-      --bg:#0b1220;
-      --surface:#111a2c;
-      --surface-alt:#0e1626;
-      --input-bg:#0e1626;
-      --input-border:#2a3546;
-      --btn-text:#0b1220;
-      --shadow:rgba(0,0,0,.35);
-    }
+/* Barra de accesibilidad flotante (calcada de ramajudicial.gov.co) */
+.a11y-bar{position:fixed;top:50%;right:0;transform:translateY(-50%);display:flex;flex-direction:column;background:var(--navy);border-radius:10px 0 0 10px;box-shadow:0 8px 24px var(--shadow);overflow:hidden;z-index:1000}
+.a11y-btn{width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,.18);color:var(--btn-text);cursor:pointer;padding:0}
+.a11y-btn:last-child{border-bottom:0}
+.a11y-btn svg{width:19px;height:19px}
+.a11y-btn:hover,.a11y-btn[aria-pressed="true"]{background:var(--gold)}
+.a11y-big{font-weight:700;font-size:1.05rem;line-height:1}
+.a11y-small{font-weight:700;font-size:.72rem;line-height:1}
 
-    /* Tema claro */
-    body.light{
-      --navy:#10243e;
-      --gold:#b9964f;
-      --ink:#17202b;
-      --muted:#687383;
-      --line:#e4e8ed;
-      --bg:#f7f8fa;
-      --surface:#ffffff;
-      --surface-alt:#fff2f2;
-      --input-bg:#ffffff;
-      --input-border:#ccd3dc;
-      --btn-text:#ffffff;
-      --shadow:rgba(16,36,62,.06);
-    }
+.app{width:min(900px,94%);margin:0 auto;padding:32px 16px 24px}
+.brand{display:flex;justify-content:center;text-align:center}
+.brand-name{font-weight:700;letter-spacing:.14em;font-size:1.1rem;color:var(--navy);margin:0}
+.brand-name span{color:var(--gold)}
+.hero{text-align:center;padding:36px 0 24px}
+h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.8rem,6vw,2.5rem);line-height:1.15;color:var(--navy);margin:0 0 12px}
+.intro{color:var(--muted);font-size:.95rem;max-width:560px;margin:auto;line-height:1.6}
 
-    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;transition:background .25s ease,color .25s ease}
-    .app{width:min(900px,92%);margin:0 auto;padding:42px 96px 24px 0}
-    .brand{display:flex;align-items:center;justify-content:center;text-align:center}
-    .brand-mark{width:48px;height:48px;border:2px solid var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-weight:700;letter-spacing:-1px}
-    .mark-t{color:var(--navy);font-size:22px}.mark-l{color:var(--gold);font-size:22px}
-    .brand-name{font-weight:700;letter-spacing:.14em;font-size:20px;color:var(--navy);margin:0}
-    .brand-name span{color:var(--gold)}
-    .brand-subtitle{font-size:9px;letter-spacing:.18em;color:var(--muted);margin-top:4px}
-    .hero{text-align:center;padding:50px 0 28px}
-    .eyebrow{font-size:10px;letter-spacing:.22em;color:var(--gold);font-weight:700;margin:0 0 12px}
-    h1{font-family:Georgia,"Times New Roman",serif;font-size:40px;line-height:1.1;color:var(--navy);margin:0 0 15px}
-    .intro{color:var(--muted);font-size:15px;max-width:580px;margin:auto;line-height:1.6}
-    .card,.result{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 35px var(--shadow);padding:30px;transition:background .25s ease,border-color .25s ease}
-    .field{margin-bottom:22px}
-    label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:9px}
-    input[type=date],input[type=number]{width:100%;height:50px;border:1px solid var(--input-border);border-radius:10px;padding:0 14px;font:inherit;color:var(--ink);background:var(--input-bg);transition:background .25s ease,border-color .25s ease}
-    input:focus{outline:2px solid rgba(185,150,79,.25);border-color:var(--gold)}
-    small{display:block;color:var(--muted);font-size:11px;margin-top:7px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-    .segmented{display:grid;grid-template-columns:1fr 1fr;height:50px;border:1px solid var(--input-border);border-radius:10px;overflow:hidden}
-    .segmented label{margin:0;position:relative}
-    .segmented input{position:absolute;opacity:0}
-    .segmented span{height:50px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);cursor:pointer}
-    .segmented input:checked+span{background:var(--navy);color:var(--btn-text)}
-    button{width:100%;height:52px;border:0;border-radius:10px;background:var(--navy);color:var(--btn-text);font-weight:700;letter-spacing:.08em;cursor:pointer;transition:background .25s ease}
-    button:hover{transform:translateY(-1px);box-shadow:0 7px 18px var(--shadow)}
-    .error{color:#e28b8b;background:var(--surface-alt);border:1px solid #b23a3a;border-radius:8px;padding:11px;margin:15px 0 0;font-size:13px}
-    .result{margin-top:20px;text-align:center;position:relative}
-    .result h2{font-family:Georgia,"Times New Roman",serif;font-size:32px;color:var(--navy);margin:0 0 8px}
-    .result-summary{color:var(--gold);font-weight:700;margin:0 0 24px}
-    .details{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:0 0 20px}
-    .details div{padding:16px 8px}.details div+div{border-left:1px solid var(--line)}
-    .details span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
-    .details strong{font-size:13px;color:var(--navy)}
-    .notice{font-size:11px;line-height:1.6;color:var(--muted);margin:0 0 18px}
-    .export-row{display:flex;flex-wrap:wrap;gap:10px;position:relative}
-    .export-btn{
-      flex:1 1 150px;
-      height:46px;
-      border-radius:10px;
-      background:transparent;
-      border:1.5px solid var(--gold);
-      color:var(--gold);
-      font-weight:700;
-      font-size:12px;
-      letter-spacing:.08em;
-      cursor:pointer;
-      transition:background .2s ease,color .2s ease;
-    }
-    .export-btn:hover{background:var(--gold);color:var(--btn-text);transform:none;box-shadow:none}
-    .export-btn svg{width:15px;height:15px;vertical-align:-3px;margin-right:6px}
-    .share-wrap{position:relative;flex:1 1 150px}
-    .share-wrap .export-btn{width:100%}
-    footer{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;padding:25px 3px 0;letter-spacing:.04em}
+.card,.result{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:0 12px 35px var(--shadow);padding:22px;transition:background .25s,border-color .25s}
+.field{margin-bottom:20px}
+label{display:block;font-size:.85rem;font-weight:600;color:var(--navy);margin-bottom:8px}
+input[type=date],input[type=number]{width:100%;height:48px;border:1px solid var(--input-border);border-radius:10px;padding:0 12px;font:inherit;font-size:1rem;color:var(--ink);background:var(--input-bg)}
+input:focus{outline:2px solid rgba(185,150,79,.25);border-color:var(--gold)}
+small{display:block;color:var(--muted);font-size:.7rem;margin-top:6px}
 
-    /* -------------------------------------------------- */
-    /* MENÚ DE COMPARTIR                                  */
-    /* -------------------------------------------------- */
-    .share-option svg{width:16px;height:16px;flex:0 0 auto}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.segmented{display:grid;grid-template-columns:1fr 1fr;height:48px;border:1px solid var(--input-border);border-radius:10px;overflow:hidden}
+.segmented label{margin:0;position:relative}
+.segmented input{position:absolute;opacity:0}
+.segmented span{height:48px;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:var(--muted);cursor:pointer;text-align:center;padding:0 4px}
+.segmented input:checked+span{background:var(--navy);color:var(--btn-text)}
 
-  </style>
+button{width:100%;height:50px;border:0;border-radius:12px;background:var(--navy);color:var(--btn-text);font-weight:700;letter-spacing:.06em;font-size:.9rem;cursor:pointer;transition:transform .15s,filter .15s}
+button:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.error{color:#e28b8b;background:var(--surface-alt);border:1px solid #b23a3a;border-radius:8px;padding:10px;margin:14px 0 0;font-size:.8rem}
 
-  <style>
-    /* ---------------------------------------------------------
-       IMPRESIÓN NATIVA DEL NAVEGADOR
-       El diálogo de impresión permite elegir "Guardar como PDF".
-       --------------------------------------------------------- */
-    #printArea {
-      display: none;
-    }
+.result{margin-top:18px;text-align:center}
+.result h2{font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.9rem,8vw,2.9rem);color:var(--navy);margin:0 0 10px;word-break:break-word;line-height:1.1}
+.result-summary{color:var(--gold);font-weight:700;margin:0 0 20px}
+.details{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:0 0 18px}
+.details div{padding:12px 6px}
+.details div+div{border-left:1px solid var(--line)}
+.details span{display:block;color:var(--muted);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.details strong{font-size:.78rem;color:var(--navy)}
+.notice{font-size:.68rem;line-height:1.6;color:var(--muted);margin:0 0 16px}
 
-    @media print {
-      @page {
-        size: auto;
-        margin: 10mm;
-      }
+.export-row{display:flex;flex-wrap:wrap;gap:10px}
+.export-btn{flex:1 1 150px;height:46px;border-radius:10px;background:transparent;border:1.5px solid var(--gold);color:var(--gold);font-weight:700;font-size:.72rem;letter-spacing:.06em;cursor:pointer}
+.export-btn:hover{background:var(--gold);color:var(--btn-text);transform:none}
+.export-btn svg{width:14px;height:14px;vertical-align:-3px;margin-right:5px}
 
-      html, body {
-        margin: 0 !important;
-        padding: 0 !important;
-        background: #ffffff !important;
-      }
+footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:.65rem;padding:22px 3px 0}
 
-      body > * {
-        display: none !important;
-      }
+@media (max-width:480px){
+  .grid{grid-template-columns:1fr}
+  .details{grid-template-columns:1fr}
+  .details div+div{border-left:0;border-top:1px solid var(--line)}
+  .a11y-btn{width:36px;height:36px}
+  .a11y-btn svg{width:16px;height:16px}
+  .export-row{flex-direction:column}
+}
 
-      #printArea {
-        display: block !important;
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        background: #ffffff !important;
-      }
-
-      #printArea img {
-        display: block !important;
-        width: 100% !important;
-        height: auto !important;
-        max-width: none !important;
-        margin: 0 auto !important;
-      }
-    }
-  </style>
+/* Impresión / PDF */
+#printArea{display:none}
+@media print{
+  @page{size:auto;margin:10mm}
+  html,body{margin:0!important;padding:0!important;background:#fff!important}
+  body>*{display:none!important}
+  #printArea{display:block!important;width:100%!important;margin:0!important;padding:0!important;background:#fff!important}
+  #printArea img{display:block!important;width:100%!important;height:auto!important;max-width:none!important;margin:0 auto!important}
+}
+</style>
 </head>
 <body>
   <div id="printArea" aria-hidden="true"></div>
 
+  <div class="a11y-bar" role="toolbar" aria-label="Accesibilidad">
+    <button type="button" id="contrastBtn" class="a11y-btn" aria-pressed="false" title="Contraste" aria-label="Contraste">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 3a9 9 0 000 18z" fill="currentColor" stroke="none"></path></svg>
+    </button>
+    <button type="button" id="increaseTextBtn" class="a11y-btn" title="Aumentar letra" aria-label="Aumentar letra">
+      <span class="a11y-big">A</span>
+    </button>
+    <button type="button" id="decreaseTextBtn" class="a11y-btn" title="Reducir letra" aria-label="Reducir letra">
+      <span class="a11y-small">A</span>
+    </button>
+  </div>
 
   <div class="app">
     <header class="brand">
@@ -155,7 +113,6 @@
 
     <main class="hero">
       <h1>Cuenta tu término.</h1>
-      <p class="intro">Calcula una fecha de vencimiento usando días hábiles o días calendario, con festivos colombianos incluidos.</p>
     </main>
 
     <div class="card">
@@ -194,49 +151,24 @@
       <div id="resultSummary" class="result-summary">-</div>
 
       <div class="details">
-        <div>
-          <span>Fecha de inicio</span>
-          <strong id="detailStart">-</strong>
-        </div>
-        <div>
-          <span>Fecha de vencimiento</span>
-          <strong id="detailEnd">-</strong>
-        </div>
-        <div>
-          <span>Tipo de días</span>
-          <strong id="detailType">-</strong>
-        </div>
+        <div><span>Fecha de inicio</span><strong id="detailStart">-</strong></div>
+        <div><span>Fecha de vencimiento</span><strong id="detailEnd">-</strong></div>
+        <div><span>Tipo de días</span><strong id="detailType">-</strong></div>
       </div>
 
       <p class="notice">Versión 0.5 — incluye festivos colombianos (Ley 51 de 1983) y el nuevo festivo de la Ley 2578 de 2026. Los festivos solo afectan el conteo de días hábiles.</p>
 
       <div class="export-row">
-        <button type="button" id="exportJpgBtn" class="export-btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block">
-            <path d="M12 3v12"></path>
-            <path d="M7 10l5 5 5-5"></path>
-            <path d="M4 19h16"></path>
-          </svg>DESCARGAR JPG
-        </button>
         <button type="button" id="exportPdfBtn" class="export-btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block">
-            <path d="M12 3v12"></path>
-            <path d="M7 10l5 5 5-5"></path>
-            <path d="M4 19h16"></path>
-          </svg>IMPRIMIR / GUARDAR PDF
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M4 19h16"></path></svg>GUARDAR PDF
         </button>
-        <div class="share-wrap">
-          <button type="button" id="exportShareBtn" class="export-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block">
-              <circle cx="18" cy="5" r="2.6"></circle>
-              <circle cx="6" cy="12" r="2.6"></circle>
-              <circle cx="18" cy="19" r="2.6"></circle>
-              <path d="M8.3 10.7 15.7 6.6"></path>
-              <path d="M8.3 13.3 15.7 17.4"></path>
-            </svg>COMPARTIR
-          </button>
-        </div>
+        <button type="button" id="exportShareBtn" class="export-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"></circle><circle cx="6" cy="12" r="2.6"></circle><circle cx="18" cy="19" r="2.6"></circle><path d="M8.3 10.7 15.7 6.6"></path><path d="M8.3 13.3 15.7 17.4"></path></svg>COMPARTIR
+        </button>
       </div>
+    </div>
+
+    <p class="intro" id="postResultNote" style="margin-top:16px" hidden>Calculo usando días hábiles o días calendario, con festivos colombianos incluidos.</p>
 
     <footer>
       <span>© 2026 TÉRMINO LEGAL</span>
@@ -244,557 +176,272 @@
     </footer>
   </div>
 
-  <script>
-    /*
-      TÉRMINO LEGAL — V0.3
-      Contador de términos con calendario colombiano + opción de compartir.
+<script>
+/* TÉRMINO LEGAL — contador con calendario colombiano.
+   Ley 51 de 1983 art.1 (festivos) + Ley 2578 de 2026 art.6 (nuevo festivo). */
 
-      Fundamentos:
-      - Ley 51 de 1983, art. 1 — festivos y traslados.
-      - Ley 2578 de 2026, art. 6 — nuevo festivo
-        Nuestra Señora del Rosario de Chiquinquirá.
-    */
+const startDateInput = document.getElementById("startDate");
+const daysInput = document.getElementById("days");
+const calculateBtn = document.getElementById("calculateBtn");
+const errorBox = document.getElementById("error");
+const result = document.getElementById("result");
+const resultDate = document.getElementById("resultDate");
+const resultSummary = document.getElementById("resultSummary");
+const detailStart = document.getElementById("detailStart");
+const detailEnd = document.getElementById("detailEnd");
+const detailType = document.getElementById("detailType");
+const exportPdfBtn = document.getElementById("exportPdfBtn");
+const exportShareBtn = document.getElementById("exportShareBtn");
 
-    // ---------------------------------------------------------
-    // UTILIDADES
-    // ---------------------------------------------------------
+let lastTermData = null;
+const pad = n => String(n).padStart(2, "0");
 
-    const startDateInput = document.getElementById("startDate");
-    const daysInput = document.getElementById("days");
-    const calculateBtn = document.getElementById("calculateBtn");
+function parseLocalDate(value){ const [y,m,d]=value.split("-").map(Number); return new Date(y,m-1,d); }
+function dateKey(date){ return [date.getFullYear(),pad(date.getMonth()+1),pad(date.getDate())].join("-"); }
+function addDays(date,days){ const r=new Date(date); r.setDate(r.getDate()+days); return r; }
+function formatDate(date){ return new Intl.DateTimeFormat("es-CO",{day:"2-digit",month:"long",year:"numeric"}).format(date); }
+function formatShortDate(date){ return new Intl.DateTimeFormat("es-CO",{day:"2-digit",month:"2-digit",year:"numeric"}).format(date); }
+function isWeekend(date){ const d=date.getDay(); return d===0||d===6; }
 
-    const errorBox = document.getElementById("error");
-    const result = document.getElementById("result");
+function easterSunday(year){
+  const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),
+        g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,
+        l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),
+        month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1;
+  return new Date(year,month-1,day);
+}
 
-    const resultDate = document.getElementById("resultDate");
-    const resultSummary = document.getElementById("resultSummary");
+function emilianiDate(year,monthIndex,day){
+  const original=new Date(year,monthIndex,day), weekday=original.getDay();
+  if(weekday===1) return original;
+  const daysUntilMonday = weekday===0 ? 1 : 8-weekday;
+  return addDays(original,daysUntilMonday);
+}
 
-    const detailStart = document.getElementById("detailStart");
-    const detailEnd = document.getElementById("detailEnd");
-    const detailType = document.getElementById("detailType");
+function addHoliday(holidays,date,name,legalBasis){ holidays.set(dateKey(date),{date:new Date(date),name,legalBasis}); }
 
-    const exportJpgBtn = document.getElementById("exportJpgBtn");
-    const exportPdfBtn = document.getElementById("exportPdfBtn");
-    const exportShareBtn = document.getElementById("exportShareBtn");
+function getColombiaHolidays(year){
+  const holidays=new Map();
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,new Date(year,4,1),"Día del Trabajo","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,new Date(year,6,20),"Independencia de Colombia","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,new Date(year,7,7),"Batalla de Boyacá","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,new Date(year,11,8),"Inmaculada Concepción","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,emilianiDate(year,0,6),"Día de los Reyes Magos","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,emilianiDate(year,2,19),"Día de San José","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,emilianiDate(year,5,29),"San Pedro y San Pablo","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,emilianiDate(year,7,15),"Asunción de la Virgen","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,emilianiDate(year,9,12),"Día de la Raza","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,emilianiDate(year,10,1),"Todos los Santos","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,emilianiDate(year,10,11),"Independencia de Cartagena","Ley 51 de 1983, art. 1");
+  const easter=easterSunday(year);
+  addHoliday(holidays,addDays(easter,-3),"Jueves Santo","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,addDays(easter,-2),"Viernes Santo","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,addDays(easter,43),"Ascensión del Señor","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,addDays(easter,64),"Corpus Christi","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,addDays(easter,71),"Sagrado Corazón de Jesús","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,emilianiDate(year,6,9),"Nuestra Señora del Rosario de Chiquinquirá","Ley 2578 de 2026, art. 6");
+  return holidays;
+}
 
-    let lastTermData = null;
+function getHoliday(date){ return getColombiaHolidays(date.getFullYear()).get(dateKey(date)) || null; }
 
-    const pad = n => String(n).padStart(2, "0");
+function getCountedDates(start,numberOfDays,type){
+  const current=new Date(start); const countedDates=[]; let counted=0;
+  while(counted<numberOfDays){
+    current.setDate(current.getDate()+1);
+    const holiday=getHoliday(current), weekend=isWeekend(current);
+    let counts = type==="calendar" ? true : (!weekend && !holiday);
+    if(counts){ counted++; countedDates.push(new Date(current)); }
+  }
+  return countedDates;
+}
 
-    function parseLocalDate(value) {
-        const [year, month, day] = value.split("-").map(Number);
-        return new Date(year, month - 1, day);
+function showError(message){ errorBox.textContent=message; errorBox.hidden=false; result.hidden=true; document.getElementById("postResultNote").hidden=true; }
+function clearError(){ errorBox.hidden=true; errorBox.textContent=""; }
+
+calculateBtn.addEventListener("click", () => {
+  clearError();
+  if(!startDateInput.value){ showError("Selecciona una fecha de inicio."); return; }
+  const days=Number(daysInput.value);
+  if(!Number.isInteger(days) || days<1){ showError("Ingresa un número entero de días mayor o igual a 1."); return; }
+  const type=document.querySelector('input[name="termType"]:checked').value;
+  const start=parseLocalDate(startDateInput.value);
+  const countedDates=getCountedDates(start,days,type);
+  const end=countedDates[countedDates.length-1];
+  const label = type==="business" ? "días hábiles" : "días calendario";
+
+  resultDate.textContent=formatDate(end).toUpperCase();
+  resultSummary.textContent=`${days} ${label}`;
+  detailStart.textContent=formatShortDate(start);
+  detailEnd.textContent=formatShortDate(end);
+  detailType.textContent = type==="business" ? "Días hábiles" : "Días calendario";
+
+  lastTermData={start,end,countedDates,days,type};
+  result.hidden=false;
+  document.getElementById("postResultNote").hidden=false;
+  result.scrollIntoView({behavior:"smooth",block:"nearest"});
+});
+
+const today=new Date();
+startDateInput.value = `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
+
+/* Calendario exportable (usado por PDF) */
+const WEEKDAY_LABELS=["Do","Lu","Ma","Mi","Ju","Vi","Sa"];
+function capitalize(t){ return t.charAt(0).toUpperCase()+t.slice(1); }
+function monthName(i){ return capitalize(new Intl.DateTimeFormat("es-CO",{month:"long"}).format(new Date(2000,i,1))); }
+
+function monthMatrix(year,monthIndex){
+  const firstDay=new Date(year,monthIndex,1), startOffset=firstDay.getDay(), daysInMonth=new Date(year,monthIndex+1,0).getDate();
+  const grid=[]; let dayCounter=1-startOffset;
+  for(let row=0; row<6; row++){
+    const weekRow=[];
+    for(let col=0; col<7; col++){
+      weekRow.push(dayCounter>=1 && dayCounter<=daysInMonth ? new Date(year,monthIndex,dayCounter) : null);
+      dayCounter++;
     }
+    grid.push(weekRow);
+  }
+  return grid;
+}
 
-    function dateKey(date) {
-        return [date.getFullYear(), pad(date.getMonth() + 1), pad(date.getDate())].join("-");
-    }
+function monthsInRange(start,end){
+  const months=[]; const cursor=new Date(start.getFullYear(),start.getMonth(),1); const last=new Date(end.getFullYear(),end.getMonth(),1);
+  while(cursor<=last){ months.push({year:cursor.getFullYear(),month:cursor.getMonth()}); cursor.setMonth(cursor.getMonth()+1); }
+  return months;
+}
 
-    function addDays(date, days) {
-        const result = new Date(date);
-        result.setDate(result.getDate() + days);
-        return result;
-    }
+function buildCalendarCanvas(termData){
+  const {start,end,countedDates,days,type}=termData;
+  const countedKeys=new Set(countedDates.map(d=>dateKey(d)));
+  const months=monthsInRange(start,end);
 
-    function formatDate(date) {
-        return new Intl.DateTimeFormat("es-CO", { day: "2-digit", month: "long", year: "numeric" }).format(date);
-    }
+  const MONTHS_PER_ROW=3, CELL_W=46, CELL_H=34, WEEKDAY_H=24, MONTH_HEADER_H=26,
+        MONTH_GAP_X=34, MONTH_GAP_Y=26, MONTH_W=CELL_W*7, PADDING=34, BRAND_H=78, FOOTER_H=70;
 
-    function formatShortDate(date) {
-        return new Intl.DateTimeFormat("es-CO", { day: "2-digit", month: "2-digit", year: "numeric" }).format(date);
-    }
+  const numCols=Math.min(months.length,MONTHS_PER_ROW), numRows=Math.ceil(months.length/MONTHS_PER_ROW);
+  const monthBlockH=MONTH_HEADER_H+WEEKDAY_H+CELL_H*6;
+  const canvasWidth=PADDING*2+numCols*MONTH_W+(numCols-1)*MONTH_GAP_X;
+  const canvasHeight=BRAND_H+numRows*monthBlockH+(numRows-1)*MONTH_GAP_Y+FOOTER_H+PADDING;
 
-    // ---------------------------------------------------------
-    // FINES DE SEMANA
-    // ---------------------------------------------------------
+  const scale=2;
+  const canvas=document.createElement("canvas");
+  canvas.width=canvasWidth*scale; canvas.height=canvasHeight*scale;
+  const ctx=canvas.getContext("2d"); ctx.scale(scale,scale);
 
-    function isWeekend(date) {
-        const day = date.getDay();
-        // 0 = domingo, 6 = sábado
-        return day === 0 || day === 6;
-    }
+  ctx.fillStyle="#ffffff"; ctx.fillRect(0,0,canvasWidth,canvasHeight);
 
-    // ---------------------------------------------------------
-    // CÁLCULO DE PASCUA
-    // ---------------------------------------------------------
+  ctx.fillStyle="#10243e"; ctx.font="700 21px Georgia, 'Times New Roman', serif";
+  ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+  ctx.fillText("TÉRMINO LEGAL",PADDING,34);
 
-    function easterSunday(year) {
-        const a = year % 19;
-        const b = Math.floor(year / 100);
-        const c = year % 100;
-        const d = Math.floor(b / 4);
-        const e = b % 4;
-        const f = Math.floor((b + 8) / 25);
-        const g = Math.floor((b - f + 1) / 3);
-        const h = (19 * a + b - d - g + 15) % 30;
-        const i = Math.floor(c / 4);
-        const k = c % 4;
-        const l = (32 + 2 * e + 2 * i - h - k) % 7;
-        const m = Math.floor((a + 11 * h + 22 * l) / 451);
-        const month = Math.floor((h + l - 7 * m + 114) / 31);
-        const day = ((h + l - 7 * m + 114) % 31) + 1;
-        return new Date(year, month - 1, day);
-    }
+  const typeLabel = type==="business" ? "días hábiles" : "días calendario";
+  ctx.fillStyle="#687383"; ctx.font="400 12.5px Arial, sans-serif";
+  ctx.fillText(`Conteo de ${days} ${typeLabel} — del ${formatShortDate(start)} al ${formatShortDate(end)}`,PADDING,56);
 
-    // ---------------------------------------------------------
-    // LEY EMILIANI — LEY 51 DE 1983
-    // ---------------------------------------------------------
+  ctx.strokeStyle="#e4e8ed"; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(PADDING,BRAND_H-16); ctx.lineTo(canvasWidth-PADDING,BRAND_H-16); ctx.stroke();
 
-    function emilianiDate(year, monthIndex, day) {
-        const original = new Date(year, monthIndex, day);
-        const weekday = original.getDay();
+  months.forEach((m,idx) => {
+    const col=idx%MONTHS_PER_ROW, row=Math.floor(idx/MONTHS_PER_ROW);
+    const originX=PADDING+col*(MONTH_W+MONTH_GAP_X), originY=BRAND_H+row*(monthBlockH+MONTH_GAP_Y);
 
-        // Si cae lunes, permanece lunes.
-        if (weekday === 1) {
-            return original;
+    ctx.fillStyle="#17202b"; ctx.font="600 15px Arial, sans-serif"; ctx.textAlign="center";
+    ctx.fillText(`${monthName(m.month)} ${m.year}`,originX+MONTH_W/2,originY+18);
+
+    ctx.font="600 11px Arial, sans-serif"; ctx.fillStyle="#687383";
+    WEEKDAY_LABELS.forEach((wd,i) => ctx.fillText(wd,originX+i*CELL_W+CELL_W/2,originY+MONTH_HEADER_H+16));
+
+    monthMatrix(m.year,m.month).forEach((weekRow,r) => {
+      weekRow.forEach((date,c) => {
+        if(!date) return;
+        const cx=originX+c*CELL_W+CELL_W/2, cy=originY+MONTH_HEADER_H+WEEKDAY_H+r*CELL_H+CELL_H/2;
+        const isRestDay = isWeekend(date) || !!getHoliday(date);
+        if(countedKeys.has(dateKey(date))){
+          ctx.beginPath(); ctx.arc(cx,cy,15,0,Math.PI*2);
+          ctx.strokeStyle="#b9964f"; ctx.lineWidth=1.6; ctx.stroke();
         }
-
-        // Si cae martes-sábado o domingo: se traslada al lunes siguiente.
-        const daysUntilMonday = weekday === 0 ? 1 : 8 - weekday;
-        return addDays(original, daysUntilMonday);
-    }
-
-    // ---------------------------------------------------------
-    // REGISTRO DE FESTIVOS
-    // ---------------------------------------------------------
-
-    function addHoliday(holidays, date, name, legalBasis) {
-        const key = dateKey(date);
-        holidays.set(key, { date: new Date(date), name, legalBasis });
-    }
-
-    // ---------------------------------------------------------
-    // FESTIVOS DE COLOMBIA
-    // ---------------------------------------------------------
-
-    function getColombiaHolidays(year) {
-        const holidays = new Map();
-
-        // FESTIVOS DE FECHA FIJA
-        addHoliday(holidays, new Date(year, 0, 1), "Año Nuevo", "Ley 51 de 1983, art. 1");
-        addHoliday(holidays, new Date(year, 4, 1), "Día del Trabajo", "Ley 51 de 1983, art. 1");
-        addHoliday(holidays, new Date(year, 6, 20), "Independencia de Colombia", "Ley 51 de 1983, art. 1");
-        addHoliday(holidays, new Date(year, 7, 7), "Batalla de Boyacá", "Ley 51 de 1983, art. 1");
-        addHoliday(holidays, new Date(year, 11, 8), "Inmaculada Concepción", "Ley 51 de 1983, art. 1");
-        addHoliday(holidays, new Date(year, 11, 25), "Navidad", "Ley 51 de 1983, art. 1");
-
-        // FESTIVOS TRASLADABLES
-        addHoliday(holidays, emilianiDate(year, 0, 6), "Día de los Reyes Magos", "Ley 51 de 1983, art. 1");
-        addHoliday(holidays, emilianiDate(year, 2, 19), "Día de San José", "Ley 51 de 1983, art. 1");
-        addHoliday(holidays, emilianiDate(year, 5, 29), "San Pedro y San Pablo", "Ley 51 de 1983, art. 1");
-        addHoliday(holidays, emilianiDate(year, 7, 15), "Asunción de la Virgen", "Ley 51 de 1983, art. 1");
-        addHoliday(holidays, emilianiDate(year, 9, 12), "Día de la Raza", "Ley 51 de 1983, art. 1");
-        addHoliday(holidays, emilianiDate(year, 10, 1), "Todos los Santos", "Ley 51 de 1983, art. 1");
-        addHoliday(holidays, emilianiDate(year, 10, 11), "Independencia de Cartagena", "Ley 51 de 1983, art. 1");
-
-        // SEMANA SANTA
-        const easter = easterSunday(year);
-        addHoliday(holidays, addDays(easter, -3), "Jueves Santo", "Ley 51 de 1983, art. 1");
-        addHoliday(holidays, addDays(easter, -2), "Viernes Santo", "Ley 51 de 1983, art. 1");
-
-        // ASCENSIÓN
-        addHoliday(holidays, addDays(easter, 43), "Ascensión del Señor", "Ley 51 de 1983, art. 1");
-
-        // CORPUS CHRISTI
-        addHoliday(holidays, addDays(easter, 64), "Corpus Christi", "Ley 51 de 1983, art. 1");
-
-        // SAGRADO CORAZÓN
-        addHoliday(holidays, addDays(easter, 71), "Sagrado Corazón de Jesús", "Ley 51 de 1983, art. 1");
-
-        // NUEVO FESTIVO — LEY 2578 DE 2026
-        addHoliday(holidays, emilianiDate(year, 6, 9), "Nuestra Señora del Rosario de Chiquinquirá", "Ley 2578 de 2026, art. 6");
-
-        return holidays;
-    }
-
-    // ---------------------------------------------------------
-    // COMPROBAR SI UNA FECHA ES FESTIVA
-    // ---------------------------------------------------------
-
-    function getHoliday(date) {
-        const holidays = getColombiaHolidays(date.getFullYear());
-        return holidays.get(dateKey(date)) || null;
-    }
-
-    // ---------------------------------------------------------
-    // CORRER TÉRMINO
-    // ---------------------------------------------------------
-
-    function getCountedDates(start, numberOfDays, type) {
-        const current = new Date(start);
-        const countedDates = [];
-        let counted = 0;
-
-        while (counted < numberOfDays) {
-            // El conteo comienza al día siguiente.
-            current.setDate(current.getDate() + 1);
-
-            const holiday = getHoliday(current);
-            const weekend = isWeekend(current);
-
-            let counts = false;
-
-            if (type === "calendar") {
-                counts = true;
-            } else if (!weekend && !holiday) {
-                counts = true;
-            }
-
-            if (counts) {
-                counted++;
-                countedDates.push(new Date(current));
-            }
-        }
-
-        return countedDates;
-    }
-
-    // ---------------------------------------------------------
-    // INTERFAZ
-    // ---------------------------------------------------------
-
-    function showError(message) {
-        errorBox.textContent = message;
-        errorBox.hidden = false;
-        result.hidden = true;
-    }
-
-    function clearError() {
-        errorBox.hidden = true;
-        errorBox.textContent = "";
-    }
-
-    // ---------------------------------------------------------
-    // BOTÓN CALCULAR
-    // ---------------------------------------------------------
-
-    calculateBtn.addEventListener("click", () => {
-        clearError();
-
-        if (!startDateInput.value) {
-            showError("Selecciona una fecha de inicio.");
-            return;
-        }
-
-        const days = Number(daysInput.value);
-
-        if (!Number.isInteger(days) || days < 1) {
-            showError("Ingresa un número entero de días mayor o igual a 1.");
-            return;
-        }
-
-        const type = document.querySelector('input[name="termType"]:checked').value;
-        const start = parseLocalDate(startDateInput.value);
-        const countedDates = getCountedDates(start, days, type);
-        const end = countedDates[countedDates.length - 1];
-        const label = type === "business" ? "días hábiles" : "días calendario";
-
-        resultDate.textContent = formatDate(end).toUpperCase();
-        resultSummary.textContent = `${days} ${label}`;
-        detailStart.textContent = formatShortDate(start);
-        detailEnd.textContent = formatShortDate(end);
-        detailType.textContent = type === "business" ? "Días hábiles" : "Días calendario";
-
-        lastTermData = { start, end, countedDates, days, type };
-
-        result.hidden = false;
-        result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        ctx.fillStyle = isRestDay ? "#c0392b" : "#17202b";
+        ctx.font = isRestDay ? "700 13px Arial, sans-serif" : "400 13px Arial, sans-serif";
+        ctx.textAlign="center"; ctx.textBaseline="middle";
+        ctx.fillText(String(date.getDate()),cx,cy+1);
+        ctx.textBaseline="alphabetic";
+      });
     });
+  });
 
-    // ---------------------------------------------------------
-    // FECHA ACTUAL
-    // ---------------------------------------------------------
+  const footerY=BRAND_H+numRows*monthBlockH+(numRows-1)*MONTH_GAP_Y+28;
+  ctx.strokeStyle="#e4e8ed"; ctx.beginPath(); ctx.moveTo(PADDING,footerY-18); ctx.lineTo(canvasWidth-PADDING,footerY-18); ctx.stroke();
 
-    const today = new Date();
-    startDateInput.value = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+  ctx.textAlign="left"; ctx.fillStyle="#687383"; ctx.font="600 11px Arial, sans-serif";
+  ctx.fillText(`Fecha de inicio: ${formatShortDate(start)}     Fecha de vencimiento: ${formatShortDate(end)}     Tipo: ${type==="business"?"Días hábiles":"Días calendario"}`,PADDING,footerY);
 
-    // ---------------------------------------------------------
-    // EXPORTAR CALENDARIO CON DÍAS CONTADOS EN CÍRCULO
-    // ---------------------------------------------------------
+  ctx.font="400 10.5px Arial, sans-serif";
+  ctx.fillText("Círculo dorado: días contados dentro del término.  Rojo: sábados, domingos y festivos. Herramienta de referencia, no constituye asesoría jurídica.",PADDING,footerY+18);
 
-    const WEEKDAY_LABELS = ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"];
+  return canvas;
+}
 
-    function capitalize(text) {
-        return text.charAt(0).toUpperCase() + text.slice(1);
-    }
+/* Impresión / Guardar como PDF (diálogo nativo del navegador) */
+exportPdfBtn.addEventListener("click", () => {
+  if(!lastTermData) return;
+  const canvas=buildCalendarCanvas(lastTermData);
+  const printArea=document.getElementById("printArea");
+  const img=document.createElement("img");
+  img.alt=`Calendario del término legal: ${formatShortDate(lastTermData.start)} a ${formatShortDate(lastTermData.end)}`;
+  img.src=canvas.toDataURL("image/jpeg",0.95);
+  printArea.innerHTML=""; printArea.appendChild(img);
+  const printNow=() => window.print();
+  if(img.complete) printNow(); else img.addEventListener("load",printNow,{once:true});
+});
 
-    function monthName(monthIndex) {
-        return capitalize(
-            new Intl.DateTimeFormat("es-CO", { month: "long" }).format(new Date(2000, monthIndex, 1))
-        );
-    }
+/* Compartir — menú nativo del sistema */
+const SHARE_TITLE="Término Legal — resultado";
+function buildShareText(termData){
+  const {start,end,days,type}=termData;
+  const label = type==="business" ? "días hábiles" : "días calendario";
+  return `Término Legal: contando desde el ${formatShortDate(start)}, ${days} ${label}, vence el ${formatDate(end)}.`;
+}
+async function shareTermData(){
+  if(!lastTermData) return;
+  const text=buildShareText(lastTermData);
+  if(typeof navigator.share === "function"){
+    try{ await navigator.share({title:SHARE_TITLE,text}); }
+    catch(err){ if(err?.name!=="AbortError"){ alert("El menú nativo de compartir no está disponible en este navegador o en esta forma de abrir el archivo."); } }
+  }else{
+    try{ await navigator.clipboard.writeText(text); alert("Este navegador no admite el menú nativo de compartir. El texto fue copiado al portapapeles."); }
+    catch(err){ alert(text); }
+  }
+}
+exportShareBtn.addEventListener("click", shareTermData);
 
-    // Matriz de 6 semanas x 7 días (domingo a sábado) para un mes dado.
-    function monthMatrix(year, monthIndex) {
-        const firstDay = new Date(year, monthIndex, 1);
-        const startOffset = firstDay.getDay();
-        const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+/* Barra de accesibilidad: Contraste / Reducir letra / Aumentar letra */
+const contrastBtn=document.getElementById("contrastBtn");
+const decreaseTextBtn=document.getElementById("decreaseTextBtn");
+const increaseTextBtn=document.getElementById("increaseTextBtn");
 
-        const grid = [];
-        let dayCounter = 1 - startOffset;
+let textScaleStep=0; // -2..+3, cada paso = 8%
+const MIN_STEP=-2, MAX_STEP=3;
 
-        for (let row = 0; row < 6; row++) {
-            const weekRow = [];
+function applyTextScale(){
+  document.documentElement.style.fontSize=(100+textScaleStep*8)+"%";
+}
 
-            for (let col = 0; col < 7; col++) {
-                if (dayCounter >= 1 && dayCounter <= daysInMonth) {
-                    weekRow.push(new Date(year, monthIndex, dayCounter));
-                } else {
-                    weekRow.push(null);
-                }
-                dayCounter++;
-            }
+contrastBtn.addEventListener("click", () => {
+  const isLight=document.body.classList.toggle("light");
+  contrastBtn.setAttribute("aria-pressed", String(isLight));
+});
 
-            grid.push(weekRow);
-        }
+decreaseTextBtn.addEventListener("click", () => {
+  textScaleStep=Math.max(MIN_STEP, textScaleStep-1);
+  applyTextScale();
+});
 
-        return grid;
-    }
-
-    // Lista de meses (año, mes) cubiertos entre dos fechas, inclusive.
-    function monthsInRange(start, end) {
-        const months = [];
-        const cursor = new Date(start.getFullYear(), start.getMonth(), 1);
-        const last = new Date(end.getFullYear(), end.getMonth(), 1);
-
-        while (cursor <= last) {
-            months.push({ year: cursor.getFullYear(), month: cursor.getMonth() });
-            cursor.setMonth(cursor.getMonth() + 1);
-        }
-
-        return months;
-    }
-
-    function buildCalendarCanvas(termData) {
-        const { start, end, countedDates, days, type } = termData;
-
-        const countedKeys = new Set(countedDates.map(d => dateKey(d)));
-        const months = monthsInRange(start, end);
-
-        const MONTHS_PER_ROW = 3;
-        const CELL_W = 46;
-        const CELL_H = 34;
-        const WEEKDAY_H = 24;
-        const MONTH_HEADER_H = 26;
-        const MONTH_GAP_X = 34;
-        const MONTH_GAP_Y = 26;
-        const MONTH_W = CELL_W * 7;
-        const PADDING = 34;
-        const BRAND_H = 78;
-        const FOOTER_H = 70;
-
-        const numCols = Math.min(months.length, MONTHS_PER_ROW);
-        const numRows = Math.ceil(months.length / MONTHS_PER_ROW);
-        const monthBlockH = MONTH_HEADER_H + WEEKDAY_H + CELL_H * 6;
-
-        const canvasWidth = PADDING * 2 + numCols * MONTH_W + (numCols - 1) * MONTH_GAP_X;
-        const canvasHeight = BRAND_H + numRows * monthBlockH + (numRows - 1) * MONTH_GAP_Y + FOOTER_H + PADDING;
-
-        const scale = 2;
-        const canvas = document.createElement("canvas");
-        canvas.width = canvasWidth * scale;
-        canvas.height = canvasHeight * scale;
-
-        const ctx = canvas.getContext("2d");
-        ctx.scale(scale, scale);
-
-        // Fondo blanco, apto para imprimir.
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-
-        // Encabezado de marca.
-        ctx.fillStyle = "#10243e";
-        ctx.font = "700 21px Georgia, 'Times New Roman', serif";
-        ctx.textAlign = "left";
-        ctx.textBaseline = "alphabetic";
-        ctx.fillText("TÉRMINO LEGAL", PADDING, 34);
-
-        const typeLabel = type === "business" ? "días hábiles" : "días calendario";
-        ctx.fillStyle = "#687383";
-        ctx.font = "400 12.5px Arial, sans-serif";
-        ctx.fillText(
-            `Conteo de ${days} ${typeLabel} — del ${formatShortDate(start)} al ${formatShortDate(end)}`,
-            PADDING,
-            56
-        );
-
-        ctx.strokeStyle = "#e4e8ed";
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(PADDING, BRAND_H - 16);
-        ctx.lineTo(canvasWidth - PADDING, BRAND_H - 16);
-        ctx.stroke();
-
-        // Meses.
-        months.forEach((m, idx) => {
-            const col = idx % MONTHS_PER_ROW;
-            const row = Math.floor(idx / MONTHS_PER_ROW);
-            const originX = PADDING + col * (MONTH_W + MONTH_GAP_X);
-            const originY = BRAND_H + row * (monthBlockH + MONTH_GAP_Y);
-
-            // Título del mes.
-            ctx.fillStyle = "#17202b";
-            ctx.font = "600 15px Arial, sans-serif";
-            ctx.textAlign = "center";
-            ctx.fillText(`${monthName(m.month)} ${m.year}`, originX + MONTH_W / 2, originY + 18);
-
-            // Encabezado de días de la semana.
-            ctx.font = "600 11px Arial, sans-serif";
-            ctx.fillStyle = "#687383";
-            WEEKDAY_LABELS.forEach((wd, i) => {
-                ctx.fillText(wd, originX + i * CELL_W + CELL_W / 2, originY + MONTH_HEADER_H + 16);
-            });
-
-            // Cuadrícula de días.
-            const grid = monthMatrix(m.year, m.month);
-
-            grid.forEach((weekRow, r) => {
-                weekRow.forEach((date, c) => {
-                    if (!date) return;
-
-                    const cx = originX + c * CELL_W + CELL_W / 2;
-                    const cy = originY + MONTH_HEADER_H + WEEKDAY_H + r * CELL_H + CELL_H / 2;
-                    const isCounted = countedKeys.has(dateKey(date));
-
-                    if (isCounted) {
-                        ctx.beginPath();
-                        ctx.arc(cx, cy, 15, 0, Math.PI * 2);
-                        ctx.strokeStyle = "#b9964f";
-                        ctx.lineWidth = 1.6;
-                        ctx.stroke();
-                    }
-
-                    ctx.fillStyle = "#17202b";
-                    ctx.font = "400 13px Arial, sans-serif";
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "middle";
-                    ctx.fillText(String(date.getDate()), cx, cy + 1);
-                    ctx.textBaseline = "alphabetic";
-                });
-            });
-        });
-
-        // Pie de página con el detalle del término.
-        const footerY = BRAND_H + numRows * monthBlockH + (numRows - 1) * MONTH_GAP_Y + 28;
-
-        ctx.strokeStyle = "#e4e8ed";
-        ctx.beginPath();
-        ctx.moveTo(PADDING, footerY - 18);
-        ctx.lineTo(canvasWidth - PADDING, footerY - 18);
-        ctx.stroke();
-
-        ctx.textAlign = "left";
-        ctx.fillStyle = "#687383";
-        ctx.font = "600 11px Arial, sans-serif";
-        ctx.fillText(
-            `Fecha de inicio: ${formatShortDate(start)}     Fecha de vencimiento: ${formatShortDate(end)}     Tipo: ${
-                type === "business" ? "Días hábiles" : "Días calendario"
-            }`,
-            PADDING,
-            footerY
-        );
-
-        ctx.font = "400 10.5px Arial, sans-serif";
-        ctx.fillText(
-            "Los días encerrados en círculo corresponden a los días contados dentro del término. Herramienta de referencia, no constituye asesoría jurídica.",
-            PADDING,
-            footerY + 18
-        );
-
-        return canvas;
-    }
-
-    exportJpgBtn.addEventListener("click", () => {
-        if (!lastTermData) return;
-
-        const canvas = buildCalendarCanvas(lastTermData);
-
-        canvas.toBlob(blob => {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-
-            link.href = url;
-            link.download = `termino-legal-${dateKey(lastTermData.start)}-a-${dateKey(lastTermData.end)}.jpg`;
-
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            URL.revokeObjectURL(url);
-        }, "image/jpeg", 0.92);
-    });
-
-    // Impresión nativa del navegador.
-    // Desde el diálogo de impresión se puede seleccionar "Guardar como PDF".
-    exportPdfBtn.addEventListener("click", () => {
-        if (!lastTermData) return;
-
-        const canvas = buildCalendarCanvas(lastTermData);
-        const printArea = document.getElementById("printArea");
-        const img = document.createElement("img");
-
-        img.alt = `Calendario del término legal: ${formatShortDate(lastTermData.start)} a ${formatShortDate(lastTermData.end)}`;
-        img.src = canvas.toDataURL("image/jpeg", 0.95);
-
-        printArea.innerHTML = "";
-        printArea.appendChild(img);
-
-        // Espera a que la imagen esté disponible antes de abrir el diálogo.
-        const printNow = () => {
-            window.print();
-        };
-
-        if (img.complete) {
-            printNow();
-        } else {
-            img.addEventListener("load", printNow, { once: true });
-        }
-    });
-
-    // ---------------------------------------------------------
-    // COMPARTIR — menú nativo del sistema
-    // ---------------------------------------------------------
-
-    const SHARE_TITLE = "Término Legal — resultado";
-
-    function buildShareText(termData) {
-        const { start, end, days, type } = termData;
-        const label = type === "business" ? "días hábiles" : "días calendario";
-        return `Término Legal: contando desde el ${formatShortDate(start)}, ${days} ${label}, vence el ${formatDate(end)}.`;
-    }
-
-    async function shareTermData() {
-        if (!lastTermData) return;
-
-        const text = buildShareText(lastTermData);
-
-        // Abre directamente el menú nativo de compartir del dispositivo/navegador.
-        if (typeof navigator.share === "function") {
-            try {
-                await navigator.share({
-                    title: SHARE_TITLE,
-                    text: text
-                });
-            } catch (err) {
-                if (err?.name !== "AbortError") {
-                    console.warn("No fue posible abrir el menú nativo:", err);
-                    alert("El menú nativo de compartir no está disponible en este navegador o en esta forma de abrir el archivo.");
-                }
-            }
-        } else {
-            // Respaldo para navegadores que no soportan Web Share.
-            try {
-                await navigator.clipboard.writeText(text);
-                alert("Este navegador no admite el menú nativo de compartir. El texto fue copiado al portapapeles.");
-            } catch (err) {
-                alert(text);
-            }
-        }
-    }
-
-    exportShareBtn.addEventListener("click", () => {
-        shareTermData();
-    });
-  </script>
+increaseTextBtn.addEventListener("click", () => {
+  textScaleStep=Math.min(MAX_STEP, textScaleStep+1);
+  applyTextScale();
+});
+</script>
 </body>
 </html>
