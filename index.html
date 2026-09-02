@@ -312,6 +312,18 @@ function monthsInRange(start,end){
   return months;
 }
 
+function wrapText(ctx,text,maxWidth){
+  const words=text.split(" ");
+  const lines=[]; let line="";
+  words.forEach(word => {
+    const testLine = line ? line+" "+word : word;
+    if(ctx.measureText(testLine).width > maxWidth && line){ lines.push(line); line=word; }
+    else{ line=testLine; }
+  });
+  if(line) lines.push(line);
+  return lines;
+}
+
 function buildCalendarCanvas(termData){
   const {start,end,countedDates,days,type}=termData;
   const countedKeys=new Set(countedDates.map(d=>dateKey(d)));
@@ -319,11 +331,20 @@ function buildCalendarCanvas(termData){
 
   const MONTHS_PER_ROW=3, CELL_W=46, CELL_H=34, WEEKDAY_H=24, MONTH_HEADER_H=26,
         MONTH_GAP_X=34, MONTH_GAP_Y=26, MONTH_W=CELL_W*7, PADDING=34, BRAND_H=78, FOOTER_H=70;
+  const LEGAL_FONT="400 11px Arial, sans-serif", LEGAL_LINE_H=15, LEGAL_TITLE_H=22, LEGAL_TOP_GAP=26, LEGAL_BOTTOM_GAP=14;
 
   const numCols=Math.min(months.length,MONTHS_PER_ROW), numRows=Math.ceil(months.length/MONTHS_PER_ROW);
   const monthBlockH=MONTH_HEADER_H+WEEKDAY_H+CELL_H*6;
   const canvasWidth=PADDING*2+numCols*MONTH_W+(numCols-1)*MONTH_GAP_X;
-  const canvasHeight=BRAND_H+numRows*monthBlockH+(numRows-1)*MONTH_GAP_Y+FOOTER_H+PADDING;
+
+  const legalText=`FUNDAMENTO LEGAL: Este documento presenta el cómputo de términos elaborado con base en la legislación colombiana vigente. El calendario de días festivos aplicado se determina conforme a la Ley 51 de 1983 (artículo 1) y a la Ley 2578 de 2026 (artículo 6). El conteo en días hábiles excluye sábados, domingos y festivos, en concordancia con el régimen procesal aplicable al trámite correspondiente (Código General del Proceso, Código de Procedimiento Administrativo y de lo Contencioso Administrativo, Código Sustantivo del Trabajo u otras normas especiales, según el caso). El conteo en días calendario incluye todos los días de forma continua e ininterrumpida. Este documento es una herramienta de cálculo de referencia elaborada por el usuario; se recomienda verificar el término ante el despacho, entidad o autoridad competente antes de su presentación formal ante terceros.`;
+
+  const measureCtx=document.createElement("canvas").getContext("2d");
+  measureCtx.font=LEGAL_FONT;
+  const legalLines=wrapText(measureCtx,legalText,canvasWidth-PADDING*2);
+  const legalBlockH=LEGAL_TOP_GAP+LEGAL_TITLE_H+legalLines.length*LEGAL_LINE_H+LEGAL_BOTTOM_GAP;
+
+  const canvasHeight=BRAND_H+numRows*monthBlockH+(numRows-1)*MONTH_GAP_Y+legalBlockH+FOOTER_H+PADDING;
 
   const scale=2;
   const canvas=document.createElement("canvas");
@@ -371,14 +392,27 @@ function buildCalendarCanvas(termData){
     });
   });
 
-  const footerY=BRAND_H+numRows*monthBlockH+(numRows-1)*MONTH_GAP_Y+28;
+  const monthsEndY=BRAND_H+numRows*monthBlockH+(numRows-1)*MONTH_GAP_Y;
+
+  ctx.strokeStyle="#e4e8ed"; ctx.beginPath();
+  ctx.moveTo(PADDING,monthsEndY+LEGAL_TOP_GAP-12); ctx.lineTo(canvasWidth-PADDING,monthsEndY+LEGAL_TOP_GAP-12); ctx.stroke();
+
+  ctx.textAlign="left"; ctx.fillStyle="#10243e"; ctx.font="700 12px Arial, sans-serif";
+  ctx.fillText("FUNDAMENTO LEGAL",PADDING,monthsEndY+LEGAL_TOP_GAP+6);
+
+  ctx.fillStyle="#3a4453"; ctx.font=LEGAL_FONT;
+  legalLines.forEach((line,i) => {
+    ctx.fillText(line,PADDING,monthsEndY+LEGAL_TOP_GAP+LEGAL_TITLE_H+i*LEGAL_LINE_H);
+  });
+
+  const footerY=monthsEndY+legalBlockH+28;
   ctx.strokeStyle="#e4e8ed"; ctx.beginPath(); ctx.moveTo(PADDING,footerY-18); ctx.lineTo(canvasWidth-PADDING,footerY-18); ctx.stroke();
 
   ctx.textAlign="left"; ctx.fillStyle="#687383"; ctx.font="600 11px Arial, sans-serif";
   ctx.fillText(`Fecha de inicio: ${formatShortDate(start)}     Fecha de vencimiento: ${formatShortDate(end)}     Tipo: ${type==="business"?"Días hábiles":"Días calendario"}`,PADDING,footerY);
 
   ctx.font="400 10.5px Arial, sans-serif";
-  ctx.fillText("Círculo dorado: días contados dentro del término.  Rojo: sábados, domingos y festivos. Herramienta de referencia, no constituye asesoría jurídica.",PADDING,footerY+18);
+  ctx.fillText("Círculo dorado: días contados dentro del término.  Rojo: sábados, domingos y festivos.",PADDING,footerY+18);
 
   return canvas;
 }
