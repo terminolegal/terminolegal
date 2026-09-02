@@ -49,6 +49,11 @@ small{display:block;color:var(--muted);font-size:.7rem;margin-top:6px}
 .segmented input{position:absolute;opacity:0}
 .segmented span{height:48px;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:var(--muted);cursor:pointer;text-align:center;padding:0 4px}
 .segmented input:checked+span{background:var(--navy);color:var(--btn-text)}
+.segmented input:disabled+span{opacity:.4;cursor:not-allowed}
+
+.segmented-3{grid-template-columns:repeat(3,1fr)}
+.segmented-3 span{font-size:.64rem;line-height:1.15;padding:0 3px}
+.field-note{font-size:.7rem;color:var(--muted);margin-top:8px;line-height:1.5}
 
 button{width:100%;height:50px;border:0;border-radius:12px;background:var(--navy);color:var(--btn-text);font-weight:700;letter-spacing:.06em;font-size:.9rem;cursor:pointer;transition:transform .15s,filter .15s}
 button:hover{transform:translateY(-1px);filter:brightness(1.08)}
@@ -78,6 +83,10 @@ footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:v
   .a11y-btn{width:36px;height:36px}
   .a11y-btn svg{width:16px;height:16px}
   .export-row{flex-direction:column}
+}
+@media (max-width:560px){
+  .segmented-3{grid-template-columns:1fr;height:auto}
+  .segmented-3 span{height:40px}
 }
 
 /* Impresión / PDF */
@@ -119,27 +128,46 @@ footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:v
       <div class="field">
         <label for="startDate">Fecha de inicio</label>
         <input type="date" id="startDate">
-        <small>El conteo inicia el día siguiente a la fecha indicada.</small>
+        <small id="startHint">El conteo inicia el día siguiente a la fecha indicada.</small>
       </div>
 
       <div class="grid">
         <div class="field">
-          <label for="days">Número de días</label>
+          <label for="days" id="daysLabel">Número de días</label>
           <input type="number" id="days" placeholder="Ej. 10" min="1" value="10">
         </div>
         <div class="field">
-          <label>Tipo de término</label>
+          <label>Unidad</label>
           <div class="segmented">
             <label>
-              <input type="radio" name="termType" value="business" checked>
-              <span>Días hábiles</span>
+              <input type="radio" name="unit" value="days" checked>
+              <span>Días</span>
             </label>
             <label>
-              <input type="radio" name="termType" value="calendar">
-              <span>Días calendario</span>
+              <input type="radio" name="unit" value="months">
+              <span>Meses</span>
             </label>
           </div>
         </div>
+      </div>
+
+      <div class="field">
+        <label>Tipo de término</label>
+        <div class="segmented segmented-3">
+          <label>
+            <input type="radio" name="termType" value="business" checked>
+            <span>Días hábiles</span>
+          </label>
+          <label>
+            <input type="radio" name="termType" value="calendar">
+            <span>Días calendario</span>
+          </label>
+          <label>
+            <input type="radio" name="termType" value="state">
+            <span>Contratación estatal (Ley 80)</span>
+          </label>
+        </div>
+        <p class="field-note" id="termTypeNote"></p>
       </div>
 
       <button type="button" id="calculateBtn">CORRER TÉRMINO</button>
@@ -156,7 +184,7 @@ footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:v
         <div><span>Tipo de días</span><strong id="detailType">-</strong></div>
       </div>
 
-      <p class="notice">Versión 0.5 — incluye festivos colombianos (Ley 51 de 1983) y el nuevo festivo de la Ley 2578 de 2026. Los festivos solo afectan el conteo de días hábiles.</p>
+      <p class="notice">Versión 0.6 — incluye festivos colombianos (Ley 51 de 1983), el festivo de la Ley 2578 de 2026, y el modo de contratación estatal (Ley 80 de 1993 / Colombia Compra Eficiente). Los festivos solo afectan el conteo de días hábiles.</p>
 
       <div class="export-row">
         <button type="button" id="exportPdfBtn" class="export-btn">
@@ -168,7 +196,7 @@ footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:v
       </div>
     </div>
 
-    <p class="intro" id="postResultNote" style="margin-top:16px" hidden>Calculo usando días hábiles o días calendario, con festivos colombianos incluidos.</p>
+    <p class="intro" id="postResultNote" style="margin-top:16px" hidden>Calculo usando días hábiles, días calendario o el régimen de contratación estatal (Ley 80), con festivos colombianos incluidos.</p>
 
     <footer>
       <span>© 2026 TÉRMINO LEGAL</span>
@@ -247,15 +275,34 @@ function getColombiaHolidays(year){
 
 function getHoliday(date){ return getColombiaHolidays(date.getFullYear()).get(dateKey(date)) || null; }
 
-function getCountedDates(start,numberOfDays,type){
+function addCalendarMonths(date,months){
+  const target=new Date(date.getFullYear(),date.getMonth()+months,1);
+  const lastDayOfTarget=new Date(target.getFullYear(),target.getMonth()+1,0).getDate();
+  return new Date(target.getFullYear(),target.getMonth(),Math.min(date.getDate(),lastDayOfTarget));
+}
+
+function getCountedDates(start,amount,type,unit){
+  if(unit==="months"){
+    const end=addCalendarMonths(start,amount);
+    const dates=[]; let cur=new Date(start);
+    while(dateKey(cur)!==dateKey(end)){ cur=addDays(cur,1); dates.push(new Date(cur)); }
+    return dates;
+  }
   const current=new Date(start); const countedDates=[]; let counted=0;
-  while(counted<numberOfDays){
+  while(counted<amount){
     current.setDate(current.getDate()+1);
     const holiday=getHoliday(current), weekend=isWeekend(current);
-    let counts = type==="calendar" ? true : (!weekend && !holiday);
+    let counts = type==="business" ? (!weekend && !holiday) : true;
     if(counts){ counted++; countedDates.push(new Date(current)); }
   }
   return countedDates;
+}
+
+function typeDisplayLabel(type,unit){
+  const unitWord = unit==="months" ? "meses" : "días";
+  if(type==="business") return "Días hábiles";
+  if(type==="state") return `Contratación estatal (Ley 80) — ${unitWord} calendario`;
+  return `Días calendario (${unitWord})`;
 }
 
 function showError(message){ errorBox.textContent=message; errorBox.hidden=false; result.hidden=true; document.getElementById("postResultNote").hidden=true; }
@@ -264,25 +311,71 @@ function clearError(){ errorBox.hidden=true; errorBox.textContent=""; }
 calculateBtn.addEventListener("click", () => {
   clearError();
   if(!startDateInput.value){ showError("Selecciona una fecha de inicio."); return; }
-  const days=Number(daysInput.value);
-  if(!Number.isInteger(days) || days<1){ showError("Ingresa un número entero de días mayor o igual a 1."); return; }
   const type=document.querySelector('input[name="termType"]:checked').value;
+  const unit=document.querySelector('input[name="unit"]:checked').value;
+  const amount=Number(daysInput.value);
+  if(!Number.isInteger(amount) || amount<1){
+    showError(`Ingresa un número entero de ${unit==="months"?"meses":"días"} mayor o igual a 1.`);
+    return;
+  }
   const start=parseLocalDate(startDateInput.value);
-  const countedDates=getCountedDates(start,days,type);
-  const end=countedDates[countedDates.length-1];
-  const label = type==="business" ? "días hábiles" : "días calendario";
+  const countedDates=getCountedDates(start,amount,type,unit);
+  const end = unit==="months" ? addCalendarMonths(start,amount) : countedDates[countedDates.length-1];
+
+  const amountLabel = unit==="months"
+    ? `${amount} ${amount===1?"mes":"meses"}`
+    : `${amount} ${type==="business"?"días hábiles":"días calendario"}`;
 
   resultDate.textContent=formatDate(end).toUpperCase();
-  resultSummary.textContent=`${days} ${label}`;
+  resultSummary.textContent=amountLabel;
   detailStart.textContent=formatShortDate(start);
   detailEnd.textContent=formatShortDate(end);
-  detailType.textContent = type==="business" ? "Días hábiles" : "Días calendario";
+  detailType.textContent = typeDisplayLabel(type,unit);
 
-  lastTermData={start,end,countedDates,days,type};
+  lastTermData={start,end,countedDates,amount,type,unit};
   result.hidden=false;
   document.getElementById("postResultNote").hidden=false;
   result.scrollIntoView({behavior:"smooth",block:"nearest"});
 });
+
+/* Interacción entre Tipo de término y Unidad + notas dinámicas */
+const termTypeNote=document.getElementById("termTypeNote");
+const daysLabel=document.getElementById("daysLabel");
+const startHint=document.getElementById("startHint");
+const monthsRadio=document.querySelector('input[name="unit"][value="months"]');
+const daysRadio=document.querySelector('input[name="unit"][value="days"]');
+
+const TERM_TYPE_NOTES={
+  business:"Excluye sábados, domingos y festivos. Aplica a trámites judiciales y a la etapa precontractual de un proceso de selección en SECOP (observaciones, adendas, recursos), conforme al CPACA.",
+  calendar:"Cuenta todos los días de forma continua e ininterrumpida, sin excluir fines de semana ni festivos.",
+  state:"Plazo de ejecución de un contrato estatal (p. ej., prestación de servicios) bajo la Ley 80 de 1993 y Colombia Compra Eficiente. Se cuenta en días o meses calendario, salvo que la minuta pacte expresamente días hábiles. Verifica siempre el acta de inicio y el contrato."
+};
+
+function syncUnitAvailability(){
+  const type=document.querySelector('input[name="termType"]:checked').value;
+  const monthsLabel=monthsRadio.closest("label");
+  if(type==="business"){
+    if(monthsRadio.checked) daysRadio.checked=true;
+    monthsRadio.disabled=true; monthsLabel.title="Los días hábiles solo se cuentan en días.";
+  } else {
+    monthsRadio.disabled=false; monthsLabel.title="";
+  }
+  termTypeNote.textContent=TERM_TYPE_NOTES[type];
+  updateDaysLabel();
+}
+
+function updateDaysLabel(){
+  const unit=document.querySelector('input[name="unit"]:checked').value;
+  daysLabel.textContent = unit==="months" ? "Número de meses" : "Número de días";
+  daysInput.placeholder = unit==="months" ? "Ej. 6" : "Ej. 10";
+  startHint.textContent = unit==="months"
+    ? "El plazo se cuenta de fecha a fecha desde el día indicado (p. ej., el acta de inicio)."
+    : "El conteo inicia el día siguiente a la fecha indicada.";
+}
+
+document.querySelectorAll('input[name="termType"]').forEach(r => r.addEventListener("change", syncUnitAvailability));
+document.querySelectorAll('input[name="unit"]').forEach(r => r.addEventListener("change", updateDaysLabel));
+syncUnitAvailability();
 
 const today=new Date();
 startDateInput.value = `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
@@ -324,8 +417,15 @@ function wrapText(ctx,text,maxWidth){
   return lines;
 }
 
+function buildLegalText(type){
+  if(type==="state"){
+    return `FUNDAMENTO LEGAL: Este documento presenta el cómputo de un plazo contractual bajo el Estatuto General de Contratación de la Administración Pública (Ley 80 de 1993, Ley 1150 de 2007 y Decreto 1082 de 2015), en concordancia con los lineamientos de Colombia Compra Eficiente. El plazo de ejecución de un contrato estatal, como uno de prestación de servicios, se cuenta por regla general en días o meses calendario, de fecha a fecha desde el inicio pactado (usualmente el acta de inicio), salvo que la minuta del contrato establezca expresamente un cómputo en días hábiles. Las actuaciones propias del proceso de selección (observaciones, adendas, traslado de informes de evaluación, recursos en SECOP) se rigen por el Código de Procedimiento Administrativo y de lo Contencioso Administrativo (Ley 1437 de 2011) y se cuentan en días hábiles. Este documento es una herramienta de cálculo de referencia; se recomienda verificar el plazo exacto contra el acta de inicio, la minuta del contrato y las instrucciones del supervisor o interventor antes de su presentación formal ante terceros o entidades estatales.`;
+  }
+  return `FUNDAMENTO LEGAL: Este documento presenta el cómputo de términos elaborado con base en la legislación colombiana vigente. El calendario de días festivos aplicado se determina conforme a la Ley 51 de 1983 (artículo 1) y a la Ley 2578 de 2026 (artículo 6). El conteo en días hábiles excluye sábados, domingos y festivos, en concordancia con el régimen procesal aplicable al trámite correspondiente (Código General del Proceso, Código de Procedimiento Administrativo y de lo Contencioso Administrativo, Código Sustantivo del Trabajo u otras normas especiales, según el caso). El conteo en días calendario incluye todos los días de forma continua e ininterrumpida. Este documento es una herramienta de cálculo de referencia elaborada por el usuario; se recomienda verificar el término ante el despacho, entidad o autoridad competente antes de su presentación formal ante terceros.`;
+}
+
 function buildCalendarCanvas(termData){
-  const {start,end,countedDates,days,type}=termData;
+  const {start,end,countedDates,amount,type,unit}=termData;
   const countedKeys=new Set(countedDates.map(d=>dateKey(d)));
   const months=monthsInRange(start,end);
 
@@ -337,7 +437,7 @@ function buildCalendarCanvas(termData){
   const monthBlockH=MONTH_HEADER_H+WEEKDAY_H+CELL_H*6;
   const canvasWidth=PADDING*2+numCols*MONTH_W+(numCols-1)*MONTH_GAP_X;
 
-  const legalText=`FUNDAMENTO LEGAL: Este documento presenta el cómputo de términos elaborado con base en la legislación colombiana vigente. El calendario de días festivos aplicado se determina conforme a la Ley 51 de 1983 (artículo 1) y a la Ley 2578 de 2026 (artículo 6). El conteo en días hábiles excluye sábados, domingos y festivos, en concordancia con el régimen procesal aplicable al trámite correspondiente (Código General del Proceso, Código de Procedimiento Administrativo y de lo Contencioso Administrativo, Código Sustantivo del Trabajo u otras normas especiales, según el caso). El conteo en días calendario incluye todos los días de forma continua e ininterrumpida. Este documento es una herramienta de cálculo de referencia elaborada por el usuario; se recomienda verificar el término ante el despacho, entidad o autoridad competente antes de su presentación formal ante terceros.`;
+  const legalText=buildLegalText(type);
 
   const measureCtx=document.createElement("canvas").getContext("2d");
   measureCtx.font=LEGAL_FONT;
@@ -357,9 +457,9 @@ function buildCalendarCanvas(termData){
   ctx.textAlign="left"; ctx.textBaseline="alphabetic";
   ctx.fillText("TÉRMINO LEGAL",PADDING,34);
 
-  const typeLabel = type==="business" ? "días hábiles" : "días calendario";
+  const typeLabel = unit==="months" ? (amount===1?"mes":"meses") : (type==="business" ? "días hábiles" : "días calendario");
   ctx.fillStyle="#687383"; ctx.font="400 12.5px Arial, sans-serif";
-  ctx.fillText(`Conteo de ${days} ${typeLabel} — del ${formatShortDate(start)} al ${formatShortDate(end)}`,PADDING,56);
+  ctx.fillText(`Conteo de ${amount} ${typeLabel} — del ${formatShortDate(start)} al ${formatShortDate(end)}`,PADDING,56);
 
   ctx.strokeStyle="#e4e8ed"; ctx.lineWidth=1;
   ctx.beginPath(); ctx.moveTo(PADDING,BRAND_H-16); ctx.lineTo(canvasWidth-PADDING,BRAND_H-16); ctx.stroke();
@@ -409,7 +509,7 @@ function buildCalendarCanvas(termData){
   ctx.strokeStyle="#e4e8ed"; ctx.beginPath(); ctx.moveTo(PADDING,footerY-18); ctx.lineTo(canvasWidth-PADDING,footerY-18); ctx.stroke();
 
   ctx.textAlign="left"; ctx.fillStyle="#687383"; ctx.font="600 11px Arial, sans-serif";
-  ctx.fillText(`Fecha de inicio: ${formatShortDate(start)}     Fecha de vencimiento: ${formatShortDate(end)}     Tipo: ${type==="business"?"Días hábiles":"Días calendario"}`,PADDING,footerY);
+  ctx.fillText(`Fecha de inicio: ${formatShortDate(start)}     Fecha de vencimiento: ${formatShortDate(end)}     Tipo: ${typeDisplayLabel(type,unit)}`,PADDING,footerY);
 
   ctx.font="400 10.5px Arial, sans-serif";
   ctx.fillText("Círculo dorado: días contados dentro del término.  Rojo: sábados, domingos y festivos.",PADDING,footerY+18);
@@ -433,9 +533,10 @@ exportPdfBtn.addEventListener("click", () => {
 /* Compartir — menú nativo del sistema */
 const SHARE_TITLE="Término Legal — resultado";
 function buildShareText(termData){
-  const {start,end,days,type}=termData;
-  const label = type==="business" ? "días hábiles" : "días calendario";
-  return `Término Legal: contando desde el ${formatShortDate(start)}, ${days} ${label}, vence el ${formatDate(end)}.`;
+  const {start,end,amount,type,unit}=termData;
+  const label = unit==="months" ? `${amount===1?"mes":"meses"}` : (type==="business" ? "días hábiles" : "días calendario");
+  const suffix = type==="state" ? " (contratación estatal — Ley 80)" : "";
+  return `Término Legal: contando desde el ${formatShortDate(start)}, ${amount} ${label}${suffix}, vence el ${formatDate(end)}.`;
 }
 async function shareTermData(){
   if(!lastTermData) return;
