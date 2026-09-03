@@ -43,6 +43,15 @@ input[type=date],input[type=number]{width:100%;height:48px;border:1px solid var(
 input:focus{outline:2px solid rgba(185,150,79,.25);border-color:var(--gold)}
 small{display:block;color:var(--muted);font-size:.7rem;margin-top:6px}
 
+.date-input-wrap{position:relative}
+.date-icon-badge{position:absolute;left:7px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:9px;background:var(--gold);display:flex;align-items:center;justify-content:center;pointer-events:none;box-shadow:0 3px 8px var(--shadow)}
+.date-icon-badge svg{width:19px;height:19px;color:#12100a}
+.date-input-wrap input[type=date]{padding-left:52px}
+
+@media (min-width:601px){
+  .field-date{max-width:280px;margin-left:auto;margin-right:auto;text-align:center}
+}
+
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .segmented{display:grid;grid-template-columns:1fr 1fr;height:48px;border:1px solid var(--input-border);border-radius:10px;overflow:hidden}
 .segmented label{margin:0;position:relative}
@@ -126,9 +135,20 @@ footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:v
     </main>
 
     <div class="card">
-      <div class="field">
+      <div class="field field-date">
         <label for="startDate">Fecha de inicio</label>
-        <input type="date" id="startDate">
+        <div class="date-input-wrap">
+          <span class="date-icon-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="3"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+              <circle cx="8" cy="15" r="1.3" fill="currentColor" stroke="none"></circle>
+            </svg>
+          </span>
+          <input type="date" id="startDate">
+        </div>
         <small id="startHint">El conteo inicia el día siguiente a la fecha indicada.</small>
       </div>
 
@@ -353,7 +373,7 @@ calculateBtn.addEventListener("click", () => {
     ? `${amount} ${amount===1?"mes":"meses"}`
     : `${amount} ${type==="business"?"días hábiles":"días calendario"}`;
 
-  resultDate.textContent=formatDate(end).toUpperCase();
+  resultDate.textContent=formatDate(end).toLowerCase();
   resultSummary.textContent=amountLabel;
   detailStart.textContent=formatShortDate(start);
   detailEnd.textContent=formatShortDate(end);
