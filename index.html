@@ -68,6 +68,7 @@ button:hover{transform:translateY(-1px);filter:brightness(1.08)}
 .details span{display:block;color:var(--muted);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
 .details strong{font-size:.78rem;color:var(--navy)}
 .notice{font-size:.68rem;line-height:1.6;color:var(--muted);margin:0 0 16px}
+.holiday-badge{display:inline-block;background:var(--surface-alt);border:1px solid var(--line);color:var(--muted);font-size:.65rem;line-height:1.5;padding:8px 12px;border-radius:10px;margin:0 0 16px;text-align:left}
 
 .export-row{display:flex;flex-wrap:wrap;gap:10px}
 .export-btn{flex:1 1 150px;height:46px;border-radius:10px;background:transparent;border:1.5px solid var(--gold);color:var(--gold);font-weight:700;font-size:.72rem;letter-spacing:.06em;cursor:pointer}
@@ -177,6 +178,7 @@ footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:v
     <div id="result" class="result" hidden>
       <h2 id="resultDate">-</h2>
       <div id="resultSummary" class="result-summary">-</div>
+      <div id="holidayList" class="holiday-badge" style="display:none"></div>
 
       <div class="details">
         <div><span>Fecha de inicio</span><strong id="detailStart">-</strong></div>
@@ -184,7 +186,7 @@ footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:v
         <div><span>Tipo de días</span><strong id="detailType">-</strong></div>
       </div>
 
-      <p class="notice">Versión 0.6 — incluye festivos colombianos (Ley 51 de 1983), el festivo de la Ley 2578 de 2026, y el modo de contratación estatal (Ley 80 de 1993 / Colombia Compra Eficiente). Los festivos solo afectan el conteo de días hábiles.</p>
+      <p class="notice">Versión 0.7 — incluye festivos colombianos (Ley 51 de 1983), el festivo de la Ley 2578 de 2026, el modo de contratación estatal (Ley 80 de 1993 / Colombia Compra Eficiente), validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.</p>
 
       <div class="export-row">
         <button type="button" id="exportPdfBtn" class="export-btn">
@@ -221,10 +223,21 @@ const detailType = document.getElementById("detailType");
 const exportPdfBtn = document.getElementById("exportPdfBtn");
 const exportShareBtn = document.getElementById("exportShareBtn");
 
+const holidayCache = new Map();
+const MAX_DAYS = 365;
+const MAX_MONTHS = 60;
+
 let lastTermData = null;
 const pad = n => String(n).padStart(2, "0");
 
-function parseLocalDate(value){ const [y,m,d]=value.split("-").map(Number); return new Date(y,m-1,d); }
+function parseLocalDate(value){
+  const parts=value.split("-").map(Number);
+  if(parts.length!==3 || parts.some(isNaN)) throw new Error("Fecha inválida");
+  const [y,m,d]=parts;
+  const date=new Date(y,m-1,d);
+  if(date.getFullYear()!==y || date.getMonth()!==m-1 || date.getDate()!==d) throw new Error("Fecha inválida");
+  return date;
+}
 function dateKey(date){ return [date.getFullYear(),pad(date.getMonth()+1),pad(date.getDate())].join("-"); }
 function addDays(date,days){ const r=new Date(date); r.setDate(r.getDate()+days); return r; }
 function formatDate(date){ return new Intl.DateTimeFormat("es-CO",{day:"2-digit",month:"long",year:"numeric"}).format(date); }
@@ -273,7 +286,11 @@ function getColombiaHolidays(year){
   return holidays;
 }
 
-function getHoliday(date){ return getColombiaHolidays(date.getFullYear()).get(dateKey(date)) || null; }
+function getHoliday(date){
+  const year=date.getFullYear();
+  if(!holidayCache.has(year)) holidayCache.set(year,getColombiaHolidays(year));
+  return holidayCache.get(year).get(dateKey(date)) || null;
+}
 
 function addCalendarMonths(date,months){
   const target=new Date(date.getFullYear(),date.getMonth()+months,1);
@@ -282,11 +299,12 @@ function addCalendarMonths(date,months){
 }
 
 function getCountedDates(start,amount,type,unit){
+  const holidaysEncountered=[];
   if(unit==="months"){
     const end=addCalendarMonths(start,amount);
     const dates=[]; let cur=new Date(start);
     while(dateKey(cur)!==dateKey(end)){ cur=addDays(cur,1); dates.push(new Date(cur)); }
-    return dates;
+    return {countedDates:dates, holidaysEncountered};
   }
   const current=new Date(start); const countedDates=[]; let counted=0;
   while(counted<amount){
@@ -294,8 +312,9 @@ function getCountedDates(start,amount,type,unit){
     const holiday=getHoliday(current), weekend=isWeekend(current);
     let counts = type==="business" ? (!weekend && !holiday) : true;
     if(counts){ counted++; countedDates.push(new Date(current)); }
+    if(holiday && !weekend && type==="business") holidaysEncountered.push({date:new Date(current),name:holiday.name});
   }
-  return countedDates;
+  return {countedDates, holidaysEncountered};
 }
 
 function typeDisplayLabel(type,unit){
@@ -305,21 +324,29 @@ function typeDisplayLabel(type,unit){
   return `Días calendario (${unitWord})`;
 }
 
-function showError(message){ errorBox.textContent=message; errorBox.hidden=false; result.hidden=true; document.getElementById("postResultNote").hidden=true; }
+function showError(message){ errorBox.textContent=message; errorBox.hidden=false; result.hidden=true; document.getElementById("postResultNote").hidden=true; document.getElementById("holidayList").style.display="none"; }
 function clearError(){ errorBox.hidden=true; errorBox.textContent=""; }
+
+const holidayListEl=document.getElementById("holidayList");
 
 calculateBtn.addEventListener("click", () => {
   clearError();
   if(!startDateInput.value){ showError("Selecciona una fecha de inicio."); return; }
   const type=document.querySelector('input[name="termType"]:checked').value;
   const unit=document.querySelector('input[name="unit"]:checked').value;
-  const amount=Number(daysInput.value);
+  const amount=parseInt(daysInput.value,10);
   if(!Number.isInteger(amount) || amount<1){
     showError(`Ingresa un número entero de ${unit==="months"?"meses":"días"} mayor o igual a 1.`);
     return;
   }
-  const start=parseLocalDate(startDateInput.value);
-  const countedDates=getCountedDates(start,amount,type,unit);
+  if(unit==="months" && amount>MAX_MONTHS){ showError(`El número máximo de meses es ${MAX_MONTHS} (5 años).`); return; }
+  if(unit==="days" && amount>MAX_DAYS){ showError(`El número máximo de días es ${MAX_DAYS}.`); return; }
+
+  let start;
+  try{ start=parseLocalDate(startDateInput.value); }
+  catch{ showError("Fecha inválida. Por favor, selecciona una fecha correcta."); return; }
+
+  const {countedDates,holidaysEncountered}=getCountedDates(start,amount,type,unit);
   const end = unit==="months" ? addCalendarMonths(start,amount) : countedDates[countedDates.length-1];
 
   const amountLabel = unit==="months"
@@ -332,10 +359,24 @@ calculateBtn.addEventListener("click", () => {
   detailEnd.textContent=formatShortDate(end);
   detailType.textContent = typeDisplayLabel(type,unit);
 
+  if(holidaysEncountered.length>0 && type==="business"){
+    const names=holidaysEncountered.map(h => h.name).join(", ");
+    holidayListEl.style.display="inline-block";
+    holidayListEl.textContent=`Festivos excluidos del conteo: ${names}.`;
+  } else {
+    holidayListEl.style.display="none";
+  }
+
   lastTermData={start,end,countedDates,amount,type,unit};
   result.hidden=false;
   document.getElementById("postResultNote").hidden=false;
   result.scrollIntoView({behavior:"smooth",block:"nearest"});
+});
+
+document.addEventListener("keydown", (e) => {
+  if(e.key==="Enter" && (document.activeElement===startDateInput || document.activeElement===daysInput)){
+    calculateBtn.click();
+  }
 });
 
 /* Interacción entre Tipo de término y Unidad + notas dinámicas */
