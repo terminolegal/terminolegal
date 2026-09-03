@@ -48,7 +48,7 @@ small{display:block;color:var(--muted);font-size:.7rem;margin-top:6px}
 .date-icon-badge svg{width:19px;height:19px;color:#12100a}
 .date-input-wrap input[type=date]{padding-left:52px;min-width:0;width:100%;-webkit-min-logical-width:100%}
 
-@media (min-width:601px){
+@media (min-width:601px) and (pointer:fine){
   .field-date{max-width:280px;margin-left:auto;margin-right:auto;text-align:center}
 }
 
@@ -234,6 +234,16 @@ footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:v
    Ley 51 de 1983 art.1 (festivos) + Ley 2578 de 2026 art.6 (nuevo festivo). */
 
 const startDateInput = document.getElementById("startDate");
+const dateIconBadge = document.querySelector(".date-icon-badge");
+function openDatePicker(){
+  if(typeof startDateInput.showPicker === "function"){ try{ startDateInput.showPicker(); }catch{ startDateInput.focus(); } }
+  else{ startDateInput.focus(); }
+}
+if(dateIconBadge){
+  dateIconBadge.style.pointerEvents="auto";
+  dateIconBadge.style.cursor="pointer";
+  dateIconBadge.addEventListener("click", openDatePicker);
+}
 const daysInput = document.getElementById("days");
 const calculateBtn = document.getElementById("calculateBtn");
 const errorBox = document.getElementById("error");
