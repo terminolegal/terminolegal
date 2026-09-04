@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,21 +9,6 @@
 *{box-sizing:border-box}
 
 :root{
-  --navy:#c9d6e8;
-  --gold:#d8b877;
-  --ink:#eef1f5;
-  --muted:#95a1b0;
-  --line:#2a3546;
-  --bg:#0b1220;
-  --surface:#111a2c;
-  --surface-alt:#0e1626;
-  --input-bg:#0e1626;
-  --input-border:#2a3546;
-  --btn-text:#0b1220;
-  --shadow:rgba(0,0,0,.35);
-}
-
-body.light{
   --navy:#10243e;
   --gold:#b9964f;
   --ink:#17202b;
@@ -37,6 +21,21 @@ body.light{
   --input-border:#ccd3dc;
   --btn-text:#fff;
   --shadow:rgba(16,36,62,.06);
+}
+
+body.dark{
+  --navy:#c9d6e8;
+  --gold:#d8b877;
+  --ink:#eef1f5;
+  --muted:#95a1b0;
+  --line:#2a3546;
+  --bg:#0b1220;
+  --surface:#111a2c;
+  --surface-alt:#0e1626;
+  --input-bg:#0e1626;
+  --input-border:#2a3546;
+  --btn-text:#0b1220;
+  --shadow:rgba(0,0,0,.35);
 }
 
 html{font-size:100%}
@@ -182,6 +181,10 @@ label{
   border-color:var(--gold)
 }
 
+.date-input-wrap input[type=text].invalid{
+  border-color:#c0392b
+}
+
 .date-icon-badge{
   position:absolute;
   left:7px;
@@ -275,6 +278,7 @@ small{
 
 .calendar-day{
   width:100%;
+  height:auto;
   aspect-ratio:1;
   border:0;
   border-radius:7px;
@@ -336,22 +340,6 @@ small{
   font-size:.58rem
 }
 
-.calendar-legend span{
-  display:flex;
-  align-items:center;
-  gap:4px
-}
-
-.calendar-legend i{
-  width:10px;
-  height:10px;
-  display:inline-block;
-  border-radius:3px
-}
-
-.legend-weekend{background:#f1f2f4}
-.legend-holiday{background:#dedfe2}
-
 /* CAMPOS */
 @media (min-width:601px) and (pointer:fine){
   .field-date{
@@ -364,8 +352,30 @@ small{
 
 .grid{
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:110px 1fr;
   gap:16px
+}
+
+#days{
+  width:100%;
+  max-width:110px;
+  height:48px;
+  border:1px solid var(--input-border);
+  border-radius:10px;
+  padding:0 12px;
+  font:inherit;
+  font-size:1rem;
+  color:var(--ink);
+  background:var(--input-bg)
+}
+
+#days:focus{
+  outline:2px solid rgba(185,150,79,.25);
+  border-color:var(--gold)
+}
+
+@media(max-width:480px){
+  #days{max-width:100%}
 }
 
 .segmented{
@@ -747,9 +757,7 @@ footer{
           <line x1="16" y1="2" x2="16" y2="6"></line>
           <line x1="8" y1="2" x2="8" y2="6"></line>
           <line x1="3" y1="10" x2="21" y2="10"></line>
-          <circle cx="8" cy="15" r="1.3"
-                  fill="currentColor"
-                  stroke="none"></circle>
+          <text x="8" y="16.3" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="7.5" font-weight="700" fill="currentColor">t</text>
 
         </svg>
 
@@ -757,9 +765,11 @@ footer{
 
       <input type="text"
              id="startDateDisplay"
-             readonly
-             placeholder="Selecciona una fecha"
-             aria-label="Fecha de inicio">
+             inputmode="numeric"
+             autocomplete="off"
+             maxlength="10"
+             placeholder="dd/mm/aaaa"
+             aria-label="Fecha de inicio (dd/mm/aaaa)">
 
       <input type="hidden" id="startDate">
 
@@ -804,15 +814,8 @@ footer{
            class="calendar-days"></div>
 
       <div class="calendar-legend">
-        <span>
-          <i class="legend-weekend"></i>
-          Fin de semana
-        </span>
-
-        <span>
-          <i class="legend-holiday"></i>
-          Festivo
-        </span>
+        <span>Fin de semana</span>
+        <span>Festivo</span>
       </div>
 
     </div>
@@ -825,7 +828,7 @@ footer{
     <div class="field">
 
       <label for="days" id="daysLabel">
-        Número de días
+        Término
       </label>
 
       <input type="number"
@@ -945,7 +948,7 @@ footer{
   </div>
 
   <p class="notice">
-    Versión 0.7 — incluye festivos colombianos
+    Versión 0.8 — incluye festivos colombianos
     (Ley 51 de 1983), el festivo de la Ley 2578 de 2026,
     el modo de contratación estatal (Ley 80 de 1993 /
     Colombia Compra Eficiente), validación de fechas y
@@ -1697,16 +1700,77 @@ function renderCalendar(){
 }
 
 
-/* ABRIR CALENDARIO */
-startDateDisplay.addEventListener(
+/* ABRIR CALENDARIO (solo desde el ícono) */
+dateIconBadge.addEventListener(
   "click",
   openCalendar
 );
 
 
-dateIconBadge.addEventListener(
-  "click",
-  openCalendar
+/* ESCRITURA MANUAL DE LA FECHA (dd/mm/aaaa) */
+function formatDateMask(digits){
+
+  let out=digits.slice(0,2);
+
+  if(digits.length>2)
+    out+="/"+digits.slice(2,4);
+
+  if(digits.length>4)
+    out+="/"+digits.slice(4,8);
+
+  return out;
+}
+
+startDateDisplay.addEventListener(
+  "input",
+  ()=>{
+
+    const digits=
+      startDateDisplay.value
+        .replace(/\D/g,"")
+        .slice(0,8);
+
+    startDateDisplay.value=
+      formatDateMask(digits);
+
+    if(digits.length===8){
+
+      const day=parseInt(digits.slice(0,2),10);
+      const month=parseInt(digits.slice(2,4),10);
+      const year=parseInt(digits.slice(4,8),10);
+      const date=new Date(year,month-1,day);
+
+      const isValid=
+        date.getFullYear()===year &&
+        date.getMonth()===month-1 &&
+        date.getDate()===day;
+
+      if(isValid){
+
+        startDateInput.value=dateKey(date);
+        startDateDisplay.classList.remove("invalid");
+
+        calendarCursor=
+          new Date(year,month-1,1);
+
+        if(!calendarPicker.hidden)
+          renderCalendar();
+
+      }else{
+
+        startDateInput.value="";
+        startDateDisplay.classList.add("invalid");
+
+      }
+
+    }else{
+
+      startDateInput.value="";
+      startDateDisplay.classList.remove("invalid");
+
+    }
+
+  }
 );
 
 
@@ -2057,11 +2121,6 @@ function updateDaysLabel(){
     document.querySelector(
       'input[name="unit"]:checked'
     ).value;
-
-  daysLabel.textContent=
-    unit==="months"
-      ?"Número de meses"
-      :"Número de días";
 
   daysInput.placeholder=
     unit==="months"
@@ -2904,14 +2963,14 @@ contrastBtn.addEventListener(
   "click",
   ()=>{
 
-    const isLight=
+    const isDark=
       document.body.classList.toggle(
-        "light"
+        "dark"
       );
 
     contrastBtn.setAttribute(
       "aria-pressed",
-      String(isLight)
+      String(isDark)
     );
 
   }
@@ -2953,4 +3012,3 @@ increaseTextBtn.addEventListener(
 
 </body>
 </html>
-```
