@@ -702,10 +702,17 @@ footer{
 }
 
 .feedback-note{
-  margin-top:6px;
-  font-size:.58rem;
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid var(--line);
+  font-size:.65rem;
   color:var(--muted);
   text-align:center
+}
+
+.feedback-note strong{
+  color:var(--navy);
+  font-weight:600
 }
 
 /* IMPRESIÓN / PDF */
@@ -1163,27 +1170,7 @@ footer{
 
   <div class="feedback-thanks" id="feedbackThanks">¡Gracias por tu respuesta!</div>
 
-  <div class="feedback-comment">
-
-    <label for="pqrsType">¿Qué deseas enviarnos?</label>
-
-    <select id="pqrsType">
-      <option value="Comentario">Comentario</option>
-      <option value="Petición">Petición</option>
-      <option value="Queja">Queja</option>
-      <option value="Reclamo">Reclamo</option>
-      <option value="Sugerencia">Sugerencia</option>
-    </select>
-
-    <label for="pqrsText">Cuéntanos más (opcional)</label>
-
-    <textarea id="pqrsText" placeholder="Escribe aquí tu comentario, petición, queja, reclamo o sugerencia..."></textarea>
-
-    <button type="button" class="send-feedback-btn" id="sendPqrsBtn">ENVIAR</button>
-
-    <p class="feedback-note">Se enviará a terminolegal.co@gmail.com mediante tu cliente de correo.</p>
-
-  </div>
+  <p class="feedback-note">¿Comentarios, peticiones, quejas, reclamos o sugerencias? Escríbenos a <strong>terminolegal.co@gmail.com</strong></p>
 
 </div>
 
@@ -3125,28 +3112,22 @@ const feedbackThanks=
     "feedbackThanks"
   );
 
-const pqrsType=
-  document.getElementById(
-    "pqrsType"
-  );
 
-const pqrsText=
-  document.getElementById(
-    "pqrsText"
-  );
-
-const sendPqrsBtn=
-  document.getElementById(
-    "sendPqrsBtn"
-  );
+/* ⚠️ Reemplaza esta URL por la que te entregue Google al
+   implementar el Apps Script como aplicación web (termina en /exec) */
+const FEEDBACK_SHEET_ENDPOINT="https://script.google.com/macros/s/AKfycbzoIN8sdMmFfI_unZJLpCxl5teXWepwlJFAi6-Nh2FksOdXIe8uwjIilEsflS3NPLeQ/exec";
 
 
 function sendFeedback(value){
 
   currentFeedback=value;
 
-  /* Aquí puedes conectar con tu backend o analítica:
-     fetch('/api/feedback', { method:'POST', body: JSON.stringify({ value }) }) */
+  /* Registro en la hoja de Google (fire-and-forget: no bloquea
+     la interfaz ni depende de que la respuesta se pueda leer) */
+  fetch(
+    `${FEEDBACK_SHEET_ENDPOINT}?voto=${value}`,
+    {mode:"no-cors"}
+  ).catch(()=>{});
 
   feedbackUpBtn.classList.remove(
     "selected-up"
@@ -3174,59 +3155,7 @@ function sendFeedback(value){
     "show"
   );
 
-  console.log(
-    "Feedback registrado:",
-    value,
-    new Date().toISOString()
-  );
-
 }
-
-
-function sendPQRS(){
-
-  const type=
-    pqrsType.value;
-
-  const text=
-    pqrsText.value.trim();
-
-  const rating=
-    currentFeedback==="up"
-      ?"👍 Positiva"
-      :currentFeedback==="down"
-        ?"👎 Negativa"
-        :"No indicada";
-
-  const contextLine=
-    lastTermData
-      ?`Cálculo consultado: del ${formatShortDate(lastTermData.start)} al ${formatShortDate(lastTermData.end)} (${typeDisplayLabel(lastTermData.type,lastTermData.unit)}).\n\n`
-      :"";
-
-  const subject=
-    encodeURIComponent(
-      `[${type}] Feedback — Término Legal`
-    );
-
-  const body=
-    encodeURIComponent(
-      `Tipo: ${type}\n`+
-      `Calificación: ${rating}\n\n`+
-      contextLine+
-      `Comentario:\n${text||"(sin comentario adicional)"}\n\n`+
-      `Fecha: ${new Date().toLocaleString("es-CO")}`
-    );
-
-  window.location.href=
-    `mailto:terminolegal.co@gmail.com?subject=${subject}&body=${body}`;
-
-}
-
-
-sendPqrsBtn.addEventListener(
-  "click",
-  sendPQRS
-);
 
 
 /* =========================================================
