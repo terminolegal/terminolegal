@@ -578,6 +578,136 @@ footer{
   padding:22px 3px 0
 }
 
+/* =========================================================
+   FEEDBACK / PQRS
+   ========================================================= */
+
+.feedback-card{
+  margin-top:14px;
+  padding:14px 16px;
+  text-align:center
+}
+
+.feedback-card > p.feedback-title{
+  margin:0 0 8px;
+  font-size:.68rem;
+  font-weight:400;
+  color:var(--muted)
+}
+
+.feedback-buttons{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:2px
+}
+
+.feedback-btn{
+  width:auto;
+  height:auto;
+  flex:0 0 auto;
+  background:transparent;
+  border:1px solid var(--input-border);
+  border-radius:8px;
+  padding:4px 12px;
+  font-size:.9rem;
+  line-height:1;
+  cursor:pointer;
+  opacity:.7
+}
+
+.feedback-btn:hover{
+  opacity:1
+}
+
+.feedback-btn.selected-up{
+  background:rgba(34,153,84,.12);
+  border-color:#229954;
+  opacity:1
+}
+
+.feedback-btn.selected-down{
+  background:rgba(192,57,43,.12);
+  border-color:#c0392b;
+  opacity:1
+}
+
+.feedback-thanks{
+  margin-top:6px;
+  font-size:.62rem;
+  color:var(--muted);
+  display:none
+}
+
+.feedback-thanks.show{
+  display:block
+}
+
+.feedback-comment{
+  margin-top:12px;
+  text-align:left;
+  border-top:1px solid var(--line);
+  padding-top:12px
+}
+
+.feedback-comment label{
+  font-size:.7rem;
+  margin-bottom:5px
+}
+
+.feedback-comment select{
+  width:100%;
+  height:36px;
+  border:1px solid var(--input-border);
+  border-radius:8px;
+  padding:0 10px;
+  font:inherit;
+  font-size:.78rem;
+  color:var(--ink);
+  background:var(--input-bg);
+  margin-bottom:10px
+}
+
+.feedback-comment select:focus{
+  outline:2px solid rgba(185,150,79,.25);
+  border-color:var(--gold)
+}
+
+.feedback-comment textarea{
+  width:100%;
+  min-height:56px;
+  border:1px solid var(--input-border);
+  border-radius:8px;
+  padding:8px 10px;
+  font:inherit;
+  font-size:.78rem;
+  color:var(--ink);
+  background:var(--input-bg);
+  resize:vertical
+}
+
+.feedback-comment textarea:focus{
+  outline:2px solid rgba(185,150,79,.25);
+  border-color:var(--gold)
+}
+
+.send-feedback-btn{
+  width:auto;
+  height:38px;
+  padding:0 20px;
+  margin-top:10px;
+  font-size:.75rem;
+  background:var(--gold);
+  color:#12100a
+}
+
+.feedback-note{
+  margin-top:6px;
+  font-size:.58rem;
+  color:var(--muted);
+  text-align:center
+}
+
 /* IMPRESIÓN / PDF */
 #printArea{display:none}
 
@@ -662,6 +792,10 @@ footer{
 
   .calendar-picker{
     width:min(300px,calc(100vw - 42px))
+  }
+
+  .feedback-btn{
+    padding:5px 14px
   }
 }
 
@@ -892,7 +1026,7 @@ footer{
         <input type="radio"
                name="termType"
                value="state">
-        <span>Contratación estatal (Ley 80)</span>
+        <span>Contratación estatal</span>
       </label>
 
     </div>
@@ -1016,6 +1150,42 @@ footer{
   con festivos colombianos incluidos.
 
 </p>
+
+<!-- FEEDBACK / PQRS -->
+<div class="feedback-card card" id="feedbackCard" hidden>
+
+  <p class="feedback-title">¿Qué tan útil te resultó esta herramienta?</p>
+
+  <div class="feedback-buttons">
+    <button type="button" class="feedback-btn" id="feedbackUpBtn" onclick="sendFeedback('up')" aria-label="Me sirvió">👍</button>
+    <button type="button" class="feedback-btn" id="feedbackDownBtn" onclick="sendFeedback('down')" aria-label="No me sirvió">👎</button>
+  </div>
+
+  <div class="feedback-thanks" id="feedbackThanks">¡Gracias por tu respuesta!</div>
+
+  <div class="feedback-comment">
+
+    <label for="pqrsType">¿Qué deseas enviarnos?</label>
+
+    <select id="pqrsType">
+      <option value="Comentario">Comentario</option>
+      <option value="Petición">Petición</option>
+      <option value="Queja">Queja</option>
+      <option value="Reclamo">Reclamo</option>
+      <option value="Sugerencia">Sugerencia</option>
+    </select>
+
+    <label for="pqrsText">Cuéntanos más (opcional)</label>
+
+    <textarea id="pqrsText" placeholder="Escribe aquí tu comentario, petición, queja, reclamo o sugerencia..."></textarea>
+
+    <button type="button" class="send-feedback-btn" id="sendPqrsBtn">ENVIAR</button>
+
+    <p class="feedback-note">Se enviará a terminolegal.co@gmail.com mediante tu cliente de correo.</p>
+
+  </div>
+
+</div>
 
 <footer>
   <span>© 2026 TÉRMINO LEGAL</span>
@@ -1505,6 +1675,10 @@ function showError(message){
   result.hidden=true;
   document.getElementById(
     "postResultNote"
+  ).hidden=true;
+
+  document.getElementById(
+    "feedbackCard"
   ).hidden=true;
 
   holidayListEl.style.display="none";
@@ -2003,6 +2177,10 @@ calculateBtn.addEventListener(
 
     document.getElementById(
       "postResultNote"
+    ).hidden=false;
+
+    document.getElementById(
+      "feedbackCard"
     ).hidden=false;
 
     result.scrollIntoView({
@@ -2923,6 +3101,131 @@ async function shareTermData(){
 exportShareBtn.addEventListener(
   "click",
   shareTermData
+);
+
+
+/* =========================================================
+   FEEDBACK / PQRS
+   ========================================================= */
+
+let currentFeedback=null;
+
+const feedbackUpBtn=
+  document.getElementById(
+    "feedbackUpBtn"
+  );
+
+const feedbackDownBtn=
+  document.getElementById(
+    "feedbackDownBtn"
+  );
+
+const feedbackThanks=
+  document.getElementById(
+    "feedbackThanks"
+  );
+
+const pqrsType=
+  document.getElementById(
+    "pqrsType"
+  );
+
+const pqrsText=
+  document.getElementById(
+    "pqrsText"
+  );
+
+const sendPqrsBtn=
+  document.getElementById(
+    "sendPqrsBtn"
+  );
+
+
+function sendFeedback(value){
+
+  currentFeedback=value;
+
+  /* Aquí puedes conectar con tu backend o analítica:
+     fetch('/api/feedback', { method:'POST', body: JSON.stringify({ value }) }) */
+
+  feedbackUpBtn.classList.remove(
+    "selected-up"
+  );
+
+  feedbackDownBtn.classList.remove(
+    "selected-down"
+  );
+
+  if(value==="up"){
+
+    feedbackUpBtn.classList.add(
+      "selected-up"
+    );
+
+  }else{
+
+    feedbackDownBtn.classList.add(
+      "selected-down"
+    );
+
+  }
+
+  feedbackThanks.classList.add(
+    "show"
+  );
+
+  console.log(
+    "Feedback registrado:",
+    value,
+    new Date().toISOString()
+  );
+
+}
+
+
+function sendPQRS(){
+
+  const type=
+    pqrsType.value;
+
+  const text=
+    pqrsText.value.trim();
+
+  const rating=
+    currentFeedback==="up"
+      ?"👍 Positiva"
+      :currentFeedback==="down"
+        ?"👎 Negativa"
+        :"No indicada";
+
+  const contextLine=
+    lastTermData
+      ?`Cálculo consultado: del ${formatShortDate(lastTermData.start)} al ${formatShortDate(lastTermData.end)} (${typeDisplayLabel(lastTermData.type,lastTermData.unit)}).\n\n`
+      :"";
+
+  const subject=
+    encodeURIComponent(
+      `[${type}] Feedback — Término Legal`
+    );
+
+  const body=
+    encodeURIComponent(
+      `Tipo: ${type}\n`+
+      `Calificación: ${rating}\n\n`+
+      contextLine+
+      `Comentario:\n${text||"(sin comentario adicional)"}\n\n`+
+      `Fecha: ${new Date().toLocaleString("es-CO")}`
+    );
+
+  window.location.href=
+    `mailto:terminolegal.co@gmail.com?subject=${subject}&body=${body}`;
+
+}
+
+
+sendPqrsBtn.addEventListener(
+  "click",
+  sendPQRS
 );
 
 
