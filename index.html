@@ -118,6 +118,48 @@ body{
   padding:36px 0 24px
 }
 
+/* JURISDICCIÓN (integrada en la fecha de inicio) */
+.date-field-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px
+}
+
+.date-field-header label{
+  margin-bottom:0
+}
+
+.country-inline{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  flex:0 0 auto
+}
+
+.country-flag-display{
+  font-size:1.05rem;
+  line-height:1;
+  padding:5px 8px;
+  border:1px solid var(--input-border);
+  border-radius:8px;
+  background:var(--input-bg);
+  pointer-events:none;
+  white-space:nowrap
+}
+
+.country-inline-select{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  opacity:0;
+  cursor:pointer;
+  border:0;
+  padding:0
+}
+
 h1{
   font-family:Georgia,"Times New Roman",serif;
   font-size:clamp(1.8rem,6vw,2.5rem);
@@ -845,6 +887,23 @@ footer{
     width:min(300px,calc(100vw - 42px))
   }
 
+
+  .export-btn{
+    flex:1 1 auto;
+    height:40px;
+    min-height:40px;
+    padding:0 12px;
+    border-width:1px;
+    border-radius:9px;
+    font-size:.68rem;
+  }
+
+  .export-btn svg{
+    width:13px;
+    height:13px;
+    margin-right:4px;
+  }
+
   .feedback-btn{
     padding:5px 14px
   }
@@ -923,7 +982,21 @@ footer{
   <!-- FECHA -->
   <div class="field field-date">
 
-    <label for="startDateDisplay">Fecha de inicio</label>
+    <div class="date-field-header">
+
+      <label for="startDateDisplay">Fecha de inicio</label>
+
+      <div class="country-inline" id="countryInline" title="Jurisdicción de referencia">
+
+        <span class="country-flag-display" id="countryFlagDisplay" aria-hidden="true">🌎</span>
+
+        <select id="countrySelect"
+                class="country-inline-select"
+                aria-label="Jurisdicción de referencia (calendario aplicado)"></select>
+
+      </div>
+
+    </div>
 
     <div class="date-input-wrap">
 
@@ -1054,7 +1127,7 @@ footer{
   <!-- TIPO DE TIEMPO -->
   <div class="field">
 
-    <label>Tiempo</label>
+    <label>Tipo de término</label>
 
     <div class="segmented segmented-3">
 
@@ -1073,10 +1146,11 @@ footer{
         <span>Días calendario</span>
       </label>
 
-      <label>
+      <label id="stateTermLabel">
         <input type="radio"
                name="termType"
-               value="state">
+               value="state"
+               id="stateTermRadio">
         <span>Contratación estatal</span>
       </label>
 
@@ -1132,13 +1206,8 @@ footer{
 
   </div>
 
-  <p class="notice">
-    Versión 0.8 — incluye festivos colombianos
-    (Ley 51 de 1983), el festivo de la Ley 2578 de 2026,
-    el modo de contratación estatal (Ley 80 de 1993 /
-    Colombia Compra Eficiente), validación de fechas y
-    límites de rango. Los festivos solo afectan el conteo
-    de días hábiles.
+  <p class="notice" id="versionNotice">
+    Versión 0.9 — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.
   </p>
 
   <div class="export-row">
@@ -1196,16 +1265,16 @@ footer{
    style="margin-top:16px"
    hidden>
 
-  Calculo usando días hábiles, días calendario o
-  el régimen de contratación estatal (Ley 80),
-  con festivos colombianos incluidos.
+  El cálculo se realiza según el tipo de término seleccionado y la jurisdicción de referencia.
+  Los días hábiles excluyen los días de descanso semanal y los festivos disponibles para esa jurisdicción.
+  Las reglas especiales pueden variar según la materia, autoridad o territorio aplicable.
 
 </p>
 
 <!-- FEEDBACK / PQRS -->
 <div class="feedback-card card" id="feedbackCard" hidden>
 
-  <p class="feedback-title">¿Qué tan útil te resultó esta herramienta?</p>
+  <p class="feedback-title">¿Te resultó útil esta herramienta?</p>
 
   <div class="feedback-buttons">
     <button type="button" class="feedback-btn" id="feedbackUpBtn" onclick="sendFeedback('up')" aria-label="Me sirvió">👍</button>
@@ -1276,6 +1345,12 @@ const holidayCache=new Map();
 
 const MAX_DAYS=365;
 const MAX_MONTHS=60;
+
+/*
+   PRINCIPIO UNIVERSAL: el motor calcula el término; la jurisdicción
+   aporta únicamente el calendario y, cuando exista, reglas especiales.
+   Las descripciones jurídicas locales se mantienen como capa informativa.
+*/
 
 let lastTermData=null;
 let calendarCursor=new Date();
@@ -1363,7 +1438,7 @@ function isWeekend(date){
 }
 
 
-/* FESTIVOS COLOMBIANOS */
+/* CALENDARIOS TERRITORIALES */
 function easterSunday(year){
 
   const a=year%19,
@@ -1425,162 +1500,729 @@ function addHoliday(
 }
 
 
+/* COLOMBIA */
 function getColombiaHolidays(year){
 
   const holidays=new Map();
 
-  addHoliday(
-    holidays,
-    new Date(year,0,1),
-    "Año Nuevo",
-    "Ley 51 de 1983, art. 1"
-  );
-
-  addHoliday(
-    holidays,
-    new Date(year,4,1),
-    "Día del Trabajo",
-    "Ley 51 de 1983, art. 1"
-  );
-
-  addHoliday(
-    holidays,
-    new Date(year,6,20),
-    "Independencia de Colombia",
-    "Ley 51 de 1983, art. 1"
-  );
-
-  addHoliday(
-    holidays,
-    new Date(year,7,7),
-    "Batalla de Boyacá",
-    "Ley 51 de 1983, art. 1"
-  );
-
-  addHoliday(
-    holidays,
-    new Date(year,11,8),
-    "Inmaculada Concepción",
-    "Ley 51 de 1983, art. 1"
-  );
-
-  addHoliday(
-    holidays,
-    new Date(year,11,25),
-    "Navidad",
-    "Ley 51 de 1983, art. 1"
-  );
-
-  addHoliday(
-    holidays,
-    emilianiDate(year,0,6),
-    "Día de los Reyes Magos",
-    "Ley 51 de 1983, art. 1"
-  );
-
-  addHoliday(
-    holidays,
-    emilianiDate(year,2,19),
-    "Día de San José",
-    "Ley 51 de 1983, art. 1"
-  );
-
-  addHoliday(
-    holidays,
-    emilianiDate(year,5,29),
-    "San Pedro y San Pablo",
-    "Ley 51 de 1983, art. 1"
-  );
-
-  addHoliday(
-    holidays,
-    emilianiDate(year,7,15),
-    "Asunción de la Virgen",
-    "Ley 51 de 1983, art. 1"
-  );
-
-  addHoliday(
-    holidays,
-    emilianiDate(year,9,12),
-    "Día de la Raza",
-    "Ley 51 de 1983, art. 1"
-  );
-
-  addHoliday(
-    holidays,
-    emilianiDate(year,10,1),
-    "Todos los Santos",
-    "Ley 51 de 1983, art. 1"
-  );
-
-  addHoliday(
-    holidays,
-    emilianiDate(year,10,11),
-    "Independencia de Cartagena",
-    "Ley 51 de 1983, art. 1"
-  );
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,new Date(year,4,1),"Día del Trabajo","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,new Date(year,6,20),"Independencia de Colombia","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,new Date(year,7,7),"Batalla de Boyacá","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,new Date(year,11,8),"Inmaculada Concepción","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,emilianiDate(year,0,6),"Día de los Reyes Magos","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,emilianiDate(year,2,19),"Día de San José","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,emilianiDate(year,5,29),"San Pedro y San Pablo","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,emilianiDate(year,7,15),"Asunción de la Virgen","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,emilianiDate(year,9,12),"Día de la Raza","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,emilianiDate(year,10,1),"Todos los Santos","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,emilianiDate(year,10,11),"Independencia de Cartagena","Ley 51 de 1983, art. 1");
 
   const easter=easterSunday(year);
 
-  addHoliday(
-    holidays,
-    addDays(easter,-3),
-    "Jueves Santo",
-    "Ley 51 de 1983, art. 1"
-  );
-
-  addHoliday(
-    holidays,
-    addDays(easter,-2),
-    "Viernes Santo",
-    "Ley 51 de 1983, art. 1"
-  );
-
-  addHoliday(
-    holidays,
-    addDays(easter,43),
-    "Ascensión del Señor",
-    "Ley 51 de 1983, art. 1"
-  );
-
-  addHoliday(
-    holidays,
-    addDays(easter,64),
-    "Corpus Christi",
-    "Ley 51 de 1983, art. 1"
-  );
-
-  addHoliday(
-    holidays,
-    addDays(easter,71),
-    "Sagrado Corazón de Jesús",
-    "Ley 51 de 1983, art. 1"
-  );
-
-  addHoliday(
-    holidays,
-    emilianiDate(year,6,9),
-    "Nuestra Señora del Rosario de Chiquinquirá",
-    "Ley 2578 de 2026, art. 6"
-  );
+  addHoliday(holidays,addDays(easter,-3),"Jueves Santo","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,addDays(easter,-2),"Viernes Santo","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,addDays(easter,43),"Ascensión del Señor","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,addDays(easter,64),"Corpus Christi","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,addDays(easter,71),"Sagrado Corazón de Jesús","Ley 51 de 1983, art. 1");
+  addHoliday(holidays,emilianiDate(year,6,9),"Nuestra Señora del Rosario de Chiquinquirá","Ley 2578 de 2026, art. 6");
 
   return holidays;
 }
+
+
+/* MÉXICO */
+function nthWeekday(year,monthIndex,weekday,n){
+
+  const first=new Date(year,monthIndex,1);
+  const firstWeekdayOffset=(weekday-first.getDay()+7)%7;
+  const day=1+firstWeekdayOffset+(n-1)*7;
+
+  return new Date(year,monthIndex,day);
+}
+
+
+function getMexicoHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Art. 74, Ley Federal del Trabajo");
+  addHoliday(holidays,nthWeekday(year,1,1,1),"Día de la Constitución","Art. 74, Ley Federal del Trabajo");
+  addHoliday(holidays,nthWeekday(year,2,1,3),"Natalicio de Benito Juárez","Art. 74, Ley Federal del Trabajo");
+  addHoliday(holidays,new Date(year,4,1),"Día del Trabajo","Art. 74, Ley Federal del Trabajo");
+  addHoliday(holidays,new Date(year,8,16),"Día de la Independencia","Art. 74, Ley Federal del Trabajo");
+  addHoliday(holidays,nthWeekday(year,10,1,3),"Día de la Revolución Mexicana","Art. 74, Ley Federal del Trabajo");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Art. 74, Ley Federal del Trabajo");
+
+  return holidays;
+}
+
+
+/* ESTADOS UNIDOS */
+function getUSHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"New Year's Day","5 U.S.C. § 6103");
+  addHoliday(holidays,nthWeekday(year,0,1,3),"Martin Luther King Jr. Day","5 U.S.C. § 6103");
+  addHoliday(holidays,nthWeekday(year,1,1,3),"Washington's Birthday","5 U.S.C. § 6103");
+
+  const lastMonday=(y,m)=>{
+    const last=new Date(y,m+1,0);
+    const offset=(last.getDay()+6)%7;
+    return addDays(last,-offset);
+  };
+
+  addHoliday(holidays,lastMonday(year,4),"Memorial Day","5 U.S.C. § 6103");
+  addHoliday(holidays,new Date(year,5,19),"Juneteenth","5 U.S.C. § 6103");
+  addHoliday(holidays,new Date(year,6,4),"Independence Day","5 U.S.C. § 6103");
+  addHoliday(holidays,nthWeekday(year,8,1,1),"Labor Day","5 U.S.C. § 6103");
+  addHoliday(holidays,nthWeekday(year,9,1,2),"Columbus Day","5 U.S.C. § 6103");
+  addHoliday(holidays,new Date(year,10,11),"Veterans Day","5 U.S.C. § 6103");
+  addHoliday(holidays,nthWeekday(year,10,4,4),"Thanksgiving Day","5 U.S.C. § 6103");
+  addHoliday(holidays,new Date(year,11,25),"Christmas Day","5 U.S.C. § 6103");
+
+  return holidays;
+}
+
+
+/* BRASIL */
+function getBrazilHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Confraternização Universal","Calendário nacional");
+  addHoliday(holidays,new Date(year,3,21),"Tiradentes","Calendário nacional");
+  addHoliday(holidays,new Date(year,4,1),"Dia do Trabalho","Calendário nacional");
+  addHoliday(holidays,new Date(year,8,7),"Independência do Brasil","Calendário nacional");
+  addHoliday(holidays,new Date(year,9,12),"Nossa Senhora Aparecida","Calendário nacional");
+  addHoliday(holidays,new Date(year,10,2),"Finados","Calendário nacional");
+  addHoliday(holidays,new Date(year,10,15),"Proclamação da República","Calendário nacional");
+  addHoliday(holidays,new Date(year,11,25),"Natal","Calendário nacional");
+
+  const easter=easterSunday(year);
+
+  addHoliday(holidays,addDays(easter,-2),"Sexta-feira Santa","Calendário nacional");
+
+  return holidays;
+}
+
+
+/* ECUADOR */
+function getEcuadorHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Art. 65, Código del Trabajo");
+  addHoliday(holidays,new Date(year,4,1),"Día del Trabajo","Art. 65, Código del Trabajo");
+  addHoliday(holidays,new Date(year,4,24),"Batalla de Pichincha","Art. 65, Código del Trabajo");
+  addHoliday(holidays,new Date(year,7,10),"Primer Grito de Independencia","Art. 65, Código del Trabajo");
+  addHoliday(holidays,new Date(year,9,9),"Independencia de Guayaquil","Art. 65, Código del Trabajo");
+  addHoliday(holidays,new Date(year,10,2),"Día de los Difuntos","Art. 65, Código del Trabajo");
+  addHoliday(holidays,new Date(year,10,3),"Independencia de Cuenca","Art. 65, Código del Trabajo");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Art. 65, Código del Trabajo");
+
+  const easter=easterSunday(year);
+
+  addHoliday(holidays,addDays(easter,-2),"Viernes Santo","Art. 65, Código del Trabajo");
+  addHoliday(holidays,addDays(easter,-48),"Lunes de Carnaval","Art. 65, Código del Trabajo");
+  addHoliday(holidays,addDays(easter,-47),"Martes de Carnaval","Art. 65, Código del Trabajo");
+
+  return holidays;
+}
+
+
+/* PANAMÁ */
+function getPanamaHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Código de Trabajo de Panamá");
+  addHoliday(holidays,new Date(year,0,9),"Día de los Mártires","Código de Trabajo de Panamá");
+  addHoliday(holidays,new Date(year,4,1),"Día del Trabajo","Código de Trabajo de Panamá");
+  addHoliday(holidays,new Date(year,10,3),"Separación de Panamá de Colombia","Código de Trabajo de Panamá");
+  addHoliday(holidays,new Date(year,10,4),"Día de la Bandera","Código de Trabajo de Panamá");
+  addHoliday(holidays,new Date(year,10,5),"Independencia de Colón","Código de Trabajo de Panamá");
+  addHoliday(holidays,new Date(year,10,10),"Primer Grito de Independencia","Código de Trabajo de Panamá");
+  addHoliday(holidays,new Date(year,10,28),"Independencia de España","Código de Trabajo de Panamá");
+  addHoliday(holidays,new Date(year,11,8),"Día de las Madres","Código de Trabajo de Panamá");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Código de Trabajo de Panamá");
+
+  const easter=easterSunday(year);
+
+  addHoliday(holidays,addDays(easter,-2),"Viernes Santo","Código de Trabajo de Panamá");
+
+  return holidays;
+}
+
+
+/* =========================================================
+   PAÍSES SOPORTADOS
+   ========================================================= */
+
+/* ARGENTINA */
+function getArgentinaHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Calendario nacional");
+  addHoliday(holidays,new Date(year,2,24),"Día de la Memoria","Calendario nacional");
+  addHoliday(holidays,new Date(year,3,2),"Día del Veterano y de los Caídos en Malvinas","Calendario nacional");
+  addHoliday(holidays,new Date(year,4,1),"Día del Trabajador","Calendario nacional");
+  addHoliday(holidays,new Date(year,4,25),"Día de la Revolución de Mayo","Calendario nacional");
+  addHoliday(holidays,new Date(year,5,20),"Día de la Bandera","Calendario nacional");
+  addHoliday(holidays,new Date(year,6,9),"Día de la Independencia","Calendario nacional");
+  addHoliday(holidays,new Date(year,7,17),"Paso a la Inmortalidad del Gral. San Martín","Calendario nacional");
+  addHoliday(holidays,new Date(year,9,12),"Día del Respeto a la Diversidad Cultural","Calendario nacional");
+  addHoliday(holidays,new Date(year,10,20),"Día de la Soberanía Nacional","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,8),"Inmaculada Concepción","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Calendario nacional");
+
+  const easter=easterSunday(year);
+
+  addHoliday(holidays,addDays(easter,-2),"Viernes Santo","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-48),"Lunes de Carnaval","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-47),"Martes de Carnaval","Calendario nacional");
+
+  return holidays;
+}
+
+
+/* CHILE */
+function getChileHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Calendario nacional");
+  addHoliday(holidays,new Date(year,4,1),"Día del Trabajo","Calendario nacional");
+  addHoliday(holidays,new Date(year,4,21),"Glorias Navales","Calendario nacional");
+  addHoliday(holidays,new Date(year,6,16),"Virgen del Carmen","Calendario nacional");
+  addHoliday(holidays,new Date(year,7,15),"Asunción de la Virgen","Calendario nacional");
+  addHoliday(holidays,new Date(year,8,18),"Independencia Nacional","Calendario nacional");
+  addHoliday(holidays,new Date(year,8,19),"Glorias del Ejército","Calendario nacional");
+  addHoliday(holidays,new Date(year,9,12),"Encuentro de Dos Mundos","Calendario nacional");
+  addHoliday(holidays,new Date(year,10,1),"Día de Todos los Santos","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,8),"Inmaculada Concepción","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Calendario nacional");
+
+  const easter=easterSunday(year);
+
+  addHoliday(holidays,addDays(easter,-2),"Viernes Santo","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-1),"Sábado Santo","Calendario nacional");
+
+  return holidays;
+}
+
+
+/* PERÚ */
+function getPeruHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Calendario nacional");
+  addHoliday(holidays,new Date(year,4,1),"Día del Trabajo","Calendario nacional");
+  addHoliday(holidays,new Date(year,5,29),"San Pedro y San Pablo","Calendario nacional");
+  addHoliday(holidays,new Date(year,6,28),"Independencia del Perú","Calendario nacional");
+  addHoliday(holidays,new Date(year,6,29),"Fiestas Patrias","Calendario nacional");
+  addHoliday(holidays,new Date(year,7,30),"Santa Rosa de Lima","Calendario nacional");
+  addHoliday(holidays,new Date(year,9,8),"Combate de Angamos","Calendario nacional");
+  addHoliday(holidays,new Date(year,10,1),"Todos los Santos","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,8),"Inmaculada Concepción","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,9),"Batalla de Ayacucho","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Calendario nacional");
+
+  const easter=easterSunday(year);
+
+  addHoliday(holidays,addDays(easter,-3),"Jueves Santo","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-2),"Viernes Santo","Calendario nacional");
+
+  return holidays;
+}
+
+
+/* VENEZUELA */
+function getVenezuelaHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Calendario nacional");
+  addHoliday(holidays,new Date(year,3,19),"Declaración de Independencia","Calendario nacional");
+  addHoliday(holidays,new Date(year,4,1),"Día del Trabajador","Calendario nacional");
+  addHoliday(holidays,new Date(year,5,24),"Batalla de Carabobo","Calendario nacional");
+  addHoliday(holidays,new Date(year,6,5),"Día de la Independencia","Calendario nacional");
+  addHoliday(holidays,new Date(year,6,24),"Natalicio de Simón Bolívar","Calendario nacional");
+  addHoliday(holidays,new Date(year,9,12),"Día de la Resistencia Indígena","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Calendario nacional");
+
+  const easter=easterSunday(year);
+
+  addHoliday(holidays,addDays(easter,-3),"Jueves Santo","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-2),"Viernes Santo","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-48),"Lunes de Carnaval","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-47),"Martes de Carnaval","Calendario nacional");
+
+  return holidays;
+}
+
+
+/* BOLIVIA */
+function getBoliviaHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Calendario nacional");
+  addHoliday(holidays,new Date(year,4,1),"Día del Trabajo","Calendario nacional");
+  addHoliday(holidays,new Date(year,5,21),"Año Nuevo Andino Amazónico","Calendario nacional");
+  addHoliday(holidays,new Date(year,7,6),"Día de la Independencia","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Calendario nacional");
+
+  const easter=easterSunday(year);
+
+  addHoliday(holidays,addDays(easter,-2),"Viernes Santo","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-48),"Lunes de Carnaval","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-47),"Martes de Carnaval","Calendario nacional");
+  addHoliday(holidays,addDays(easter,60),"Corpus Christi","Calendario nacional");
+
+  return holidays;
+}
+
+
+/* PARAGUAY */
+function getParaguayHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Calendario nacional");
+  addHoliday(holidays,new Date(year,2,1),"Día de los Héroes","Calendario nacional");
+  addHoliday(holidays,new Date(year,4,1),"Día del Trabajador","Calendario nacional");
+  addHoliday(holidays,new Date(year,4,15),"Día de la Independencia","Calendario nacional");
+  addHoliday(holidays,new Date(year,5,12),"Paz del Chaco","Calendario nacional");
+  addHoliday(holidays,new Date(year,7,15),"Fundación de Asunción","Calendario nacional");
+  addHoliday(holidays,new Date(year,8,29),"Victoria de Boquerón","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,8),"Virgen de Caacupé","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Calendario nacional");
+
+  const easter=easterSunday(year);
+
+  addHoliday(holidays,addDays(easter,-3),"Jueves Santo","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-2),"Viernes Santo","Calendario nacional");
+
+  return holidays;
+}
+
+
+/* URUGUAY */
+function getUruguayHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Calendario nacional");
+  addHoliday(holidays,new Date(year,3,19),"Desembarco de los 33 Orientales","Calendario nacional");
+  addHoliday(holidays,new Date(year,4,1),"Día de los Trabajadores","Calendario nacional");
+  addHoliday(holidays,new Date(year,4,18),"Batalla de las Piedras","Calendario nacional");
+  addHoliday(holidays,new Date(year,5,19),"Natalicio de Artigas","Calendario nacional");
+  addHoliday(holidays,new Date(year,6,18),"Jura de la Constitución","Calendario nacional");
+  addHoliday(holidays,new Date(year,7,25),"Declaratoria de la Independencia","Calendario nacional");
+  addHoliday(holidays,new Date(year,9,12),"Día de la Raza","Calendario nacional");
+  addHoliday(holidays,new Date(year,10,2),"Día de los Difuntos","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Calendario nacional");
+
+  const easter=easterSunday(year);
+
+  addHoliday(holidays,addDays(easter,-3),"Jueves Santo","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-2),"Viernes Santo","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-48),"Lunes de Carnaval","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-47),"Martes de Carnaval","Calendario nacional");
+
+  return holidays;
+}
+
+
+/* COSTA RICA */
+function getCostaRicaHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Calendario nacional");
+  addHoliday(holidays,new Date(year,3,11),"Día de Juan Santamaría","Calendario nacional");
+  addHoliday(holidays,new Date(year,4,1),"Día del Trabajador","Calendario nacional");
+  addHoliday(holidays,new Date(year,6,25),"Anexión del Partido de Nicoya","Calendario nacional");
+  addHoliday(holidays,new Date(year,7,2),"Día de la Virgen de los Ángeles","Calendario nacional");
+  addHoliday(holidays,new Date(year,7,15),"Día de la Madre","Calendario nacional");
+  addHoliday(holidays,new Date(year,8,15),"Día de la Independencia","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Calendario nacional");
+
+  const easter=easterSunday(year);
+
+  addHoliday(holidays,addDays(easter,-3),"Jueves Santo","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-2),"Viernes Santo","Calendario nacional");
+
+  return holidays;
+}
+
+
+/* GUATEMALA */
+function getGuatemalaHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Calendario nacional");
+  addHoliday(holidays,new Date(year,4,1),"Día del Trabajo","Calendario nacional");
+  addHoliday(holidays,new Date(year,5,30),"Día del Ejército","Calendario nacional");
+  addHoliday(holidays,new Date(year,8,15),"Día de la Independencia","Calendario nacional");
+  addHoliday(holidays,new Date(year,9,20),"Día de la Revolución","Calendario nacional");
+  addHoliday(holidays,new Date(year,10,1),"Día de Todos los Santos","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Calendario nacional");
+
+  const easter=easterSunday(year);
+
+  addHoliday(holidays,addDays(easter,-3),"Jueves Santo","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-2),"Viernes Santo","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-1),"Sábado Santo","Calendario nacional");
+
+  return holidays;
+}
+
+
+/* HONDURAS */
+function getHondurasHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Calendario nacional");
+  addHoliday(holidays,new Date(year,3,14),"Día de las Américas","Calendario nacional");
+  addHoliday(holidays,new Date(year,4,1),"Día del Trabajador","Calendario nacional");
+  addHoliday(holidays,new Date(year,8,15),"Día de la Independencia","Calendario nacional");
+  addHoliday(holidays,new Date(year,9,3),"Día de Morazán","Calendario nacional");
+  addHoliday(holidays,new Date(year,9,12),"Día de la Raza","Calendario nacional");
+  addHoliday(holidays,new Date(year,9,21),"Día de las Fuerzas Armadas","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Calendario nacional");
+
+  const easter=easterSunday(year);
+
+  addHoliday(holidays,addDays(easter,-3),"Jueves Santo","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-2),"Viernes Santo","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-1),"Sábado de Gloria","Calendario nacional");
+
+  return holidays;
+}
+
+
+/* EL SALVADOR */
+function getElSalvadorHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Calendario nacional");
+  addHoliday(holidays,new Date(year,4,1),"Día del Trabajo","Calendario nacional");
+  addHoliday(holidays,new Date(year,7,6),"Día del Salvador del Mundo","Calendario nacional");
+  addHoliday(holidays,new Date(year,8,15),"Día de la Independencia","Calendario nacional");
+  addHoliday(holidays,new Date(year,10,2),"Día de los Difuntos","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Calendario nacional");
+
+  const easter=easterSunday(year);
+
+  addHoliday(holidays,addDays(easter,-3),"Jueves Santo","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-2),"Viernes Santo","Calendario nacional");
+
+  return holidays;
+}
+
+
+/* NICARAGUA */
+function getNicaraguaHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Calendario nacional");
+  addHoliday(holidays,new Date(year,4,1),"Día del Trabajo","Calendario nacional");
+  addHoliday(holidays,new Date(year,6,19),"Día de la Revolución","Calendario nacional");
+  addHoliday(holidays,new Date(year,8,14),"Batalla de San Jacinto","Calendario nacional");
+  addHoliday(holidays,new Date(year,8,15),"Día de la Independencia","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,8),"Concepción de María","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Calendario nacional");
+
+  const easter=easterSunday(year);
+
+  addHoliday(holidays,addDays(easter,-3),"Jueves Santo","Calendario nacional");
+  addHoliday(holidays,addDays(easter,-2),"Viernes Santo","Calendario nacional");
+
+  return holidays;
+}
+
+
+/* REPÚBLICA DOMINICANA */
+function getDominicanaHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Calendario nacional");
+  addHoliday(holidays,new Date(year,0,21),"Virgen de la Altagracia","Calendario nacional");
+  addHoliday(holidays,new Date(year,1,27),"Día de la Independencia","Calendario nacional");
+  addHoliday(holidays,new Date(year,4,1),"Día del Trabajo","Calendario nacional");
+  addHoliday(holidays,new Date(year,7,16),"Día de la Restauración","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Calendario nacional");
+
+  const easter=easterSunday(year);
+
+  addHoliday(holidays,addDays(easter,-2),"Viernes Santo","Calendario nacional");
+
+  return holidays;
+}
+
+
+/* ESPAÑA */
+function getEspanaHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Año Nuevo","Calendario nacional");
+  addHoliday(holidays,new Date(year,0,6),"Epifanía del Señor","Calendario nacional");
+  addHoliday(holidays,new Date(year,4,1),"Fiesta del Trabajo","Calendario nacional");
+  addHoliday(holidays,new Date(year,7,15),"Asunción de la Virgen","Calendario nacional");
+  addHoliday(holidays,new Date(year,9,12),"Fiesta Nacional de España","Calendario nacional");
+  addHoliday(holidays,new Date(year,10,1),"Todos los Santos","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,6),"Día de la Constitución","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,8),"Inmaculada Concepción","Calendario nacional");
+  addHoliday(holidays,new Date(year,11,25),"Navidad","Calendario nacional");
+
+  const easter=easterSunday(year);
+
+  addHoliday(holidays,addDays(easter,-2),"Viernes Santo","Calendario nacional");
+
+  return holidays;
+}
+
+
+/* OTRO PAÍS / NO LISTADO — modo genérico sin base de festivos */
+function getOtherCountryHolidays(year){
+
+  return new Map();
+}
+
+
+const COUNTRIES={
+
+  CO:{
+    name:"Colombia",
+    flag:"🇨🇴",
+    getHolidays:getColombiaHolidays,
+    note:"Festivos según la Ley 51 de 1983 y la Ley 2578 de 2026."
+  },
+  MX:{
+    name:"México",
+    flag:"🇲🇽",
+    getHolidays:getMexicoHolidays,
+    note:"Días de descanso obligatorio según el art. 74 de la Ley Federal del Trabajo."
+  },
+  US:{
+    name:"Estados Unidos",
+    flag:"🇺🇸",
+    getHolidays:getUSHolidays,
+    note:"Federal holidays según 5 U.S.C. § 6103. Los estados pueden tener festivos adicionales."
+  },
+  BR:{
+    name:"Brasil",
+    flag:"🇧🇷",
+    getHolidays:getBrazilHolidays,
+    note:"Feriados nacionais. Estados y municipios pueden tener feriados adicionales."
+  },
+  EC:{
+    name:"Ecuador",
+    flag:"🇪🇨",
+    getHolidays:getEcuadorHolidays,
+    note:"Festivos según el art. 65 del Código del Trabajo."
+  },
+  PA:{
+    name:"Panamá",
+    flag:"🇵🇦",
+    getHolidays:getPanamaHolidays,
+    note:"Días de fiesta o duelo nacional según el Código de Trabajo."
+  },
+  AR:{
+    name:"Argentina",
+    flag:"🇦🇷",
+    getHolidays:getArgentinaHolidays,
+    note:"Feriados nacionales, inamovibles y trasladables."
+  },
+  CL:{
+    name:"Chile",
+    flag:"🇨🇱",
+    getHolidays:getChileHolidays,
+    note:"Feriados legales de carácter nacional."
+  },
+  PE:{
+    name:"Perú",
+    flag:"🇵🇪",
+    getHolidays:getPeruHolidays,
+    note:"Feriados no laborables de alcance nacional."
+  },
+  VE:{
+    name:"Venezuela",
+    flag:"🇻🇪",
+    getHolidays:getVenezuelaHolidays,
+    note:"Días feriados de carácter nacional."
+  },
+  BO:{
+    name:"Bolivia",
+    flag:"🇧🇴",
+    getHolidays:getBoliviaHolidays,
+    note:"Feriados nacionales."
+  },
+  PY:{
+    name:"Paraguay",
+    flag:"🇵🇾",
+    getHolidays:getParaguayHolidays,
+    note:"Días feriados nacionales."
+  },
+  UY:{
+    name:"Uruguay",
+    flag:"🇺🇾",
+    getHolidays:getUruguayHolidays,
+    note:"Feriados nacionales, laborables y no laborables."
+  },
+  CR:{
+    name:"Costa Rica",
+    flag:"🇨🇷",
+    getHolidays:getCostaRicaHolidays,
+    note:"Feriados de pago obligatorio según el Código de Trabajo."
+  },
+  GT:{
+    name:"Guatemala",
+    flag:"🇬🇹",
+    getHolidays:getGuatemalaHolidays,
+    note:"Días de asueto según el Código de Trabajo."
+  },
+  HN:{
+    name:"Honduras",
+    flag:"🇭🇳",
+    getHolidays:getHondurasHolidays,
+    note:"Días feriados según el Código del Trabajo."
+  },
+  SV:{
+    name:"El Salvador",
+    flag:"🇸🇻",
+    getHolidays:getElSalvadorHolidays,
+    note:"Asuetos según el Código de Trabajo."
+  },
+  NI:{
+    name:"Nicaragua",
+    flag:"🇳🇮",
+    getHolidays:getNicaraguaHolidays,
+    note:"Feriados nacionales según el Código del Trabajo."
+  },
+  DO:{
+    name:"República Dominicana",
+    flag:"🇩🇴",
+    getHolidays:getDominicanaHolidays,
+    note:"Días feriados según el Código de Trabajo."
+  },
+  ES:{
+    name:"España",
+    flag:"🇪🇸",
+    getHolidays:getEspanaHolidays,
+    note:"Fiestas laborales de ámbito nacional; cada comunidad autónoma añade las suyas."
+  },
+  OT:{
+    name:"Otro país / no listado",
+    flag:"🌍",
+    getHolidays:getOtherCountryHolidays,
+    note:"Modo genérico: solo excluye sábados y domingos. No incluye festivos locales — verifica los festivos de tu jurisdicción por separado."
+  }
+
+};
+
+const DEFAULT_COUNTRY="CO";
+
+/* Zonas horarias más comunes por país, para la detección automática */
+const TIMEZONE_COUNTRY_MAP={
+  "America/Bogota":"CO",
+  "America/Mexico_City":"MX",
+  "America/Tijuana":"MX",
+  "America/Cancun":"MX",
+  "America/Monterrey":"MX",
+  "America/New_York":"US",
+  "America/Chicago":"US",
+  "America/Denver":"US",
+  "America/Los_Angeles":"US",
+  "America/Anchorage":"US",
+  "Pacific/Honolulu":"US",
+  "America/Sao_Paulo":"BR",
+  "America/Manaus":"BR",
+  "America/Fortaleza":"BR",
+  "America/Recife":"BR",
+  "America/Bahia":"BR",
+  "America/Guayaquil":"EC",
+  "Pacific/Galapagos":"EC",
+  "America/Panama":"PA",
+  "America/Argentina/Buenos_Aires":"AR",
+  "America/Argentina/Cordoba":"AR",
+  "America/Argentina/Mendoza":"AR",
+  "America/Argentina/Salta":"AR",
+  "America/Santiago":"CL",
+  "America/Punta_Arenas":"CL",
+  "America/Lima":"PE",
+  "America/Caracas":"VE",
+  "America/La_Paz":"BO",
+  "America/Asuncion":"PY",
+  "America/Montevideo":"UY",
+  "America/Costa_Rica":"CR",
+  "America/Guatemala":"GT",
+  "America/Tegucigalpa":"HN",
+  "America/El_Salvador":"SV",
+  "America/Managua":"NI",
+  "America/Santo_Domingo":"DO",
+  "Europe/Madrid":"ES"
+};
+
+
+function detectCountry(){
+
+  try{
+
+    const tz=
+      Intl.DateTimeFormat()
+        .resolvedOptions()
+        .timeZone;
+
+    return(
+      TIMEZONE_COUNTRY_MAP[tz]||
+      "OT"
+    );
+
+  }catch{
+
+    return "OT";
+  }
+
+}
+
+
+let currentCountry=DEFAULT_COUNTRY;
 
 
 function getHoliday(date){
 
   const year=date.getFullYear();
 
-  if(!holidayCache.has(year)){
+  const cacheKey=
+    `${currentCountry}-${year}`;
+
+  if(!holidayCache.has(cacheKey)){
+
+    const provider=
+      COUNTRIES[currentCountry].getHolidays;
+
     holidayCache.set(
-      year,
-      getColombiaHolidays(year)
+      cacheKey,
+      provider(year)
     );
+
   }
 
   return holidayCache
-    .get(year)
+    .get(cacheKey)
     .get(dateKey(date))||null;
 }
 
@@ -1709,7 +2351,7 @@ function typeDisplayLabel(type,unit){
     return"Días hábiles";
 
   if(type==="state")
-    return`Contratación estatal (Ley 80) — ${unitWord} calendario`;
+    return`Régimen especial: contratación estatal (Ley 80) — ${unitWord} calendario`;
 
   return`Días calendario (${unitWord})`;
 }
@@ -2293,18 +2935,37 @@ const daysRadio=
   );
 
 
-const TERM_TYPE_NOTES={
+const TERM_TYPE_NOTES_BY_COUNTRY={
 
-  business:
-    "Excluye sábados, domingos y festivos. Aplica a trámites judiciales y a la etapa precontractual de un proceso de selección en SECOP (observaciones, adendas, recursos), conforme al CPACA.",
+  CO:{
+    business:"Excluye sábados, domingos y festivos según el calendario de referencia de la jurisdicción. Las reglas especiales de cada trámite pueden modificar el cómputo y deben verificarse en la norma aplicable.",
+    calendar:"Cuenta todos los días de forma continua e ininterrumpida, sin excluir fines de semana ni festivos.",
+    state:"Plazo de ejecución de un contrato estatal (p. ej., prestación de servicios) bajo la Ley 80 de 1993 y Colombia Compra Eficiente. Se cuenta en días o meses calendario, salvo que la minuta pacte expresamente días hábiles. Verifica siempre el acta de inicio y el contrato."
+  },
 
-  calendar:
-    "Cuenta todos los días de forma continua e ininterrumpida, sin excluir fines de semana ni festivos.",
+  DEFAULT:{
+    business:"Excluye los días de descanso semanal y los festivos incluidos en el calendario de la jurisdicción seleccionada. Las reglas concretas pueden variar según la materia.",
+    calendar:"Cuenta todos los días de forma continua e ininterrumpida, sin excluir fines de semana ni festivos."
+  },
 
-  state:
-    "Plazo de ejecución de un contrato estatal (p. ej., prestación de servicios) bajo la Ley 80 de 1993 y Colombia Compra Eficiente. Se cuenta en días o meses calendario, salvo que la minuta pacte expresamente días hábiles. Verifica siempre el acta de inicio y el contrato."
+  OT:{
+    business:"⚠️ Modo genérico: solo excluye sábados y domingos. No conocemos los festivos de tu país; verifícalos aparte antes de confiar en este resultado.",
+    calendar:"Cuenta todos los días de forma continua e ininterrumpida, sin excluir fines de semana ni festivos."
+  }
 
 };
+
+
+function getTermTypeNotes(){
+
+  return(
+    TERM_TYPE_NOTES_BY_COUNTRY[
+      currentCountry
+    ]||
+    TERM_TYPE_NOTES_BY_COUNTRY.DEFAULT
+  );
+
+}
 
 
 function syncUnitAvailability(){
@@ -2335,7 +2996,7 @@ function syncUnitAvailability(){
   }
 
   termTypeNote.textContent=
-    TERM_TYPE_NOTES[type];
+    getTermTypeNotes()[type]||"";
 
   updateDaysLabel();
 }
@@ -2382,6 +3043,174 @@ document
       updateDaysLabel
     )
   );
+
+
+/* =========================================================
+   PAÍS DE REFERENCIA
+   ========================================================= */
+
+const countrySelect=
+  document.getElementById(
+    "countrySelect"
+  );
+
+const countryFlagDisplay=
+  document.getElementById(
+    "countryFlagDisplay"
+  );
+
+const countryInline=
+  document.getElementById(
+    "countryInline"
+  );
+
+const stateTermLabel=
+  document.getElementById(
+    "stateTermLabel"
+  );
+
+const stateTermRadio=
+  document.getElementById(
+    "stateTermRadio"
+  );
+
+const COUNTRY_STORAGE_KEY=
+  "terminoLegalJurisdiction";
+
+
+function populateCountrySelect(){
+
+  Object.keys(COUNTRIES).forEach(
+    code=>{
+
+      const opt=
+        document.createElement(
+          "option"
+        );
+
+      opt.value=code;
+
+      opt.textContent=
+        `${COUNTRIES[code].flag} ${COUNTRIES[code].name}`;
+
+      countrySelect.appendChild(
+        opt
+      );
+
+    }
+  );
+
+}
+
+
+function applyCountryUI(){
+
+  const info=
+    COUNTRIES[currentCountry];
+
+  countryFlagDisplay.textContent=
+    info.flag;
+
+  countryInline.title=
+    `${info.name} — ${info.note} Haz clic para cambiar de jurisdicción.`;
+
+  /* "Contratación estatal" (Ley 80) solo aplica a Colombia */
+  const showStateOption=
+    currentCountry==="CO";
+
+  stateTermLabel.style.display=
+    showStateOption
+      ?""
+      :"none";
+
+  if(
+    !showStateOption &&
+    stateTermRadio.checked
+  ){
+
+    document.querySelector(
+      'input[name="termType"][value="business"]'
+    ).checked=true;
+
+  }
+
+}
+
+
+function setCountry(code,persist){
+
+  if(!COUNTRIES[code])
+    code=DEFAULT_COUNTRY;
+
+  currentCountry=code;
+
+  countrySelect.value=code;
+
+  if(persist){
+
+    try{
+
+      localStorage.setItem(
+        COUNTRY_STORAGE_KEY,
+        code
+      );
+
+    }catch{}
+
+  }
+
+  applyCountryUI();
+
+  syncUnitAvailability();
+
+  if(!calendarPicker.hidden)
+    renderCalendar();
+
+}
+
+
+function initCountry(){
+
+  populateCountrySelect();
+
+  let saved=null;
+
+  try{
+
+    saved=
+      localStorage.getItem(
+        COUNTRY_STORAGE_KEY
+      );
+
+  }catch{}
+
+  const initial=
+    saved&&COUNTRIES[saved]
+      ?saved
+      :detectCountry();
+
+  setCountry(
+    initial,
+    false
+  );
+
+}
+
+
+countrySelect.addEventListener(
+  "change",
+  ()=>{
+
+    setCountry(
+      countrySelect.value,
+      true
+    );
+
+  }
+);
+
+
+initCountry();
 
 
 /* =========================================================
@@ -2553,12 +3382,28 @@ function wrapText(
 
 function buildLegalText(type){
 
-  if(type==="state"){
+  if(
+    type==="state" &&
+    currentCountry==="CO"
+  ){
 
     return`FUNDAMENTO LEGAL: Este documento presenta el cómputo de un plazo contractual bajo el Estatuto General de Contratación de la Administración Pública (Ley 80 de 1993, Ley 1150 de 2007 y Decreto 1082 de 2015), en concordancia con los lineamientos de Colombia Compra Eficiente. El plazo de ejecución de un contrato estatal, como uno de prestación de servicios, se cuenta por regla general en días o meses calendario, de fecha a fecha desde el inicio pactado (usualmente el acta de inicio), salvo que la minuta del contrato establezca expresamente un cómputo en días hábiles. Las actuaciones propias del proceso de selección (observaciones, adendas, traslado de informes de evaluación, recursos en SECOP) se rigen por el Código de Procedimiento Administrativo y de lo Contencioso Administrativo (Ley 1437 de 2011) y se cuentan en días hábiles. Este documento es una herramienta de cálculo de referencia; se recomienda verificar el plazo exacto contra el acta de inicio, la minuta del contrato y las instrucciones del supervisor o interventor antes de su presentación formal ante terceros o entidades estatales.`;
   }
 
-  return`FUNDAMENTO LEGAL: Este documento presenta el cómputo de términos elaborado con base en la legislación colombiana vigente. El calendario de días festivos aplicado se determina conforme a la Ley 51 de 1983 (artículo 1) y a la Ley 2578 de 2026 (artículo 6). El conteo en días hábiles excluye sábados, domingos y festivos, en concordancia con el régimen procesal aplicable al trámite correspondiente (Código General del Proceso, Código de Procedimiento Administrativo y de lo Contencioso Administrativo, Código Sustantivo del Trabajo u otras normas especiales, según el caso). El conteo en días calendario incluye todos los días de forma continua e ininterrumpida. Este documento es una herramienta de cálculo de referencia elaborada por el usuario; se recomienda verificar el término ante el despacho, entidad o autoridad competente antes de su presentación formal ante terceros.`;
+  if(currentCountry==="CO"){
+
+    return`BASE DEL CÓMPUTO: El resultado se obtiene aplicando la regla de conteo seleccionada sobre la fecha de inicio y el calendario de referencia de ${COUNTRIES[currentCountry].name}. En días hábiles se excluyen sábados, domingos y los festivos incorporados al calendario. En días calendario se cuentan consecutivamente todos los días. La referencia territorial utilizada es: ${COUNTRIES[currentCountry].note} Las reglas especiales de cada procedimiento, materia, autoridad o contrato pueden modificar el cómputo; por ello, este resultado debe verificarse frente a la norma específica aplicable.`;
+  }
+
+  if(currentCountry==="OT"){
+
+    return`BASE DEL CÓMPUTO: Este documento fue generado en modo genérico, sin una base de datos de festivos oficiales para la jurisdicción de referencia. El conteo de días hábiles aquí presentado excluye únicamente sábados y domingos; NO excluye festivos nacionales, regionales o locales, ya que no se cuenta con esa información para esta jurisdicción. Antes de usar este resultado de forma formal, verifica de manera independiente el calendario de festivos aplicable y confírmalo con la autoridad, despacho o contraparte competente.`;
+  }
+
+  const countryInfo=
+    COUNTRIES[currentCountry];
+
+  return`BASE DEL CÓMPUTO: El resultado se obtiene aplicando la regla de conteo seleccionada sobre la fecha de inicio y el calendario de referencia de ${countryInfo.name}. En días hábiles se excluyen los días de descanso semanal y los festivos incorporados al calendario disponible; en días calendario se cuentan consecutivamente todos los días. Referencia territorial: ${countryInfo.note} Pueden existir reglas especiales por materia, órgano, nivel territorial, convenio, contrato o procedimiento que modifiquen el cómputo. Este documento es una herramienta de referencia y no sustituye la verificación de la norma específica aplicable al término.`;
 }
 
 
@@ -2723,7 +3568,7 @@ function buildCalendarCanvas(termData){
     "400 12.5px Arial, sans-serif";
 
   ctx.fillText(
-    `Conteo de ${amount} ${typeLabel} — del ${formatShortDate(start)} al ${formatShortDate(end)}`,
+    `${COUNTRIES[currentCountry].flag} ${COUNTRIES[currentCountry].name} — Conteo de ${amount} ${typeLabel} — del ${formatShortDate(start)} al ${formatShortDate(end)}`,
     PADDING,
     56
   );
@@ -2921,7 +3766,7 @@ function buildCalendarCanvas(termData){
     "700 12px Arial, sans-serif";
 
   ctx.fillText(
-    "FUNDAMENTO LEGAL",
+    type==="state" && currentCountry==="CO" ? "FUNDAMENTO LEGAL" : "BASE DEL CÓMPUTO",
     PADDING,
     monthsEndY+
       LEGAL_TOP_GAP+6
@@ -2989,7 +3834,7 @@ function buildCalendarCanvas(termData){
     "400 10.5px Arial, sans-serif";
 
   ctx.fillText(
-    "Círculo dorado: días contados dentro del término.  Gris: sábados, domingos y festivos.",
+    "Círculo dorado: días contados dentro del término.  Gris: días de descanso semanal o festivos del calendario seleccionado.",
     PADDING,
     footerY+18
   );
@@ -3081,7 +3926,7 @@ function buildShareText(
       );
 
   const suffix=
-    type==="state"
+    type==="state" && currentCountry==="CO"
       ?" (contratación estatal — Ley 80)"
       :"";
 
