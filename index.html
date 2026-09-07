@@ -715,6 +715,50 @@ footer{
   font-weight:600
 }
 
+.feedback-social{
+  margin-top:10px;
+  padding-top:12px;
+  border-top:1px solid var(--line);
+  text-align:center
+}
+
+.feedback-social-label{
+  font-size:.65rem;
+  color:var(--muted);
+  margin:0 0 10px
+}
+
+.feedback-social-btn{
+  width:auto;
+  height:auto;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:8px 16px;
+  border-radius:999px;
+  background:transparent;
+  border:1px solid var(--input-border);
+  color:var(--navy);
+  font-size:.72rem;
+  font-weight:600;
+  letter-spacing:.02em;
+  text-decoration:none;
+  cursor:pointer
+}
+
+.feedback-social-btn:hover{
+  background:var(--surface-alt);
+  border-color:var(--gold);
+  transform:none
+}
+
+.feedback-social-btn svg{
+  width:14px;
+  height:14px;
+  flex:0 0 auto;
+  color:var(--gold)
+}
+
 /* IMPRESIÓN / PDF */
 #printArea{display:none}
 
@@ -1170,7 +1214,24 @@ footer{
 
   <div class="feedback-thanks" id="feedbackThanks">¡Gracias por tu respuesta!</div>
 
-  <p class="feedback-note">¿Comentarios, peticiones, quejas, reclamos o sugerencias? Escríbenos a <strong>terminolegal.co@gmail.com</strong></p>
+  <div class="feedback-social">
+
+    <p class="feedback-social-label">¿Comentarios, peticiones, quejas, reclamos o sugerencias?</p>
+
+    <a href="https://www.instagram.com/terminolegal/"
+       target="_blank"
+       rel="noopener noreferrer"
+       class="feedback-social-btn">
+
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2c2.7 0 3.05.01 4.12.06 1.06.05 1.79.22 2.43.47.66.26 1.22.6 1.77 1.15.55.55.9 1.11 1.15 1.77.25.64.42 1.37.47 2.43.05 1.07.06 1.42.06 4.12s-.01 3.05-.06 4.12c-.05 1.06-.22 1.79-.47 2.43-.26.66-.6 1.22-1.15 1.77-.55.55-1.11.9-1.77 1.15-.64.25-1.37.42-2.43.47-1.07.05-1.42.06-4.12.06s-3.05-.01-4.12-.06c-1.06-.05-1.79-.22-2.43-.47-.66-.26-1.22-.6-1.77-1.15-.55-.55-.9-1.11-1.15-1.77-.25-.64-.42-1.37-.47-2.43C2.01 15.05 2 14.7 2 12s.01-3.05.06-4.12c.05-1.06.22-1.79.47-2.43.26-.66.6-1.22 1.15-1.77.55-.55 1.11-.9 1.77-1.15.64-.25 1.37-.42 2.43-.47C8.95 2.01 9.3 2 12 2zm0 5a5 5 0 100 10 5 5 0 000-10zm0 8.2a3.2 3.2 0 110-6.4 3.2 3.2 0 010 6.4zM17.4 6.6a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4z"/>
+      </svg>
+
+      Instagram
+
+    </a>
+
+  </div>
 
 </div>
 
