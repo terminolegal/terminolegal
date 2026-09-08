@@ -626,22 +626,25 @@ footer{
 
 .feedback-card{
   margin-top:14px;
-  padding:14px 16px;
-  text-align:center
+  padding:12px 16px;
+  text-align:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap
 }
 
-.feedback-card > p.feedback-title{
-  margin:0 0 8px;
+.feedback-inline-label{
   font-size:.68rem;
-  font-weight:400;
-  color:var(--muted)
+  color:var(--muted);
+  margin:0
 }
 
 .feedback-buttons{
   display:flex;
-  justify-content:center;
-  gap:10px;
-  margin-bottom:2px
+  align-items:center;
+  gap:6px
 }
 
 .feedback-btn{
@@ -651,8 +654,8 @@ footer{
   background:transparent;
   border:1px solid var(--input-border);
   border-radius:8px;
-  padding:4px 12px;
-  font-size:.9rem;
+  padding:3px 10px;
+  font-size:.85rem;
   line-height:1;
   cursor:pointer;
   opacity:.7
@@ -675,99 +678,20 @@ footer{
 }
 
 .feedback-thanks{
-  margin-top:6px;
-  font-size:.62rem;
+  font-size:.6rem;
   color:var(--muted);
   display:none
 }
 
 .feedback-thanks.show{
-  display:block
+  display:inline-block
 }
 
-.feedback-comment{
-  margin-top:12px;
-  text-align:left;
-  border-top:1px solid var(--line);
-  padding-top:12px
-}
-
-.feedback-comment label{
-  font-size:.7rem;
-  margin-bottom:5px
-}
-
-.feedback-comment select{
-  width:100%;
-  height:36px;
-  border:1px solid var(--input-border);
-  border-radius:8px;
-  padding:0 10px;
-  font:inherit;
-  font-size:.78rem;
-  color:var(--ink);
-  background:var(--input-bg);
-  margin-bottom:10px
-}
-
-.feedback-comment select:focus{
-  outline:2px solid rgba(185,150,79,.25);
-  border-color:var(--gold)
-}
-
-.feedback-comment textarea{
-  width:100%;
-  min-height:56px;
-  border:1px solid var(--input-border);
-  border-radius:8px;
-  padding:8px 10px;
-  font:inherit;
-  font-size:.78rem;
-  color:var(--ink);
-  background:var(--input-bg);
-  resize:vertical
-}
-
-.feedback-comment textarea:focus{
-  outline:2px solid rgba(185,150,79,.25);
-  border-color:var(--gold)
-}
-
-.send-feedback-btn{
-  width:auto;
-  height:38px;
-  padding:0 20px;
-  margin-top:10px;
-  font-size:.75rem;
-  background:var(--gold);
-  color:#12100a
-}
-
-.feedback-note{
-  margin-top:10px;
-  padding-top:10px;
-  border-top:1px solid var(--line);
-  font-size:.65rem;
-  color:var(--muted);
-  text-align:center
-}
-
-.feedback-note strong{
-  color:var(--navy);
-  font-weight:600
-}
-
-.feedback-social{
-  margin-top:10px;
-  padding-top:12px;
-  border-top:1px solid var(--line);
-  text-align:center
-}
-
-.feedback-social-label{
-  font-size:.65rem;
-  color:var(--muted);
-  margin:0 0 10px
+.feedback-divider{
+  width:1px;
+  height:16px;
+  background:var(--line);
+  flex:0 0 auto
 }
 
 .feedback-social-btn{
@@ -775,13 +699,13 @@ footer{
   height:auto;
   display:inline-flex;
   align-items:center;
-  gap:7px;
-  padding:8px 16px;
+  gap:5px;
+  padding:5px 12px;
   border-radius:999px;
   background:transparent;
   border:1px solid var(--input-border);
   color:var(--navy);
-  font-size:.72rem;
+  font-size:.68rem;
   font-weight:600;
   letter-spacing:.02em;
   text-decoration:none;
@@ -795,10 +719,24 @@ footer{
 }
 
 .feedback-social-btn svg{
-  width:14px;
-  height:14px;
+  width:12px;
+  height:12px;
   flex:0 0 auto;
   color:var(--gold)
+}
+
+@media(max-width:480px){
+
+  .feedback-card{
+    flex-direction:column;
+    gap:8px
+  }
+
+  .feedback-divider{
+    width:60%;
+    height:1px
+  }
+
 }
 
 /* IMPRESIÓN / PDF */
@@ -904,9 +842,6 @@ footer{
     margin-right:4px;
   }
 
-  .feedback-btn{
-    padding:5px 14px
-  }
 }
 
 @media(max-width:560px){
@@ -1271,36 +1206,31 @@ footer{
 
 </p>
 
-<!-- FEEDBACK / PQRS -->
+<!-- FEEDBACK / PQRS (compacto, todo en una línea) -->
 <div class="feedback-card card" id="feedbackCard" hidden>
 
-  <p class="feedback-title">¿Te resultó útil esta herramienta?</p>
+  <span class="feedback-inline-label">¿Te sirvió?</span>
 
   <div class="feedback-buttons">
     <button type="button" class="feedback-btn" id="feedbackUpBtn" onclick="sendFeedback('up')" aria-label="Me sirvió">👍</button>
     <button type="button" class="feedback-btn" id="feedbackDownBtn" onclick="sendFeedback('down')" aria-label="No me sirvió">👎</button>
+    <span class="feedback-thanks" id="feedbackThanks">¡Gracias!</span>
   </div>
 
-  <div class="feedback-thanks" id="feedbackThanks">¡Gracias por tu respuesta!</div>
+  <span class="feedback-divider"></span>
 
-  <div class="feedback-social">
+  <a href="https://www.instagram.com/terminolegal/"
+     target="_blank"
+     rel="noopener noreferrer"
+     class="feedback-social-btn">
 
-    <p class="feedback-social-label">¿Comentarios, peticiones, quejas, reclamos o sugerencias?</p>
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2c2.7 0 3.05.01 4.12.06 1.06.05 1.79.22 2.43.47.66.26 1.22.6 1.77 1.15.55.55.9 1.11 1.15 1.77.25.64.42 1.37.47 2.43.05 1.07.06 1.42.06 4.12s-.01 3.05-.06 4.12c-.05 1.06-.22 1.79-.47 2.43-.26.66-.6 1.22-1.15 1.77-.55.55-1.11.9-1.77 1.15-.64.25-1.37.42-2.43.47-1.07.05-1.42.06-4.12.06s-3.05-.01-4.12-.06c-1.06-.05-1.79-.22-2.43-.47-.66-.26-1.22-.6-1.77-1.15-.55-.55-.9-1.11-1.15-1.77-.25-.64-.42-1.37-.47-2.43C2.01 15.05 2 14.7 2 12s.01-3.05.06-4.12c.05-1.06.22-1.79.47-2.43.26-.66.6-1.22 1.15-1.77.55-.55 1.11-.9 1.77-1.15.64-.25 1.37-.42 2.43-.47C8.95 2.01 9.3 2 12 2zm0 5a5 5 0 100 10 5 5 0 000-10zm0 8.2a3.2 3.2 0 110-6.4 3.2 3.2 0 010 6.4zM17.4 6.6a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4z"/>
+    </svg>
 
-    <a href="https://www.instagram.com/terminolegal/"
-       target="_blank"
-       rel="noopener noreferrer"
-       class="feedback-social-btn">
+    Instagram
 
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2c2.7 0 3.05.01 4.12.06 1.06.05 1.79.22 2.43.47.66.26 1.22.6 1.77 1.15.55.55.9 1.11 1.15 1.77.25.64.42 1.37.47 2.43.05 1.07.06 1.42.06 4.12s-.01 3.05-.06 4.12c-.05 1.06-.22 1.79-.47 2.43-.26.66-.6 1.22-1.15 1.77-.55.55-1.11.9-1.77 1.15-.64.25-1.37.42-2.43.47-1.07.05-1.42.06-4.12.06s-3.05-.01-4.12-.06c-1.06-.05-1.79-.22-2.43-.47-.66-.26-1.22-.6-1.77-1.15-.55-.55-.9-1.11-1.15-1.77-.25-.64-.42-1.37-.47-2.43C2.01 15.05 2 14.7 2 12s.01-3.05.06-4.12c.05-1.06.22-1.79.47-2.43.26-.66.6-1.22 1.15-1.77.55-.55 1.11-.9 1.77-1.15.64-.25 1.37-.42 2.43-.47C8.95 2.01 9.3 2 12 2zm0 5a5 5 0 100 10 5 5 0 000-10zm0 8.2a3.2 3.2 0 110-6.4 3.2 3.2 0 010 6.4zM17.4 6.6a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4z"/>
-      </svg>
-
-      Instagram
-
-    </a>
-
-  </div>
+  </a>
 
 </div>
 
