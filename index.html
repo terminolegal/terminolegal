@@ -3356,6 +3356,23 @@ function buildCalendarCanvas(termData){
       )
     );
 
+  const countIndexByKey=
+    new Map();
+
+  countedDates.forEach(
+    (d,i)=>{
+
+      countIndexByKey.set(
+        dateKey(d),
+        i+1
+      );
+
+    }
+  );
+
+  const startKey=
+    dateKey(start);
+
   const months=
     monthsInRange(
       start,
@@ -3605,12 +3622,40 @@ function buildCalendarCanvas(termData){
                 isWeekend(date)||
                 !!getHoliday(date);
 
+              const dKey=
+                dateKey(date);
+
+              const isStart=
+                dKey===startKey;
+
+              const countIndex=
+                countIndexByKey.get(dKey);
+
+
+              /* FECHA DE INICIO — sombreado diferenciado */
+              if(isStart){
+
+                ctx.beginPath();
+
+                ctx.arc(
+                  cx,
+                  cy,
+                  15,
+                  0,
+                  Math.PI*2
+                );
+
+                ctx.fillStyle="#10243e";
+
+                ctx.fill();
+
+              }
+
 
               /* DÍA CONTADO */
               if(
-                countedKeys.has(
-                  dateKey(date)
-                )
+                countedKeys.has(dKey) &&
+                !isStart
               ){
 
                 ctx.beginPath();
@@ -3632,12 +3677,14 @@ function buildCalendarCanvas(termData){
 
               /* COLOR DE DÍAS */
               ctx.fillStyle=
-                isRestDay
-                  ?"#6b7280"
-                  :"#17202b";
+                isStart
+                  ?"#ffffff"
+                  :isRestDay
+                    ?"#6b7280"
+                    :"#17202b";
 
               ctx.font=
-                isRestDay
+                isStart||isRestDay
                   ?"700 13px Arial, sans-serif"
                   :"400 13px Arial, sans-serif";
 
@@ -3647,11 +3694,34 @@ function buildCalendarCanvas(termData){
               ctx.fillText(
                 String(date.getDate()),
                 cx,
-                cy+1
+                cy+(countIndex&&!isStart?-3:1)
               );
 
               ctx.textBaseline=
                 "alphabetic";
+
+
+              /* NÚMERO DE CONTEO (sutil, dentro del círculo) */
+              if(countIndex&&!isStart){
+
+                ctx.fillStyle="#b9964f";
+
+                ctx.font=
+                  "600 8px Arial, sans-serif";
+
+                ctx.textAlign="center";
+                ctx.textBaseline="middle";
+
+                ctx.fillText(
+                  String(countIndex),
+                  cx,
+                  cy+8
+                );
+
+                ctx.textBaseline=
+                  "alphabetic";
+
+              }
 
             }
           );
@@ -3764,7 +3834,7 @@ function buildCalendarCanvas(termData){
     "400 10.5px Arial, sans-serif";
 
   ctx.fillText(
-    "Círculo dorado: días contados dentro del término.  Gris: días de descanso semanal o festivos del calendario seleccionado.",
+    "Círculo dorado: días contados (el número pequeño indica el orden del conteo). Círculo azul: fecha de inicio. Gris: descanso semanal o festivo.",
     PADDING,
     footerY+18
   );
