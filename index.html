@@ -287,6 +287,62 @@ small{
   font-size:.85rem
 }
 
+.calendar-title-btn{
+  width:100%;
+  height:32px;
+  background:transparent;
+  border:0;
+  border-radius:8px;
+  padding:0 4px;
+  color:var(--navy);
+  cursor:pointer
+}
+
+.calendar-title-btn:hover{
+  background:var(--surface-alt);
+  transform:none
+}
+
+.calendar-month-grid,
+.calendar-year-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:6px;
+  margin-top:4px
+}
+
+.calendar-month-btn,
+.calendar-year-btn{
+  width:100%;
+  height:44px;
+  border:0;
+  border-radius:8px;
+  background:transparent;
+  color:var(--ink);
+  font:inherit;
+  font-size:.72rem;
+  font-weight:600;
+  cursor:pointer
+}
+
+.calendar-month-btn:hover,
+.calendar-year-btn:hover{
+  background:rgba(185,150,79,.16);
+  transform:none
+}
+
+.calendar-month-btn.selected,
+.calendar-year-btn.selected{
+  background:var(--gold);
+  color:#fff
+}
+
+.calendar-day-view[hidden],
+.calendar-month-grid[hidden],
+.calendar-year-grid[hidden]{
+  display:none
+}
+
 .calendar-nav{
   width:36px;
   height:32px;
@@ -695,21 +751,22 @@ footer{
 }
 
 .feedback-social-btn{
-  width:auto;
-  height:auto;
-  display:inline-flex;
-  align-items:center;
-  gap:5px;
-  padding:5px 12px;
-  border-radius:999px;
-  background:transparent;
-  border:1px solid var(--input-border);
-  color:var(--navy);
-  font-size:.68rem;
-  font-weight:600;
-  letter-spacing:.02em;
-  text-decoration:none;
-  cursor:pointer
+   width:34px;
+   height:34px;
+   display:inline-flex;
+   align-items:center;
+   justify-content:center;
+   gap:0;
+   padding:7px;
+   border-radius:999px;
+   background:transparent;
+   border:1px solid var(--input-border);
+   color:var(--navy);
+   font-size:.68rem;
+   font-weight:600;
+   letter-spacing:.02em;
+   text-decoration:none;
+   cursor:pointer
 }
 
 .feedback-social-btn:hover{
@@ -719,10 +776,10 @@ footer{
 }
 
 .feedback-social-btn svg{
-  width:12px;
-  height:12px;
-  flex:0 0 auto;
-  color:var(--gold)
+   width:16px;
+   height:16px;
+   flex:0 0 auto;
+   color:var(--gold)
 }
 
 @media(max-width:480px){
@@ -950,7 +1007,7 @@ footer{
           <line x1="16" y1="2" x2="16" y2="6"></line>
           <line x1="8" y1="2" x2="8" y2="6"></line>
           <line x1="3" y1="10" x2="21" y2="10"></line>
-          <text x="8" y="16.3" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="7.5" font-weight="700" fill="currentColor">t</text>
+          <text x="8" y="16.3" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="7.5" font-weight="500" fill="currentColor">t</text>
 
         </svg>
 
@@ -984,7 +1041,12 @@ footer{
                 class="calendar-nav"
                 aria-label="Mes anterior">‹</button>
 
-        <strong id="calendarMonth"></strong>
+        <button type="button"
+                id="calendarTitleBtn"
+                class="calendar-title-btn"
+                aria-label="Cambiar vista del calendario">
+          <strong id="calendarMonth"></strong>
+        </button>
 
         <button type="button"
                 id="nextMonth"
@@ -992,6 +1054,17 @@ footer{
                 aria-label="Mes siguiente">›</button>
 
       </div>
+
+      <div id="calendarMonthGrid"
+           class="calendar-month-grid"
+           hidden></div>
+
+      <div id="calendarYearGrid"
+           class="calendar-year-grid"
+           hidden></div>
+
+      <div id="calendarDayView"
+           class="calendar-day-view">
 
       <div class="calendar-weekdays">
         <span>Do</span>
@@ -1005,6 +1078,8 @@ footer{
 
       <div id="calendarDays"
            class="calendar-days"></div>
+
+      </div>
 
       <div class="calendar-legend">
         <span>Fin de semana</span>
@@ -1222,13 +1297,13 @@ footer{
   <a href="https://www.instagram.com/terminolegal/"
      target="_blank"
      rel="noopener noreferrer"
-     class="feedback-social-btn">
+     class="feedback-social-btn"
+     aria-label="Instagram"
+     title="Instagram">
 
     <svg viewBox="0 0 24 24" fill="currentColor">
       <path d="M12 2c2.7 0 3.05.01 4.12.06 1.06.05 1.79.22 2.43.47.66.26 1.22.6 1.77 1.15.55.55.9 1.11 1.15 1.77.25.64.42 1.37.47 2.43.05 1.07.06 1.42.06 4.12s-.01 3.05-.06 4.12c-.05 1.06-.22 1.79-.47 2.43-.26.66-.6 1.22-1.15 1.77-.55.55-1.11.9-1.77 1.15-.64.25-1.37.42-2.43.47-1.07.05-1.42.06-4.12.06s-3.05-.01-4.12-.06c-1.06-.05-1.79-.22-2.43-.47-.66-.26-1.22-.6-1.77-1.15-.55-.55-.9-1.11-1.15-1.77-.25-.64-.42-1.37-.47-2.43C2.01 15.05 2 14.7 2 12s.01-3.05.06-4.12c.05-1.06.22-1.79.47-2.43.26-.66.6-1.22 1.15-1.77.55-.55 1.11-.9 1.77-1.15.64-.25 1.37-.42 2.43-.47C8.95 2.01 9.3 2 12 2zm0 5a5 5 0 100 10 5 5 0 000-10zm0 8.2a3.2 3.2 0 110-6.4 3.2 3.2 0 010 6.4zM17.4 6.6a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4z"/>
     </svg>
-
-    Instagram
 
   </a>
 
@@ -1257,6 +1332,10 @@ const calendarMonth=document.getElementById("calendarMonth");
 const calendarDays=document.getElementById("calendarDays");
 const prevMonth=document.getElementById("prevMonth");
 const nextMonth=document.getElementById("nextMonth");
+const calendarTitleBtn=document.getElementById("calendarTitleBtn");
+const calendarMonthGrid=document.getElementById("calendarMonthGrid");
+const calendarYearGrid=document.getElementById("calendarYearGrid");
+const calendarDayView=document.getElementById("calendarDayView");
 
 const daysInput=document.getElementById("days");
 const calculateBtn=document.getElementById("calculateBtn");
@@ -1284,6 +1363,8 @@ const MAX_MONTHS=60;
 
 let lastTermData=null;
 let calendarCursor=new Date();
+let calendarView="days";
+let calendarYearPage=null;
 
 const pad=n=>String(n).padStart(2,"0");
 
@@ -1933,6 +2014,33 @@ function getOtherCountryHolidays(year){
 
 
 const COUNTRIES={
+  AR:{
+    name:"Argentina",
+    flag:"🇦🇷",
+    getHolidays:getArgentinaHolidays,
+    note:"Feriados nacionales, inamovibles y trasladables."
+  },
+
+  BO:{
+    name:"Bolivia",
+    flag:"🇧🇴",
+    getHolidays:getBoliviaHolidays,
+    note:"Feriados nacionales."
+  },
+
+  BR:{
+    name:"Brasil",
+    flag:"🇧🇷",
+    getHolidays:getBrazilHolidays,
+    note:"Feriados nacionais. Estados y municipios pueden tener feriados adicionales."
+  },
+
+  CL:{
+    name:"Chile",
+    flag:"🇨🇱",
+    getHolidays:getChileHolidays,
+    note:"Feriados legales de carácter nacional."
+  },
 
   CO:{
     name:"Colombia",
@@ -1940,127 +2048,118 @@ const COUNTRIES={
     getHolidays:getColombiaHolidays,
     note:"Festivos según la Ley 51 de 1983 y la Ley 2578 de 2026."
   },
-  MX:{
-    name:"México",
-    flag:"🇲🇽",
-    getHolidays:getMexicoHolidays,
-    note:"Días de descanso obligatorio según el art. 74 de la Ley Federal del Trabajo."
-  },
-  US:{
-    name:"Estados Unidos",
-    flag:"🇺🇸",
-    getHolidays:getUSHolidays,
-    note:"Federal holidays según 5 U.S.C. § 6103. Los estados pueden tener festivos adicionales."
-  },
-  BR:{
-    name:"Brasil",
-    flag:"🇧🇷",
-    getHolidays:getBrazilHolidays,
-    note:"Feriados nacionais. Estados y municipios pueden tener feriados adicionales."
-  },
-  EC:{
-    name:"Ecuador",
-    flag:"🇪🇨",
-    getHolidays:getEcuadorHolidays,
-    note:"Festivos según el art. 65 del Código del Trabajo."
-  },
-  PA:{
-    name:"Panamá",
-    flag:"🇵🇦",
-    getHolidays:getPanamaHolidays,
-    note:"Días de fiesta o duelo nacional según el Código de Trabajo."
-  },
-  AR:{
-    name:"Argentina",
-    flag:"🇦🇷",
-    getHolidays:getArgentinaHolidays,
-    note:"Feriados nacionales, inamovibles y trasladables."
-  },
-  CL:{
-    name:"Chile",
-    flag:"🇨🇱",
-    getHolidays:getChileHolidays,
-    note:"Feriados legales de carácter nacional."
-  },
-  PE:{
-    name:"Perú",
-    flag:"🇵🇪",
-    getHolidays:getPeruHolidays,
-    note:"Feriados no laborables de alcance nacional."
-  },
-  VE:{
-    name:"Venezuela",
-    flag:"🇻🇪",
-    getHolidays:getVenezuelaHolidays,
-    note:"Días feriados de carácter nacional."
-  },
-  BO:{
-    name:"Bolivia",
-    flag:"🇧🇴",
-    getHolidays:getBoliviaHolidays,
-    note:"Feriados nacionales."
-  },
-  PY:{
-    name:"Paraguay",
-    flag:"🇵🇾",
-    getHolidays:getParaguayHolidays,
-    note:"Días feriados nacionales."
-  },
-  UY:{
-    name:"Uruguay",
-    flag:"🇺🇾",
-    getHolidays:getUruguayHolidays,
-    note:"Feriados nacionales, laborables y no laborables."
-  },
+
   CR:{
     name:"Costa Rica",
     flag:"🇨🇷",
     getHolidays:getCostaRicaHolidays,
     note:"Feriados de pago obligatorio según el Código de Trabajo."
   },
-  GT:{
-    name:"Guatemala",
-    flag:"🇬🇹",
-    getHolidays:getGuatemalaHolidays,
-    note:"Días de asueto según el Código de Trabajo."
+
+  EC:{
+    name:"Ecuador",
+    flag:"🇪🇨",
+    getHolidays:getEcuadorHolidays,
+    note:"Festivos según el art. 65 del Código del Trabajo."
   },
-  HN:{
-    name:"Honduras",
-    flag:"🇭🇳",
-    getHolidays:getHondurasHolidays,
-    note:"Días feriados según el Código del Trabajo."
-  },
+
   SV:{
     name:"El Salvador",
     flag:"🇸🇻",
     getHolidays:getElSalvadorHolidays,
     note:"Asuetos según el Código de Trabajo."
   },
-  NI:{
-    name:"Nicaragua",
-    flag:"🇳🇮",
-    getHolidays:getNicaraguaHolidays,
-    note:"Feriados nacionales según el Código del Trabajo."
-  },
-  DO:{
-    name:"República Dominicana",
-    flag:"🇩🇴",
-    getHolidays:getDominicanaHolidays,
-    note:"Días feriados según el Código de Trabajo."
-  },
+
   ES:{
     name:"España",
     flag:"🇪🇸",
     getHolidays:getEspanaHolidays,
     note:"Fiestas laborales de ámbito nacional; cada comunidad autónoma añade las suyas."
   },
+
+  US:{
+    name:"Estados Unidos",
+    flag:"🇺🇸",
+    getHolidays:getUSHolidays,
+    note:"Federal holidays según 5 U.S.C. § 6103. Los estados pueden tener festivos adicionales."
+  },
+
+  GT:{
+    name:"Guatemala",
+    flag:"🇬🇹",
+    getHolidays:getGuatemalaHolidays,
+    note:"Días de asueto según el Código de Trabajo."
+  },
+
+  HN:{
+    name:"Honduras",
+    flag:"🇭🇳",
+    getHolidays:getHondurasHolidays,
+    note:"Días feriados según el Código del Trabajo."
+  },
+
+  MX:{
+    name:"México",
+    flag:"🇲🇽",
+    getHolidays:getMexicoHolidays,
+    note:"Días de descanso obligatorio según el art. 74 de la Ley Federal del Trabajo."
+  },
+
+  NI:{
+    name:"Nicaragua",
+    flag:"🇳🇮",
+    getHolidays:getNicaraguaHolidays,
+    note:"Feriados nacionales según el Código del Trabajo."
+  },
+
+  PA:{
+    name:"Panamá",
+    flag:"🇵🇦",
+    getHolidays:getPanamaHolidays,
+    note:"Días de fiesta o duelo nacional según el Código de Trabajo."
+  },
+
+  PY:{
+    name:"Paraguay",
+    flag:"🇵🇾",
+    getHolidays:getParaguayHolidays,
+    note:"Días feriados nacionales."
+  },
+
+  PE:{
+    name:"Perú",
+    flag:"🇵🇪",
+    getHolidays:getPeruHolidays,
+    note:"Feriados no laborables de alcance nacional."
+  },
+
+  DO:{
+    name:"República Dominicana",
+    flag:"🇩🇴",
+    getHolidays:getDominicanaHolidays,
+    note:"Días feriados según el Código de Trabajo."
+  },
+
+  UY:{
+    name:"Uruguay",
+    flag:"🇺🇾",
+    getHolidays:getUruguayHolidays,
+    note:"Feriados nacionales, laborables y no laborables."
+  },
+
+  VE:{
+    name:"Venezuela",
+    flag:"🇻🇪",
+    getHolidays:getVenezuelaHolidays,
+    note:"Días feriados de carácter nacional."
+  },
+
   OT:{
     name:"Otro país / no listado",
     flag:"🌍",
     getHolidays:getOtherCountryHolidays,
     note:"Modo genérico: solo excluye sábados y domingos. No incluye festivos locales — verifica los festivos de tu jurisdicción por separado."
   }
-
 };
 
 const DEFAULT_COUNTRY="CO";
@@ -2349,15 +2448,34 @@ function openCalendar(){
       1
     );
 
-  renderCalendar();
-
+  calendarView="days";
+  calendarYearPage=null;
   calendarPicker.hidden=false;
+  setCalendarView("days");
 }
 
 
 function closeCalendar(){
 
   calendarPicker.hidden=true;
+}
+
+
+function setCalendarView(view){
+
+  calendarView=view;
+
+  calendarDayView.hidden=
+    view!=="days";
+
+  calendarMonthGrid.hidden=
+    view!=="months";
+
+  calendarYearGrid.hidden=
+    view!=="years";
+
+  renderCalendar();
+
 }
 
 
@@ -2369,129 +2487,322 @@ function renderCalendar(){
   const month=
     calendarCursor.getMonth();
 
-  calendarMonth.textContent=
-    `${monthName(month)} ${year}`;
 
-  calendarDays.innerHTML="";
+  if(calendarView==="days"){
 
-  const first=
-    new Date(year,month,1);
+    calendarMonth.textContent=
+      `${monthName(month)} ${year}`;
 
-  const offset=
-    first.getDay();
+    calendarTitleBtn.setAttribute(
+      "aria-label",
+      `Seleccionar mes y año. Vista actual: ${monthName(month)} ${year}`
+    );
 
-  const total=
-    new Date(
-      year,
-      month+1,
-      0
-    ).getDate();
+    calendarDays.innerHTML="";
 
-  /* ESPACIOS ANTES DEL DÍA 1 */
-  for(let i=0;i<offset;i++){
 
-    const empty=
-      document.createElement("span");
-
-    empty.className=
-      "calendar-day empty";
-
-    calendarDays.appendChild(empty);
-  }
-
-  const selectedKey=
-    startDateInput.value;
-
-  const todayKey=
-    dateKey(new Date());
-
-  /* DÍAS */
-  for(
-    let day=1;
-    day<=total;
-    day++
-  ){
-
-    const date=
+    const first=
       new Date(
         year,
         month,
-        day
+        1
       );
 
-    const key=
-      dateKey(date);
+    const offset=
+      first.getDay();
 
-    const holiday=
-      getHoliday(date);
+    const total=
+      new Date(
+        year,
+        month+1,
+        0
+      ).getDate();
 
-    const weekend=
-      isWeekend(date);
+
+    for(let i=0;i<offset;i++){
+
+      const empty=
+        document.createElement("span");
+
+      empty.className=
+        "calendar-day empty";
+
+      calendarDays.appendChild(
+        empty
+      );
+
+    }
+
+
+    const selectedKey=
+      startDateInput.value;
+
+    const todayKey=
+      dateKey(new Date());
+
+
+    for(
+      let day=1;
+      day<=total;
+      day++
+    ){
+
+      const date=
+        new Date(
+          year,
+          month,
+          day
+        );
+
+      const key=
+        dateKey(date);
+
+      const holiday=
+        getHoliday(date);
+
+      const weekend=
+        isWeekend(date);
+
+      const btn=
+        document.createElement("button");
+
+      btn.type="button";
+
+      btn.className=
+        "calendar-day";
+
+
+      if(weekend)
+        btn.classList.add("weekend");
+
+      if(date.getDay()===0)
+        btn.classList.add("sunday");
+
+      if(holiday)
+        btn.classList.add("holiday");
+
+      if(key===selectedKey)
+        btn.classList.add("selected");
+
+      if(key===todayKey)
+        btn.classList.add("today");
+
+
+      btn.textContent=
+        day;
+
+
+      if(holiday){
+
+        btn.title=
+          holiday.name;
+
+        btn.setAttribute(
+          "aria-label",
+          `${day} — ${holiday.name}`
+        );
+
+      }else{
+
+        btn.setAttribute(
+          "aria-label",
+          `${day}`
+        );
+
+      }
+
+
+      btn.addEventListener(
+        "click",
+        ()=>{
+
+          startDateInput.value=
+            key;
+
+          startDateDisplay.value=
+            formatShortDate(date);
+
+          closeCalendar();
+
+        }
+      );
+
+
+      calendarDays.appendChild(
+        btn
+      );
+
+    }
+
+    return;
+
+  }
+
+
+  if(calendarView==="months"){
+
+    calendarMonth.textContent=
+      `${year}`;
+
+    calendarTitleBtn.setAttribute(
+      "aria-label",
+      `Seleccionar año. Año actual: ${year}`
+    );
+
+    calendarMonthGrid.innerHTML="";
+
+
+    for(let i=0;i<12;i++){
+
+      const btn=
+        document.createElement("button");
+
+      btn.type="button";
+
+      btn.className=
+        "calendar-month-btn";
+
+      if(i===month)
+        btn.classList.add(
+          "selected"
+        );
+
+      btn.textContent=
+        monthName(i);
+
+      btn.addEventListener(
+        "click",
+        ()=>{
+
+          calendarCursor.setMonth(i);
+
+          setCalendarView(
+            "days"
+          );
+
+        }
+      );
+
+      calendarMonthGrid.appendChild(
+        btn
+      );
+
+    }
+
+    return;
+
+  }
+
+
+  /* VISTA DE AÑOS: bloques de 12 años */
+
+  const currentYear=
+    calendarCursor.getFullYear();
+
+  if(calendarYearPage===null){
+
+    calendarYearPage=
+      currentYear-
+      Math.floor(
+        currentYear/12
+      )*12;
+
+  }
+
+  const endYear=
+    calendarYearPage+11;
+
+  calendarMonth.textContent=
+    `${calendarYearPage}–${endYear}`;
+
+  calendarTitleBtn.setAttribute(
+    "aria-label",
+    `Seleccionar año. Rango ${calendarYearPage} a ${endYear}`
+  );
+
+  calendarYearGrid.innerHTML="";
+
+
+  for(
+    let y=calendarYearPage;
+    y<=endYear;
+    y++
+  ){
 
     const btn=
       document.createElement("button");
 
     btn.type="button";
-    btn.className="calendar-day";
 
-    /* FIN DE SEMANA */
-    if(weekend)
-      btn.classList.add("weekend");
+    btn.className=
+      "calendar-year-btn";
 
-    /* DOMINGO */
-    if(date.getDay()===0)
-      btn.classList.add("sunday");
-
-    /* FESTIVO */
-    if(holiday)
-      btn.classList.add("holiday");
-
-    /* SELECCIONADO */
-    if(key===selectedKey)
-      btn.classList.add("selected");
-
-    /* HOY */
-    if(key===todayKey)
-      btn.classList.add("today");
-
-    btn.textContent=day;
-
-    if(holiday){
-
-      btn.title=
-        holiday.name;
-
-      btn.setAttribute(
-        "aria-label",
-        `${day} — ${holiday.name}`
+    if(y===currentYear)
+      btn.classList.add(
+        "selected"
       );
 
-    }else{
-
-      btn.setAttribute(
-        "aria-label",
-        `${day}`
-      );
-
-    }
+    btn.textContent=
+      y;
 
     btn.addEventListener(
       "click",
       ()=>{
 
-        startDateInput.value=key;
+        calendarCursor.setFullYear(y);
 
-        startDateDisplay.value=
-          formatShortDate(date);
+        calendarYearPage=null;
 
-        closeCalendar();
+        setCalendarView(
+          "months"
+        );
 
       }
     );
 
-    calendarDays.appendChild(btn);
+    calendarYearGrid.appendChild(
+      btn
+    );
+
   }
+
 }
+
+
+/* CAMBIO DE VISTA: DÍAS → MESES → AÑOS */
+
+calendarTitleBtn.addEventListener(
+  "click",
+  ()=>{
+
+    if(calendarView==="days"){
+
+      setCalendarView(
+        "months"
+      );
+
+      return;
+
+    }
+
+    if(calendarView==="months"){
+
+      calendarYearPage=null;
+
+      setCalendarView(
+        "years"
+      );
+
+      return;
+
+    }
+
+    setCalendarView(
+      "months"
+    );
+
+  }
+);
 
 
 /* ABRIR CALENDARIO (solo desde el ícono) */
@@ -2548,7 +2859,7 @@ startDateDisplay.addEventListener(
           new Date(year,month-1,1);
 
         if(!calendarPicker.hidden)
-          renderCalendar();
+          setCalendarView("days");
 
       }else{
 
@@ -2568,14 +2879,31 @@ startDateDisplay.addEventListener(
 );
 
 
-/* MES ANTERIOR */
+/* NAVEGACIÓN DEL CALENDARIO */
+
 prevMonth.addEventListener(
   "click",
   ()=>{
 
-    calendarCursor.setMonth(
-      calendarCursor.getMonth()-1
-    );
+    if(calendarView==="days"){
+
+      calendarCursor.setMonth(
+        calendarCursor.getMonth()-1
+      );
+
+    }else if(calendarView==="months"){
+
+      calendarCursor.setFullYear(
+        calendarCursor.getFullYear()-1
+      );
+
+    }else{
+
+      calendarYearPage=
+        (calendarYearPage??
+          calendarCursor.getFullYear())-12;
+
+    }
 
     renderCalendar();
 
@@ -2583,14 +2911,29 @@ prevMonth.addEventListener(
 );
 
 
-/* MES SIGUIENTE */
 nextMonth.addEventListener(
   "click",
   ()=>{
 
-    calendarCursor.setMonth(
-      calendarCursor.getMonth()+1
-    );
+    if(calendarView==="days"){
+
+      calendarCursor.setMonth(
+        calendarCursor.getMonth()+1
+      );
+
+    }else if(calendarView==="months"){
+
+      calendarCursor.setFullYear(
+        calendarCursor.getFullYear()+1
+      );
+
+    }else{
+
+      calendarYearPage=
+        (calendarYearPage??
+          calendarCursor.getFullYear())+12;
+
+    }
 
     renderCalendar();
 
