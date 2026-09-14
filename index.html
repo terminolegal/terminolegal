@@ -4067,8 +4067,8 @@ function buildCalendarCanvas(termData){
   const MONTH_GAP_Y=26;
   const MONTH_W=CELL_W*7;
   const PADDING=34;
-  const BRAND_H=78;
-  const FOOTER_H=64;
+  const BRAND_H=20;
+  const FOOTER_H=0;
 
   const numCols=
     Math.min(
@@ -4127,63 +4127,7 @@ function buildCalendarCanvas(termData){
     canvasHeight
   );
 
-  /* ENCABEZADO */
-  ctx.fillStyle="#10243e";
-  ctx.font=
-    "700 21px Georgia, 'Times New Roman', serif";
-
-  ctx.textAlign="left";
-  ctx.textBaseline="alphabetic";
-
-  ctx.fillText(
-    "TÉRMINO LEGAL",
-    PADDING,
-    34
-  );
-
-  const typeLabel=
-    unit==="months"
-      ?(
-        amount===1
-          ?"mes"
-          :"meses"
-      )
-      :(
-        type==="business"
-          ?"días hábiles"
-          :"días calendario"
-      );
-
-  ctx.fillStyle="#687383";
-
-  ctx.font=
-    "400 12.5px Arial, sans-serif";
-
-  ctx.fillText(
-    `${COUNTRIES[currentCountry].flag} ${COUNTRIES[currentCountry].name} — Conteo de ${amount} ${typeLabel} — del ${formatShortDate(start)} al ${formatShortDate(end)}`,
-    PADDING,
-    56
-  );
-
-  ctx.strokeStyle="#e4e8ed";
-  ctx.lineWidth=1;
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    PADDING,
-    BRAND_H-16
-  );
-
-  ctx.lineTo(
-    canvasWidth-PADDING,
-    BRAND_H-16
-  );
-
-  ctx.stroke();
-
-
-  /* MESES */
+  /* CALENDARIO */
   months.forEach(
     (m,idx)=>{
 
@@ -4375,57 +4319,6 @@ function buildCalendarCanvas(termData){
       );
 
     }
-  );
-
-
-  /* PIE DEL CALENDARIO */
-  const monthsEndY=
-    BRAND_H+
-    numRows*monthBlockH+
-    (numRows-1)*MONTH_GAP_Y;
-
-  const footerY=
-    monthsEndY+
-    24;
-
-  ctx.strokeStyle="#e4e8ed";
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    PADDING,
-    footerY-18
-  );
-
-  ctx.lineTo(
-    canvasWidth-PADDING,
-    footerY-18
-  );
-
-  ctx.stroke();
-
-
-  ctx.textAlign="left";
-
-  ctx.fillStyle="#687383";
-
-  ctx.font=
-    "600 11px Arial, sans-serif";
-
-  ctx.fillText(
-    `Fecha de inicio: ${formatShortDate(start)}     Fecha de vencimiento: ${formatShortDate(end)}     Tipo: ${typeDisplayLabel(type,unit)}`,
-    PADDING,
-    footerY
-  );
-
-
-  ctx.font=
-    "400 10.5px Arial, sans-serif";
-
-  ctx.fillText(
-    "Círculo dorado: días contados (el número pequeño indica el orden del conteo). Círculo azul: fecha de inicio. Gris: descanso semanal o festivo.",
-    PADDING,
-    footerY+18
   );
 
   return canvas;
