@@ -790,12 +790,320 @@ footer{
 
 }
 
+
+/* =========================================================
+   CERTIFICACIÓN DE CÓMPUTO
+   ========================================================= */
+
+.certification-view{
+  margin-top:18px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  text-align:left;
+  overflow:hidden;
+  box-shadow:0 8px 24px var(--shadow)
+}
+
+.certification-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 14px;
+  border-bottom:1px solid var(--line);
+  background:var(--surface-alt)
+}
+
+.certification-toolbar strong{
+  font-size:.72rem;
+  letter-spacing:.05em;
+  color:var(--navy)
+}
+
+.certification-close{
+  width:auto;
+  height:32px;
+  padding:0 12px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:transparent;
+  color:var(--muted);
+  font-size:.68rem;
+  letter-spacing:.04em
+}
+
+.certification-close:hover{
+  background:var(--surface);
+  color:var(--navy);
+  filter:none
+}
+
+.certification-document{
+  max-width:780px;
+  margin:0 auto;
+  padding:34px 34px 38px;
+  background:#fff;
+  color:#17202b;
+  font-family:Arial,Helvetica,sans-serif
+}
+
+.certification-brand{
+  text-align:center;
+  margin-bottom:26px
+}
+
+.certification-brand-name{
+  color:#10243e;
+  font-weight:700;
+  letter-spacing:.16em;
+  font-size:14px;
+  margin:0 0 5px
+}
+
+.certification-brand-sub{
+  color:#687383;
+  font-size:9px;
+  margin:0
+}
+
+.certification-title{
+  text-align:center;
+  color:#10243e;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:22px;
+  line-height:1.2;
+  margin:0 0 7px
+}
+
+.certification-subtitle{
+  text-align:center;
+  color:#687383;
+  font-size:10px;
+  line-height:1.5;
+  margin:0 auto 25px;
+  max-width:600px
+}
+
+.certification-section{
+  margin-top:20px
+}
+
+.certification-section h3{
+  color:#10243e;
+  font-size:11px;
+  letter-spacing:.06em;
+  margin:0 0 9px;
+  padding-bottom:6px;
+  border-bottom:1px solid #e4e8ed
+}
+
+.certification-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  border:1px solid #e4e8ed;
+  border-radius:8px;
+  overflow:hidden
+}
+
+.certification-item{
+  padding:9px 11px;
+  border-bottom:1px solid #e4e8ed
+}
+
+.certification-item:nth-child(odd){
+  border-right:1px solid #e4e8ed
+}
+
+.certification-item:nth-last-child(-n+2){
+  border-bottom:0
+}
+
+.certification-item span{
+  display:block;
+  color:#687383;
+  font-size:8px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  margin-bottom:3px
+}
+
+.certification-item strong{
+  display:block;
+  color:#17202b;
+  font-size:10px;
+  line-height:1.35
+}
+
+.certification-result{
+  margin-top:12px;
+  padding:18px 14px;
+  text-align:center;
+  border:1px solid #e4e8ed;
+  border-radius:9px
+}
+
+.certification-result-label{
+  color:#687383;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-size:8px;
+  margin-bottom:5px
+}
+
+.certification-result-date{
+  color:#10243e;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:24px;
+  font-weight:700
+}
+
+.certification-method{
+  color:#3a4453;
+  font-size:9.5px;
+  line-height:1.6;
+  margin:0
+}
+
+.certification-sequence{
+  display:grid;
+  gap:4px;
+  max-height:280px;
+  overflow:auto;
+  padding-right:4px
+}
+
+.certification-sequence-row{
+  display:grid;
+  grid-template-columns:44px 92px 1fr;
+  gap:8px;
+  align-items:center;
+  padding:6px 8px;
+  border:1px solid #e4e8ed;
+  border-radius:6px;
+  font-size:8.5px
+}
+
+.certification-sequence-row .n{
+  color:#b9964f;
+  font-weight:700
+}
+
+.certification-sequence-row .date{
+  color:#17202b;
+  font-weight:700
+}
+
+.certification-sequence-row .status{
+  color:#687383
+}
+
+.certification-sequence-row.start-row{
+  background:#f5f7fa
+}
+
+.certification-calendar{
+  margin-top:12px;
+  border:1px solid #e4e8ed;
+  border-radius:8px;
+  padding:8px;
+  text-align:center
+}
+
+.certification-calendar img{
+  display:block;
+  width:100%;
+  height:auto
+}
+
+.certification-legal{
+  color:#3a4453;
+  font-size:9.5px;
+  line-height:1.65;
+  margin:0
+}
+
+.certification-code{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:18px
+}
+
+.certification-code-box{
+  border:1px solid #e4e8ed;
+  border-radius:8px;
+  padding:10px
+}
+
+.certification-code-box span{
+  display:block;
+  color:#687383;
+  font-size:8px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  margin-bottom:4px
+}
+
+.certification-code-box strong{
+  display:block;
+  color:#10243e;
+  font-size:10px;
+  word-break:break-word
+}
+
+.certification-scope{
+  color:#687383;
+  font-size:8.5px;
+  line-height:1.6;
+  margin:16px 0 0
+}
+
+.certification-footer{
+  border-top:1px solid #e4e8ed;
+  margin-top:20px;
+  padding-top:10px;
+  color:#687383;
+  font-size:7.5px;
+  line-height:1.5
+}
+
+@media(max-width:600px){
+  .certification-document{
+    padding:24px 16px 28px
+  }
+
+  .certification-grid{
+    grid-template-columns:1fr
+  }
+
+  .certification-item:nth-child(odd){
+    border-right:0
+  }
+
+  .certification-item:nth-last-child(-n+2){
+    border-bottom:1px solid #e4e8ed
+  }
+
+  .certification-item:last-child{
+    border-bottom:0
+  }
+
+  .certification-code{
+    grid-template-columns:1fr
+  }
+
+  .certification-sequence-row{
+    grid-template-columns:38px 88px 1fr
+  }
+}
+
 /* IMPRESIÓN / PDF */
 #printArea{display:none}
 
 @media print{
   @page{
-    size:auto;
+    size:A4;
     margin:10mm
   }
 
@@ -817,12 +1125,25 @@ footer{
     background:#fff!important
   }
 
-  #printArea img{
+  #printArea .certification-document{
     display:block!important;
-    width:100%!important;
-    height:auto!important;
     max-width:none!important;
-    margin:0 auto!important
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    box-shadow:none!important
+  }
+
+  #printArea .certification-calendar{
+    break-inside:avoid;
+    page-break-inside:avoid
+  }
+
+  #printArea .certification-section,
+  #printArea .certification-result,
+  #printArea .certification-code{
+    break-inside:avoid;
+    page-break-inside:avoid
   }
 }
 
@@ -1196,10 +1517,30 @@ footer{
   </div>
 
   <p class="notice" id="versionNotice">
-    Versión 0.9 — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.
+    Versión 1.0 — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.
   </p>
 
   <div class="export-row">
+
+    <button type="button"
+            id="viewComputationBtn"
+            class="export-btn">
+
+      <svg viewBox="0 0 24 24"
+           fill="none"
+           stroke="currentColor"
+           stroke-width="2"
+           stroke-linecap="round"
+           stroke-linejoin="round">
+
+        <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path>
+        <circle cx="12" cy="12" r="2.5"></circle>
+
+      </svg>
+
+      VER CÓMPUTO
+
+    </button>
 
     <button type="button"
             id="exportPdfBtn"
@@ -1246,6 +1587,27 @@ footer{
     </button>
 
   </div>
+
+
+</div>
+
+<!-- CERTIFICACIÓN VISIBLE -->
+<div id="certificationView"
+     class="certification-view"
+     hidden>
+
+  <div class="certification-toolbar">
+    <strong>CERTIFICACIÓN DE CÓMPUTO</strong>
+
+    <button type="button"
+            id="closeCertificationBtn"
+            class="certification-close">
+      CERRAR
+    </button>
+  </div>
+
+  <div id="certificationDocument"
+       class="certification-document"></div>
 
 </div>
 
@@ -1355,6 +1717,10 @@ const detailStart=document.getElementById("detailStart");
 const detailEnd=document.getElementById("detailEnd");
 const detailType=document.getElementById("detailType");
 const exportPdfBtn=document.getElementById("exportPdfBtn");
+const viewComputationBtn=document.getElementById("viewComputationBtn");
+const closeCertificationBtn=document.getElementById("closeCertificationBtn");
+const certificationView=document.getElementById("certificationView");
+const certificationDocument=document.getElementById("certificationDocument");
 const exportShareBtn=document.getElementById("exportShareBtn");
 const holidayListEl=document.getElementById("holidayList");
 
@@ -3094,9 +3460,11 @@ calculateBtn.addEventListener(
       start,
       end,
       countedDates,
+      holidaysEncountered,
       amount,
       type,
-      unit
+      unit,
+      country:currentCountry
     };
 
     result.hidden=false;
@@ -3108,6 +3476,8 @@ calculateBtn.addEventListener(
     document.getElementById(
       "feedbackCard"
     ).hidden=false;
+
+    certificationView.hidden=true;
 
     result.scrollIntoView({
       behavior:"smooth",
@@ -4150,6 +4520,368 @@ function buildCalendarCanvas(termData){
 
 
 /* =========================================================
+   CERTIFICACIÓN DE CÓMPUTO
+   ========================================================= */
+
+function escapeHtml(value){
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+
+/*
+   Código de verificación local:
+   se obtiene de una representación estable de los parámetros
+   del cálculo. Permite detectar cambios en esos parámetros.
+   No constituye firma electrónica ni crea por sí solo un
+   registro externo de verificación.
+*/
+function hashString(value){
+
+  let hash=2166136261;
+
+  for(let i=0;i<value.length;i++){
+
+    hash^=value.charCodeAt(i);
+    hash+=
+      (hash<<1)+
+      (hash<<4)+
+      (hash<<7)+
+      (hash<<8)+
+      (hash<<24);
+
+  }
+
+  return(
+    hash>>>0
+  )
+    .toString(36)
+    .toUpperCase()
+    .padStart(7,"0");
+}
+
+
+function buildVerificationData(termData){
+
+  const{
+    start,
+    end,
+    amount,
+    type,
+    unit,
+    country
+  }=termData;
+
+  const canonical=[
+    dateKey(start),
+    dateKey(end),
+    amount,
+    type,
+    unit,
+    country
+  ].join("|");
+
+  const digest=
+    hashString(canonical);
+
+  const id=
+    `TL-${digest}-${String(start.getFullYear()).slice(-2)}${pad(start.getMonth()+1)}${pad(start.getDate())}`;
+
+  return{
+    canonical,
+    digest,
+    id
+  };
+}
+
+
+function buildCertificationSequence(termData){
+
+  const{
+    start,
+    countedDates,
+    type
+  }=termData;
+
+  const rows=[];
+
+  rows.push(`
+    <div class="certification-sequence-row start-row">
+      <span class="n">—</span>
+      <span class="date">${escapeHtml(formatShortDate(start))}</span>
+      <span class="status">Fecha de inicio — no contabilizada</span>
+    </div>
+  `);
+
+  countedDates.forEach(
+    (date,index)=>{
+
+      const holiday=getHoliday(date);
+      const weekend=isWeekend(date);
+
+      let status="Día contabilizado";
+
+      if(type==="business"){
+
+        if(holiday)
+          status=`Día hábil contabilizado — ${escapeHtml(holiday.name)}`;
+
+        else if(weekend)
+          status="Día de descanso — excluido";
+
+      }
+
+      rows.push(`
+        <div class="certification-sequence-row">
+          <span class="n">${index+1}</span>
+          <span class="date">${escapeHtml(formatShortDate(date))}</span>
+          <span class="status">${status}</span>
+        </div>
+      `);
+
+    }
+  );
+
+  return rows.join("");
+}
+
+
+function buildCertificationHTML(termData,includeCalendar=true){
+
+  const{
+    start,
+    end,
+    amount,
+    type,
+    unit,
+    country
+  }=termData;
+
+  const countryInfo=
+    COUNTRIES[country]||
+    COUNTRIES[currentCountry];
+
+  const verification=
+    buildVerificationData(termData);
+
+  const amountLabel=
+    unit==="months"
+      ?`${amount} ${amount===1?"mes":"meses"}`
+      :`${amount} ${type==="business"?"días hábiles":"días calendario"}`;
+
+  const typeLabel=
+    typeDisplayLabel(
+      type,
+      unit
+    );
+
+  const legalText=
+    buildLegalText(type);
+
+  const methodText=
+    unit==="months"
+      ?`La fecha de inicio es ${escapeHtml(formatShortDate(start))}. El sistema suma ${amountLabel} mediante la regla de meses calendario definida por el motor y obtiene como fecha resultante ${escapeHtml(formatShortDate(end))}.`
+      :`La fecha de inicio ${escapeHtml(formatShortDate(start))} no se contabiliza. El conteo comienza al día siguiente y continúa hasta completar ${escapeHtml(String(amount))} ${type==="business"?"días hábiles":"días calendario"}. En días hábiles se excluyen los días de descanso semanal y los festivos incorporados al calendario de referencia.`;
+
+  const calendarHtml=
+    includeCalendar
+      ?`
+        <div class="certification-calendar">
+          <img id="certificationCalendarImage"
+               alt="Calendario de trazabilidad del término legal">
+        </div>
+      `
+      :"";
+
+  return`
+    <div class="certification-brand">
+      <p class="certification-brand-name">TÉRMINO LEGAL</p>
+      <p class="certification-brand-sub">Herramienta de cómputo y trazabilidad de términos</p>
+    </div>
+
+    <h1 class="certification-title">CERTIFICACIÓN DE CÓMPUTO DE TÉRMINO</h1>
+
+    <p class="certification-subtitle">
+      Constancia técnica del cálculo realizado por el sistema. Este documento
+      identifica los parámetros utilizados y la secuencia del cómputo.
+    </p>
+
+    <section class="certification-section">
+      <h3>1. IDENTIFICACIÓN DEL CÓMPUTO</h3>
+
+      <div class="certification-grid">
+
+        <div class="certification-item">
+          <span>Fecha de inicio</span>
+          <strong>${escapeHtml(formatShortDate(start))}</strong>
+        </div>
+
+        <div class="certification-item">
+          <span>Fecha de resultado</span>
+          <strong>${escapeHtml(formatShortDate(end))}</strong>
+        </div>
+
+        <div class="certification-item">
+          <span>Número de días / unidad</span>
+          <strong>${escapeHtml(amountLabel)}</strong>
+        </div>
+
+        <div class="certification-item">
+          <span>Modalidad</span>
+          <strong>${escapeHtml(typeLabel)}</strong>
+        </div>
+
+        <div class="certification-item">
+          <span>Jurisdicción de referencia</span>
+          <strong>${escapeHtml(countryInfo.flag || "")} ${escapeHtml(countryInfo.name || country)}</strong>
+        </div>
+
+        <div class="certification-item">
+          <span>Identificador del cálculo</span>
+          <strong>${escapeHtml(verification.id)}</strong>
+        </div>
+
+      </div>
+
+      <div class="certification-result">
+        <div class="certification-result-label">Fecha resultante</div>
+        <div class="certification-result-date">${escapeHtml(formatDate(end))}</div>
+      </div>
+    </section>
+
+    <section class="certification-section">
+      <h3>2. MÉTODO UTILIZADO</h3>
+      <p class="certification-method">${escapeHtml(methodText)}</p>
+    </section>
+
+    <section class="certification-section">
+      <h3>3. SECUENCIA Y TRAZABILIDAD DEL CONTEO</h3>
+      <div class="certification-sequence">
+        ${buildCertificationSequence(termData)}
+      </div>
+    </section>
+
+    ${calendarHtml}
+
+    <section class="certification-section">
+      <h3>4. BASE DEL CÓMPUTO</h3>
+      <p class="certification-legal">${escapeHtml(legalText)}</p>
+    </section>
+
+    <div class="certification-code">
+
+      <div class="certification-code-box">
+        <span>Código de verificación</span>
+        <strong>${escapeHtml(verification.digest)}</strong>
+      </div>
+
+      <div class="certification-code-box">
+        <span>Identificador del cálculo</span>
+        <strong>${escapeHtml(verification.id)}</strong>
+      </div>
+
+    </div>
+
+    <p class="certification-scope">
+      El código anterior se genera a partir de los parámetros del cálculo y
+      permite cotejar la consistencia de esta representación con dichos
+      parámetros. No constituye firma electrónica, certificación de autoridad
+      pública ni garantía de la procedencia jurídica del término.
+    </p>
+
+    <p class="certification-scope">
+      La procedencia, duración, suspensión, interrupción, prórroga o vencimiento
+      de un término concreto dependerán de la norma especial aplicable, de la
+      materia, autoridad, actuación, contrato o circunstancia territorial
+      correspondiente. Este documento acredita el cómputo realizado por
+      Término Legal bajo los parámetros indicados, no la interpretación jurídica
+      del término.
+    </p>
+
+    <div class="certification-footer">
+      Término Legal · Certificación generada automáticamente a partir del
+      resultado del motor de cómputo. Fecha de generación:
+      ${escapeHtml(formatDate(new Date()))}.
+    </div>
+  `;
+}
+
+
+function renderCertification(termData){
+
+  if(!termData)
+    return;
+
+  certificationDocument.innerHTML=
+    buildCertificationHTML(
+      termData,
+      true
+    );
+
+  const calendarImage=
+    certificationDocument.querySelector(
+      "#certificationCalendarImage"
+    );
+
+  if(calendarImage){
+
+    const canvas=
+      buildCalendarCanvas(
+        termData
+      );
+
+    calendarImage.src=
+      canvas.toDataURL(
+        "image/jpeg",
+        .95
+      );
+  }
+}
+
+
+function showCertification(){
+
+  if(!lastTermData)
+    return;
+
+  renderCertification(
+    lastTermData
+  );
+
+  certificationView.hidden=false;
+
+  certificationView.scrollIntoView({
+    behavior:"smooth",
+    block:"start"
+  });
+
+}
+
+
+function closeCertification(){
+
+  certificationView.hidden=true;
+
+}
+
+
+viewComputationBtn.addEventListener(
+  "click",
+  showCertification
+);
+
+
+closeCertificationBtn.addEventListener(
+  "click",
+  closeCertification
+);
+
+
+/* =========================================================
    GUARDAR PDF
    ========================================================= */
 
@@ -4160,43 +4892,55 @@ exportPdfBtn.addEventListener(
     if(!lastTermData)
       return;
 
-    const canvas=
-      buildCalendarCanvas(
-        lastTermData
-      );
-
     const printArea=
       document.getElementById(
         "printArea"
       );
 
-    const img=
-      document.createElement("img");
+    printArea.innerHTML=
+      `<div class="certification-document">
+        ${buildCertificationHTML(lastTermData,true)}
+      </div>`;
 
-    img.alt=
-      `Calendario del término legal: ${formatShortDate(lastTermData.start)} a ${formatShortDate(lastTermData.end)}`;
-
-    img.src=
-      canvas.toDataURL(
-        "image/jpeg",
-        .95
+    const calendarImage=
+      printArea.querySelector(
+        "#certificationCalendarImage"
       );
 
-    printArea.innerHTML="";
+    const canvas=
+      buildCalendarCanvas(
+        lastTermData
+      );
 
-    printArea.appendChild(img);
+    if(calendarImage){
+
+      calendarImage.src=
+        canvas.toDataURL(
+          "image/jpeg",
+          .95
+        );
+
+    }
 
     const printNow=
       ()=>window.print();
 
-    if(img.complete)
-      printNow();
-    else
-      img.addEventListener(
+    if(
+      calendarImage &&
+      !calendarImage.complete
+    ){
+
+      calendarImage.addEventListener(
         "load",
         printNow,
         {once:true}
       );
+
+    }else{
+
+      printNow();
+
+    }
 
   }
 );
@@ -4219,7 +4963,8 @@ function buildShareText(
     end,
     amount,
     type,
-    unit
+    unit,
+    country
   }=termData;
 
   const label=
@@ -4232,7 +4977,7 @@ function buildShareText(
       );
 
   const suffix=
-    type==="state" && currentCountry==="CO"
+    type==="state" && (country||currentCountry)==="CO"
       ?" (contratación estatal — Ley 80)"
       :"";
 
