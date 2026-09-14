@@ -1016,11 +1016,28 @@ footer{
   height:auto
 }
 
+.certification-section.legal-section{
+  margin-top:22px;
+  padding-top:2px
+}
+
+.certification-section.legal-section h3{
+  color:#687383;
+  font-family:Inter,Arial,Helvetica,sans-serif;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.12em;
+  margin:0 0 8px;
+  padding-bottom:5px;
+  border-bottom:0
+}
+
 .certification-legal{
-  color:#3a4453;
-  font-size:9.5px;
+  color:#5d6673;
+  font-size:8.8px;
   line-height:1.65;
-  margin:0
+  margin:0;
+  font-family:Inter,Arial,Helvetica,sans-serif
 }
 
 .certification-code{
@@ -4016,6 +4033,13 @@ function buildLegalText(type){
 /* PDF */
 function buildCalendarCanvas(termData){
 
+  /*
+     El calendario se exporta como imagen para preservar su trazabilidad visual.
+     La "BASE DEL CÓMPUTO" NO se renderiza dentro de esta imagen:
+     se mantiene únicamente en HTML (sección 4) para que sea texto seleccionable,
+     copiable y accesible.
+  */
+
   const{
     start,
     end,
@@ -4067,14 +4091,6 @@ function buildCalendarCanvas(termData){
   const BRAND_H=78;
   const FOOTER_H=70;
 
-  const LEGAL_FONT=
-    "400 11px Arial, sans-serif";
-
-  const LEGAL_LINE_H=15;
-  const LEGAL_TITLE_H=22;
-  const LEGAL_TOP_GAP=26;
-  const LEGAL_BOTTOM_GAP=14;
-
   const numCols=
     Math.min(
       months.length,
@@ -4097,36 +4113,13 @@ function buildCalendarCanvas(termData){
     numCols*MONTH_W+
     (numCols-1)*MONTH_GAP_X;
 
-  const legalText=
-    buildLegalText(type);
-
-  const measureCtx=
-    document
-      .createElement("canvas")
-      .getContext("2d");
-
-  measureCtx.font=
-    LEGAL_FONT;
-
-  const legalLines=
-    wrapText(
-      measureCtx,
-      legalText,
-      canvasWidth-PADDING*2
-    );
-
-  const legalBlockH=
-    LEGAL_TOP_GAP+
-    LEGAL_TITLE_H+
-    legalLines.length*
-      LEGAL_LINE_H+
-    LEGAL_BOTTOM_GAP;
-
-  const canvasHeight=
+  const calendarBlockH=
     BRAND_H+
     numRows*monthBlockH+
-    (numRows-1)*MONTH_GAP_Y+
-    legalBlockH+
+    (numRows-1)*MONTH_GAP_Y;
+
+  const canvasHeight=
+    calendarBlockH+
     FOOTER_H+
     PADDING;
 
@@ -4409,70 +4402,9 @@ function buildCalendarCanvas(termData){
   );
 
 
-  /* FUNDAMENTO */
-  const monthsEndY=
-    BRAND_H+
-    numRows*monthBlockH+
-    (numRows-1)*MONTH_GAP_Y;
-
-  ctx.strokeStyle="#e4e8ed";
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    PADDING,
-    monthsEndY+
-      LEGAL_TOP_GAP-12
-  );
-
-  ctx.lineTo(
-    canvasWidth-PADDING,
-    monthsEndY+
-      LEGAL_TOP_GAP-12
-  );
-
-  ctx.stroke();
-
-
-  ctx.textAlign="left";
-
-  ctx.fillStyle="#10243e";
-
-  ctx.font=
-    "700 12px Arial, sans-serif";
-
-  ctx.fillText(
-    type==="state" && currentCountry==="CO" ? "FUNDAMENTO LEGAL" : "BASE DEL CÓMPUTO",
-    PADDING,
-    monthsEndY+
-      LEGAL_TOP_GAP+6
-  );
-
-
-  ctx.fillStyle="#3a4453";
-
-  ctx.font=LEGAL_FONT;
-
-  legalLines.forEach(
-    (line,i)=>{
-
-      ctx.fillText(
-        line,
-        PADDING,
-        monthsEndY+
-          LEGAL_TOP_GAP+
-          LEGAL_TITLE_H+
-          i*LEGAL_LINE_H
-      );
-
-    }
-  );
-
-
   /* PIE */
   const footerY=
-    monthsEndY+
-    legalBlockH+
+    calendarBlockH+
     28;
 
   ctx.strokeStyle="#e4e8ed";
@@ -4767,7 +4699,7 @@ function buildCertificationHTML(termData,includeCalendar=true){
 
     ${calendarHtml}
 
-    <section class="certification-section">
+    <section class="certification-section legal-section">
       <h3>4. BASE DEL CÓMPUTO</h3>
       <p class="certification-legal">${escapeHtml(legalText)}</p>
     </section>
