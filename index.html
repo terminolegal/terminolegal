@@ -3278,10 +3278,33 @@ document.addEventListener(
   "click",
   e=>{
 
+    if(calendarPicker.hidden) return;
+
+    /* Se usa composedPath() porque al elegir un mes o un año el
+       botón pulsado se elimina del DOM (innerHTML se reescribe)
+       antes de que el clic termine de propagarse. Con e.target,
+       ese nodo ya "desconectado" hace fallar .contains() y el
+       calendario se cierra solo. composedPath() conserva la ruta
+       del clic tal como era en el momento del evento. */
+    const path=
+      typeof e.composedPath==="function"
+        ?e.composedPath()
+        :[e.target];
+
+    const clickedInsideCalendar=
+      path.includes(calendarPicker);
+
+    const clickedInsideInput=
+      path.some(
+        el=>
+          el instanceof Element &&
+          el.classList &&
+          el.classList.contains("date-input-wrap")
+      );
+
     if(
-      !calendarPicker.hidden &&
-      !calendarPicker.contains(e.target) &&
-      !e.target.closest(".date-input-wrap")
+      !clickedInsideCalendar &&
+      !clickedInsideInput
     ){
 
       closeCalendar();
@@ -4566,12 +4589,13 @@ function buildCertificationHTML(termData,includeCalendar=true){
 
     <section class="certification-section">
       <h3>3. SECUENCIA Y TRAZABILIDAD DEL CONTEO</h3>
-      <div class="certification-sequence">
+
+      ${calendarHtml}
+
+      <div class="certification-sequence" style="margin-top:12px">
         ${buildCertificationSequence(termData)}
       </div>
     </section>
-
-    ${calendarHtml}
 
     <section class="certification-section">
       <h3>4. BASE DEL CÓMPUTO</h3>
