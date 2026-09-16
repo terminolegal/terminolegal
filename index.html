@@ -1808,7 +1808,7 @@ footer{
 @media print{
   @page{
     size:A4;
-    margin:10mm
+    margin:8mm 10mm 8mm
   }
 
   html,body{
@@ -1835,19 +1835,84 @@ footer{
     width:100%!important;
     margin:0!important;
     padding:0!important;
-    box-shadow:none!important
+    box-shadow:none!important;
+    font-size:9px;
   }
 
+  /* PDF compacto: evita bloques con espacio excesivo y permite que
+     la secuencia continúe naturalmente en la página siguiente. */
+  #printArea .certification-brand{margin-bottom:12px}
+  #printArea .certification-brand-name{font-size:12px;margin-bottom:3px}
+  #printArea .certification-brand-sub{font-size:8px}
+  #printArea .certification-title{font-size:18px;margin-bottom:5px}
+  #printArea .certification-subtitle{font-size:8.5px;line-height:1.35;margin-bottom:12px}
+  #printArea .certification-section{margin-top:12px}
+  #printArea .certification-section h3{font-size:10px;margin-bottom:6px;padding-bottom:4px}
+  #printArea .certification-item{padding:6px 8px}
+  #printArea .certification-item span{font-size:7px;margin-bottom:2px}
+  #printArea .certification-item strong{font-size:9px}
+  #printArea .certification-result{margin-top:8px;padding:10px 12px}
+  #printArea .certification-result-label{font-size:7px;margin-bottom:3px}
+  #printArea .certification-result-date{font-size:20px}
+  #printArea .certification-method{font-size:8.5px;line-height:1.45}
   #printArea .certification-calendar{
+    margin-top:7px;
+    padding:4px;
     break-inside:avoid;
-    page-break-inside:avoid
+    page-break-inside:avoid;
+  }
+  #printArea .certification-sequence{
+    margin-top:8px!important;
+    gap:4px 6px;
+  }
+  #printArea .certification-sequence-row{
+    padding:4px 6px;
+    font-size:7.7px;
+    grid-template-columns:34px 78px 1fr;
+    gap:6px;
+  }
+  #printArea .certification-code{
+    gap:8px;
+    margin-top:10px;
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+  #printArea .certification-code-box{padding:7px 8px}
+  #printArea .certification-code-box span{font-size:7px;margin-bottom:3px}
+  #printArea .certification-code-box strong{font-size:8.5px}
+  #printArea .certification-scope{font-size:7.5px;line-height:1.4;margin-top:10px}
+  #printArea .certification-footer{
+    font-size:7px;
+    line-height:1.35;
+    margin-top:10px;
+    padding-top:6px;
+    break-inside:avoid;
+    page-break-inside:avoid;
   }
 
-  #printArea .certification-section,
-  #printArea .certification-result,
-  #printArea .certification-code{
+  /* No forzamos que toda la sección 3 quepa en una sola página.
+     Así el calendario queda en la primera cuando cabe y la secuencia
+     puede continuar en la segunda si el conteo es largo. */
+  #printArea .certification-section{
+    break-inside:auto;
+    page-break-inside:auto;
+  }
+
+  #printArea .certification-calendar-block{
     break-inside:avoid;
-    page-break-inside:avoid
+    page-break-inside:avoid;
+  }
+
+  #printArea .certification-sequence-section{
+    break-before:auto;
+    page-break-before:auto;
+    break-inside:auto;
+    page-break-inside:auto;
+  }
+
+  #printArea .certification-end{
+    break-inside:avoid;
+    page-break-inside:avoid;
   }
 }
 
@@ -6376,55 +6441,59 @@ function buildCertificationHTML(termData,includeCalendar=true){
       <p class="certification-method">${escapeHtml(methodText)}</p>
     </section>
 
-    <section class="certification-section">
-      <h3>3. SECUENCIA Y TRAZABILIDAD DEL CONTEO</h3>
-
+    <section class="certification-section certification-calendar-block">
+      <h3>3. TRAZABILIDAD DEL CONTEO</h3>
       ${calendarHtml}
+    </section>
 
-      <div class="certification-sequence" style="margin-top:12px">
+    <section class="certification-section certification-sequence-section">
+      <h3>4. SECUENCIA DEL CONTEO</h3>
+      <div class="certification-sequence" style="margin-top:0">
         ${buildCertificationSequence(termData)}
       </div>
     </section>
 
     <section class="certification-section">
-      <h3>4. BASE DEL CÓMPUTO</h3>
+      <h3>5. BASE DEL CÓMPUTO</h3>
       <p class="certification-legal">${escapeHtml(legalText)}</p>
     </section>
 
-    <div class="certification-code">
+    <div class="certification-end">
+      <div class="certification-code">
 
-      <div class="certification-code-box">
-        <span>Código de verificación</span>
-        <strong>${escapeHtml(verification.digest)}</strong>
+        <div class="certification-code-box">
+          <span>Código de verificación</span>
+          <strong>${escapeHtml(verification.digest)}</strong>
+        </div>
+
+        <div class="certification-code-box">
+          <span>Identificador del cálculo</span>
+          <strong>${escapeHtml(verification.id)}</strong>
+        </div>
+
       </div>
 
-      <div class="certification-code-box">
-        <span>Identificador del cálculo</span>
-        <strong>${escapeHtml(verification.id)}</strong>
+      <p class="certification-scope">
+        El código anterior se genera a partir de los parámetros del cálculo y
+        permite cotejar la consistencia de esta representación con dichos
+        parámetros. No constituye firma electrónica, certificación de autoridad
+        pública ni garantía de la procedencia jurídica del término.
+      </p>
+
+      <p class="certification-scope">
+        La procedencia, duración, suspensión, interrupción, prórroga o vencimiento
+        de un término concreto dependerán de la norma especial aplicable, de la
+        materia, autoridad, actuación, contrato o circunstancia territorial
+        correspondiente. Este documento acredita el cómputo realizado por
+        Término Legal bajo los parámetros indicados, no la interpretación jurídica
+        del término.
+      </p>
+
+      <div class="certification-footer">
+        Término Legal · Certificación generada automáticamente a partir del
+        resultado del motor de cómputo. Fecha de generación:
+        ${escapeHtml(formatDate(new Date()))}.
       </div>
-
-    </div>
-
-    <p class="certification-scope">
-      El código anterior se genera a partir de los parámetros del cálculo y
-      permite cotejar la consistencia de esta representación con dichos
-      parámetros. No constituye firma electrónica, certificación de autoridad
-      pública ni garantía de la procedencia jurídica del término.
-    </p>
-
-    <p class="certification-scope">
-      La procedencia, duración, suspensión, interrupción, prórroga o vencimiento
-      de un término concreto dependerán de la norma especial aplicable, de la
-      materia, autoridad, actuación, contrato o circunstancia territorial
-      correspondiente. Este documento acredita el cómputo realizado por
-      Término Legal bajo los parámetros indicados, no la interpretación jurídica
-      del término.
-    </p>
-
-    <div class="certification-footer">
-      Término Legal · Certificación generada automáticamente a partir del
-      resultado del motor de cómputo. Fecha de generación:
-      ${escapeHtml(formatDate(new Date()))}.
     </div>
   `;
 }
@@ -6572,6 +6641,11 @@ exportPdfBtn.addEventListener(
 const SHARE_TITLE=
   "Término Legal — resultado";
 
+/* Dominio centralizado para poder sustituirlo fácilmente cuando exista el
+   dominio definitivo de Término Legal. */
+const SHARE_URL=
+  "https://terminolegal.vercel.app/";
+
 
 function buildShareText(
   termData
@@ -6602,7 +6676,7 @@ function buildShareText(
       ?` (${selectedLegalTerm})`
       :"";
 
-  return`Término Legal: contando desde el ${formatShortDate(start)}, ${amount} ${label}${suffix}, vence el ${formatDate(end)}.`;
+  return`Contando desde el ${formatShortDate(start)}, ${amount} ${label}${suffix}, vence el ${formatDate(end)}.\n\nCalcula o verifica tu término: ${SHARE_URL}`;
 }
 
 
@@ -6625,7 +6699,8 @@ async function shareTermData(){
 
       await navigator.share({
         title:SHARE_TITLE,
-        text
+        text,
+        url:SHARE_URL
       });
 
     }catch(err){
