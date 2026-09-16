@@ -792,6 +792,707 @@ footer{
 
 
 /* =========================================================
+   TÉRMINOS FRECUENTES — GUÍA INTERACTIVA
+   ========================================================= */
+
+.legal-terms-panel{
+  margin-top:12px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:var(--surface-alt);
+  text-align:left
+}
+
+.legal-terms-header strong{
+  display:block;
+  color:var(--navy);
+  font-size:.8rem;
+  margin-bottom:3px
+}
+
+.legal-terms-header span{
+  display:block;
+  color:var(--muted);
+  font-size:.66rem;
+  line-height:1.45
+}
+
+.legal-search-wrap{
+  position:relative;
+  margin-top:11px
+}
+
+.legal-term-search{
+  width:100%;
+  height:42px;
+  border:1px solid var(--input-border);
+  border-radius:9px;
+  padding:0 38px 0 34px;
+  font:inherit;
+  font-size:.82rem;
+  color:var(--ink);
+  background:var(--input-bg)
+}
+
+.legal-term-search:focus{
+  outline:2px solid rgba(185,150,79,.2);
+  border-color:var(--gold)
+}
+
+.legal-search-icon{
+  position:absolute;
+  left:11px;
+  top:50%;
+  transform:translateY(-52%);
+  color:var(--muted);
+  font-size:1.15rem;
+  pointer-events:none
+}
+
+.legal-search-clear{
+  position:absolute;
+  right:6px;
+  top:6px;
+  width:30px;
+  height:30px;
+  padding:0;
+  border-radius:7px;
+  background:transparent;
+  color:var(--muted);
+  font-size:1.1rem;
+  line-height:1;
+  font-weight:500
+}
+
+.legal-search-clear:hover{
+  background:var(--surface);
+  color:var(--navy);
+  filter:none;
+  transform:none
+}
+
+.legal-categories{
+  display:grid;
+  gap:6px;
+  margin-top:10px
+}
+
+.legal-category{
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:var(--surface);
+  overflow:hidden
+}
+
+.legal-category-button{
+  width:100%;
+  min-height:40px;
+  height:auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:8px 10px;
+  border:0;
+  border-radius:8px;
+  background:transparent;
+  color:var(--navy);
+  font-size:.72rem;
+  font-weight:700;
+  text-align:left;
+  letter-spacing:0;
+  transform:none
+}
+
+.legal-category-button:hover{
+  background:rgba(185,150,79,.08);
+  filter:none;
+  transform:none
+}
+
+.legal-category-button .chevron{
+  color:var(--muted);
+  font-size:.9rem;
+  transition:transform .15s
+}
+
+.legal-category.open .chevron{
+  transform:rotate(90deg)
+}
+
+.legal-category-terms{
+  display:grid;
+  gap:3px;
+  padding:0 7px 7px
+}
+
+.legal-term-option{
+  width:100%;
+  min-height:34px;
+  height:auto;
+  padding:7px 9px;
+  border:1px solid transparent;
+  border-radius:7px;
+  background:transparent;
+  color:var(--ink);
+  font-size:.7rem;
+  font-weight:500;
+  text-align:left;
+  letter-spacing:0;
+  transform:none
+}
+
+.legal-term-option:hover{
+  background:var(--surface-alt);
+  border-color:var(--line);
+  color:var(--navy);
+  filter:none;
+  transform:none
+}
+
+.legal-term-option.selected{
+  border-color:var(--gold);
+  background:rgba(185,150,79,.10);
+  font-weight:700
+}
+
+.legal-search-results{
+  margin-top:8px;
+  display:grid;
+  gap:5px
+}
+
+.legal-search-empty{
+  padding:9px 10px;
+  color:var(--muted);
+  font-size:.67rem;
+  line-height:1.45;
+  border:1px dashed var(--input-border);
+  border-radius:8px
+}
+
+.legal-search-result{
+  width:100%;
+  min-height:38px;
+  height:auto;
+  padding:7px 9px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:var(--surface);
+  color:var(--ink);
+  text-align:left;
+  font-size:.7rem;
+  letter-spacing:0;
+  transform:none
+}
+
+.legal-search-result:hover{
+  border-color:var(--gold);
+  background:var(--surface-alt);
+  filter:none;
+  transform:none
+}
+
+.legal-search-result strong{
+  display:block;
+  color:var(--navy);
+  font-size:.71rem
+}
+
+.legal-search-result span{
+  display:block;
+  color:var(--muted);
+  margin-top:2px;
+  font-size:.6rem
+}
+
+.legal-selected-term{
+  margin-top:9px;
+  padding:9px 10px;
+  border-left:3px solid var(--gold);
+  border-radius:7px;
+  background:var(--surface);
+  position:relative
+}
+
+.legal-selected-term span{
+  display:block;
+  color:var(--muted);
+  font-size:.58rem;
+  text-transform:uppercase;
+  letter-spacing:.06em
+}
+
+.legal-selected-term strong{
+  display:block;
+  color:var(--navy);
+  font-size:.76rem;
+  margin-top:2px;
+  padding-right:62px
+}
+
+.legal-selected-clear{
+  position:absolute;
+  right:7px;
+  top:8px;
+  width:auto;
+  min-width:52px;
+  height:28px;
+  padding:0 8px;
+  border:1px solid var(--line);
+  border-radius:7px;
+  background:transparent;
+  color:var(--muted);
+  font-size:.6rem;
+  letter-spacing:0;
+  transform:none
+}
+
+.legal-selected-clear:hover{
+  background:var(--surface-alt);
+  color:var(--navy);
+  filter:none;
+  transform:none
+}
+
+.legal-term-hint{
+  margin:8px 1px 0;
+  color:var(--muted);
+  font-size:.61rem;
+  line-height:1.45
+}
+
+.legal-reference-badge{
+  display:block;
+  margin-top:3px;
+  color:var(--gold);
+  font-size:.58rem;
+  font-weight:700
+}
+
+.legal-selected-reference{
+  margin-top:9px;
+  padding:9px 10px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:var(--surface)
+}
+
+.legal-reference-title{
+  display:block;
+  color:var(--muted);
+  font-size:.58rem;
+  text-transform:uppercase;
+  letter-spacing:.05em
+}
+
+.legal-reference-options{
+  display:grid;
+  gap:5px;
+  margin-top:6px
+}
+
+.legal-reference-option{
+  width:100%;
+  height:auto;
+  padding:7px 9px;
+  border:1px solid var(--line);
+  border-radius:7px;
+  background:var(--surface-alt);
+  color:var(--ink);
+  text-align:left;
+  font-size:.64rem;
+  transform:none
+}
+
+.legal-reference-option:hover{
+  border-color:var(--gold);
+  background:rgba(185,150,79,.08);
+  filter:none;
+  transform:none
+}
+
+.legal-reference-option strong{
+  display:block;
+  color:var(--navy);
+  font-size:.68rem
+}
+
+.legal-reference-option span{
+  display:block;
+  margin-top:2px;
+  color:var(--muted);
+  line-height:1.35
+}
+
+
+/* =========================================================
+   ASESORÍA DENTRO DE TÉRMINOS FRECUENTES
+   ========================================================= */
+.legal-advice-panel{
+  margin-top:10px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:var(--surface-alt);
+}
+
+.legal-advice-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.legal-advice-copy{
+  min-width:0;
+}
+
+.legal-advice-kicker{
+  display:block;
+  color:var(--gold);
+  font-size:.54rem;
+  font-weight:800;
+  letter-spacing:.08em;
+  margin-bottom:3px;
+}
+
+.legal-advice-copy strong{
+  display:block;
+  color:var(--navy);
+  font-size:.72rem;
+  line-height:1.3;
+}
+
+.legal-advice-copy p{
+  margin:3px 0 0;
+  color:var(--muted);
+  font-size:.59rem;
+  line-height:1.4;
+}
+
+.legal-advice-btn{
+  flex:0 0 auto;
+  width:auto;
+  min-width:92px;
+  height:30px;
+  padding:0 9px;
+  border-radius:7px;
+  font-size:.56rem;
+}
+
+/* =========================================================
+   DIRECTORIO / REGISTRO DE PROFESIONALES
+   ========================================================= */
+.site-footer-actions{
+  margin-top:18px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.footer-social-btn{
+  width:30px;
+  height:30px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  background:transparent;
+  border:1px solid var(--input-border);
+  color:var(--navy);
+  text-decoration:none;
+  cursor:pointer;
+  padding:0;
+}
+
+.footer-social-btn:hover{
+  background:var(--surface-alt);
+  border-color:var(--gold);
+  transform:none;
+}
+
+.footer-social-btn svg{
+  width:15px;
+  height:15px;
+  color:var(--gold);
+}
+
+.footer-professionals-link{
+  width:34px;
+  height:34px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  background:var(--surface);
+  border:1px solid var(--gold);
+  color:var(--gold);
+  cursor:pointer;
+  padding:0;
+  box-shadow:0 4px 12px var(--shadow);
+  transition:transform .15s,background .15s,color .15s;
+}
+
+.footer-professionals-link:hover{
+  background:var(--gold);
+  color:#fff;
+  transform:translateY(-1px);
+}
+
+.footer-professionals-link svg{
+  width:18px;
+  height:18px;
+}
+
+.professionals-view{
+  margin-top:18px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:var(--surface);
+  box-shadow:0 10px 28px var(--shadow);
+  overflow:hidden;
+}
+
+.professionals-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px 14px;
+  border-bottom:1px solid var(--line);
+  background:var(--surface-alt);
+}
+
+.professionals-toolbar strong{
+  color:var(--navy);
+  font-size:.72rem;
+  letter-spacing:.06em;
+}
+
+.professionals-close,
+.professionals-tab{
+  width:auto;
+  height:32px;
+  padding:0 10px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:transparent;
+  color:var(--muted);
+  font-size:.62rem;
+  letter-spacing:.02em;
+}
+
+.professionals-close:hover,
+.professionals-tab:hover{
+  background:var(--surface);
+  color:var(--navy);
+  filter:none;
+  transform:none;
+}
+
+.professionals-body{
+  padding:14px;
+}
+
+.professionals-tabs{
+  display:flex;
+  gap:6px;
+  margin-bottom:12px;
+}
+
+.professionals-tab.active{
+  background:var(--navy);
+  color:var(--btn-text);
+  border-color:var(--navy);
+}
+
+.professionals-search-row{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:8px;
+  margin-bottom:9px;
+}
+
+.professionals-search{
+  width:100%;
+  height:40px;
+  border:1px solid var(--input-border);
+  border-radius:9px;
+  padding:0 11px;
+  font:inherit;
+  font-size:.78rem;
+  color:var(--ink);
+  background:var(--input-bg);
+}
+
+.professionals-filter{
+  height:40px;
+  width:auto;
+  min-width:118px;
+  border:1px solid var(--input-border);
+  border-radius:9px;
+  padding:0 9px;
+  background:var(--input-bg);
+  color:var(--ink);
+  font:inherit;
+  font-size:.7rem;
+}
+
+.professionals-list{
+  display:grid;
+  gap:7px;
+}
+
+.professional-profile-card{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:9px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:var(--surface-alt);
+}
+
+.professional-avatar-lg{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:var(--navy);
+  color:#fff;
+  font-size:.7rem;
+  font-weight:700;
+  flex:0 0 auto;
+}
+
+.professional-profile-info{
+  flex:1;
+  min-width:0;
+}
+
+.professional-profile-info strong{
+  display:block;
+  color:var(--navy);
+  font-size:.7rem;
+}
+
+.professional-profile-info span{
+  display:block;
+  margin-top:2px;
+  color:var(--muted);
+  font-size:.59rem;
+  line-height:1.35;
+}
+
+.professional-profile-action{
+  width:auto;
+  height:30px;
+  padding:0 9px;
+  border-radius:7px;
+  font-size:.55rem;
+  white-space:nowrap;
+}
+
+.professionals-note{
+  margin:9px 0 0;
+  color:var(--muted);
+  font-size:.58rem;
+  line-height:1.45;
+}
+
+.professional-register-form{
+  display:grid;
+  gap:9px;
+}
+
+.professional-register-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+
+.professional-register-grid .full{
+  grid-column:1 / -1;
+}
+
+.professional-register-form label{
+  font-size:.68rem;
+  margin-bottom:5px;
+}
+
+.professional-register-form input,
+.professional-register-form select,
+.professional-register-form textarea{
+  width:100%;
+  border:1px solid var(--input-border);
+  border-radius:8px;
+  padding:8px 9px;
+  font:inherit;
+  font-size:.7rem;
+  color:var(--ink);
+  background:var(--input-bg);
+}
+
+.professional-register-form input,
+.professional-register-form select{
+  height:38px;
+}
+
+.professional-register-form textarea{
+  min-height:78px;
+  resize:vertical;
+}
+
+.professional-register-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:7px;
+}
+
+.professional-register-actions button{
+  width:auto;
+  height:36px;
+  padding:0 12px;
+  border-radius:8px;
+  font-size:.62rem;
+}
+
+.professional-registration-success{
+  padding:10px;
+  border:1px solid #ccd9cf;
+  border-radius:8px;
+  background:#f3f7f4;
+  color:#385443;
+  font-size:.64rem;
+  line-height:1.45;
+}
+
+@media(max-width:560px){
+  .legal-advice-row{
+    align-items:stretch;
+    flex-direction:column;
+  }
+
+  .legal-advice-btn{
+    width:100%;
+  }
+
+  .professionals-search-row,
+  .professional-register-grid{
+    grid-template-columns:1fr;
+  }
+
+  .professional-register-grid .full{
+    grid-column:auto;
+  }
+}
+
+/* =========================================================
    CERTIFICACIÓN DE CÓMPUTO
    ========================================================= */
 
@@ -1459,18 +2160,87 @@ footer{
         <span>Días calendario</span>
       </label>
 
-      <label id="stateTermLabel">
+      <label id="legalTermTypeLabel">
         <input type="radio"
                name="termType"
-               value="state"
-               id="stateTermRadio">
-        <span>Contratación estatal</span>
+               value="legal"
+               id="legalTermRadio">
+        <span>Términos frecuentes</span>
       </label>
 
     </div>
 
     <p class="field-note"
        id="termTypeNote"></p>
+
+    <div id="legalTermsPanel"
+         class="legal-terms-panel"
+         hidden>
+
+      <div class="legal-terms-header">
+        <strong>Encuentra tu término jurídico</strong>
+        <span>Busca directamente o explora las materias para encontrar una referencia.</span>
+      </div>
+
+      <div class="legal-search-wrap">
+        <span class="legal-search-icon" aria-hidden="true">⌕</span>
+        <input type="search"
+               id="legalTermSearch"
+               class="legal-term-search"
+               placeholder="Ej.: tutela, despido, liquidación..."
+               autocomplete="off"
+               aria-label="Buscar término jurídico">
+        <button type="button"
+                id="legalTermSearchClear"
+                class="legal-search-clear"
+                aria-label="Limpiar búsqueda"
+                hidden>×</button>
+      </div>
+
+      <div id="legalSearchResults"
+           class="legal-search-results"
+           hidden></div>
+
+      <div id="legalCategories"
+           class="legal-categories"></div>
+
+      <div id="legalSelectedTerm"
+           class="legal-selected-term"
+           hidden>
+        <span>Término seleccionado</span>
+        <strong id="legalSelectedTermName">—</strong>
+        <button type="button"
+                id="legalSelectedTermClear"
+                class="legal-selected-clear">
+          Cambiar
+        </button>
+      </div>
+
+      <p id="legalTermHint"
+         class="legal-term-hint">
+        Selecciona un término para usarlo como contexto de la consulta.
+      </p>
+
+      <div id="legalAdvicePanel" class="legal-advice-panel" hidden>
+        <div class="legal-advice-row">
+          <div class="legal-advice-copy">
+            <span class="legal-advice-kicker">ASESORÍA JURÍDICA</span>
+            <strong>¿El término depende de las circunstancias de tu caso?</strong>
+            <p>Cuando no existe un único plazo general, puedes consultar profesionales disponibles en esa materia.</p>
+          </div>
+          <button type="button" id="findLegalProfessionalBtn" class="legal-advice-btn">
+            BUSCAR PROFESIONAL
+          </button>
+        </div>
+      </div>
+
+      <select id="legalTermSelect"
+              aria-label="Término jurídico seleccionado"
+              hidden>
+        <option value="">Selecciona un término</option>
+      </select>
+
+    </div>
 
   </div>
 
@@ -1636,51 +2406,119 @@ footer{
     <span class="feedback-thanks" id="feedbackThanks">¡Gracias!</span>
   </div>
 
-  <span class="feedback-divider"></span>
+<div class="site-footer-actions" aria-label="Redes y profesionales">
 
-  <div class="feedback-social">
+  <button type="button"
+          class="footer-professionals-link"
+          id="openProfessionalsBtn"
+          aria-label="Profesionales de Término Legal"
+          title="Profesionales">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="3" y="4" width="18" height="18" rx="3"></rect>
+      <line x1="16" y1="2" x2="16" y2="6"></line>
+      <line x1="8" y1="2" x2="8" y2="6"></line>
+      <line x1="3" y1="10" x2="21" y2="10"></line>
+      <text x="8" y="16.3" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="7.5" font-weight="400" fill="currentColor" stroke="none">t</text>
+    </svg>
+  </button>
 
-    <a href="https://www.instagram.com/terminolegal/"
-       target="_blank"
-       rel="noopener noreferrer"
-       class="feedback-social-btn"
-       aria-label="Instagram de Término Legal"
-       title="Instagram">
+  <a href="https://www.instagram.com/terminolegal/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" aria-label="Instagram de Término Legal" title="Instagram">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 2c2.7 0 3.05.01 4.12.06 1.06.05 1.79.22 2.43.47.66.26 1.22.6 1.77 1.15.55.55.9 1.11 1.15 1.77.25.64.42 1.37.47 2.43.05 1.07.06 1.42.06 4.12s-.01 3.05-.06 4.12c-.05 1.06-.22 1.79-.47 2.43-.26.66-.6 1.22-1.15 1.77-.55.55-1.11.9-1.77 1.15-.64.25-1.37.42-2.43.47-1.07.05-1.42.06-4.12.06s-3.05-.01-4.12-.06c-1.06-.05-1.79-.22-2.43-.47-.66-.26-1.22-.6-1.77-1.15-.55-.55-.9-1.11-1.15-1.77-.25-.64-.42-1.37-.47-2.43C2.01 15.05 2 14.7 2 12s.01-3.05.06-4.12c.05-1.06.22-1.79.47-2.43.26-.66.6-1.22 1.15-1.77.55-.55.9-1.11 1.15-1.77.64-.25 1.37-.42 2.43-.47C8.95 2.01 9.3 2 12 2zm0 5a5 5 0 100 10 5 5 0 000-10zm0 8.2a3.2 3.2 0 110-6.4 3.2 3.2 0 010 6.4zM17.4 6.6a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4z"/>
+    </svg>
+  </a>
 
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2c2.7 0 3.05.01 4.12.06 1.06.05 1.79.22 2.43.47.66.26 1.22.6 1.77 1.15.55.55.9 1.11 1.15 1.77.25.64.42 1.37.47 2.43.05 1.07.06 1.42.06 4.12s-.01 3.05-.06 4.12c-.05 1.06-.22 1.79-.47 2.43-.26.66-.6 1.22-1.15 1.77-.55.55-1.11.9-1.77 1.15-.64.25-1.37.42-2.43.47-1.07.05-1.42.06-4.12.06s-3.05-.01-4.12-.06c-1.06-.05-1.79-.22-2.43-.47-.66-.26-1.22-.6-1.77-1.15-.55-.55-.9-1.11-1.15-1.77-.25-.64-.42-1.37-.47-2.43C2.01 15.05 2 14.7 2 12s.01-3.05.06-4.12c.05-1.06.22-1.79.47-2.43.26-.66.6-1.22 1.15-1.77.55-.55 1.11-.9 1.77-1.15.64-.25 1.37-.42 2.43-.47C8.95 2.01 9.3 2 12 2zm0 5a5 5 0 100 10 5 5 0 000-10zm0 8.2a3.2 3.2 0 110-6.4 3.2 3.2 0 010 6.4zM17.4 6.6a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4z"/>
-      </svg>
+  <a href="https://web.facebook.com/terminolegal" target="_blank" rel="noopener noreferrer" class="footer-social-btn" aria-label="Facebook de Término Legal" title="Facebook">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06C2 17.06 5.66 21.2 10.44 22v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.47h-1.26c-1.24 0-1.63.78-1.63 1.57v1.87h2.78l-.45 2.91h-2.33V22C18.34 21.2 22 17.06 22 12.06z"/>
+    </svg>
+  </a>
 
-    </a>
+  <a href="https://www.linkedin.com/company/terminolegal" target="_blank" rel="noopener noreferrer" class="footer-social-btn" aria-label="LinkedIn de Término Legal" title="LinkedIn">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.61 0 4.28 2.38 4.28 5.47v6.27zM5.34 7.43a2.07 2.07 0 110-4.13 2.07 2.07 0 010 4.13zM7.12 20.45H3.56V9h3.56v11.45z"/>
+    </svg>
+  </a>
 
-    <a href="https://web.facebook.com/terminolegal"
-       target="_blank"
-       rel="noopener noreferrer"
-       class="feedback-social-btn"
-       aria-label="Facebook de Término Legal"
-       title="Facebook">
+</div>
 
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06C2 17.06 5.66 21.2 10.44 22v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.47h-1.26c-1.24 0-1.63.78-1.63 1.57v1.87h2.78l-.45 2.91h-2.33V22C18.34 21.2 22 17.06 22 12.06z"/>
-      </svg>
-
-    </a>
-
-    <a href="https://www.linkedin.com/company/terminolegal"
-       target="_blank"
-       rel="noopener noreferrer"
-       class="feedback-social-btn"
-       aria-label="LinkedIn de Término Legal"
-       title="LinkedIn">
-
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.61 0 4.28 2.38 4.28 5.47v6.27zM5.34 7.43a2.07 2.07 0 110-4.13 2.07 2.07 0 010 4.13zM7.12 20.45H3.56V9h3.56v11.45z"/>
-      </svg>
-
-    </a>
-
+<!-- DIRECTORIO Y REGISTRO DE PROFESIONALES -->
+<div id="professionalsView" class="professionals-view" hidden>
+  <div class="professionals-toolbar">
+    <strong>PROFESIONALES DE TÉRMINO LEGAL</strong>
+    <button type="button" id="closeProfessionalsBtn" class="professionals-close">CERRAR</button>
   </div>
 
+  <div class="professionals-body">
+    <div class="professionals-tabs" role="tablist" aria-label="Profesionales">
+      <button type="button" id="professionalsDirectoryTab" class="professionals-tab active" role="tab">Buscar profesional</button>
+      <button type="button" id="professionalsRegisterTab" class="professionals-tab" role="tab">Soy profesional</button>
+    </div>
+
+    <div id="professionalsDirectoryPane">
+      <div class="professionals-search-row">
+        <input type="search" id="professionalsSearch" class="professionals-search" placeholder="Busca por nombre, materia o ciudad" autocomplete="off" aria-label="Buscar profesional">
+        <select id="professionalsFilter" class="professionals-filter" aria-label="Filtrar por materia">
+          <option value="all">Todas las materias</option>
+          <option value="laboral">Laboral</option>
+          <option value="administrativo">Administrativo</option>
+          <option value="civil">Civil</option>
+          <option value="familia">Familia</option>
+          <option value="penal">Penal</option>
+        </select>
+      </div>
+      <div id="professionalsList" class="professionals-list"></div>
+      <p class="professionals-note">Directorio en construcción. Los perfiles registrados en esta versión se almacenan localmente como prototipo; la validación profesional, disponibilidad y contacto en línea requieren conexión con el servicio definitivo.</p>
+    </div>
+
+    <div id="professionalsRegisterPane" hidden>
+      <form id="professionalRegisterForm" class="professional-register-form">
+        <div class="professional-register-grid">
+          <div>
+            <label for="professionalName">Nombre profesional</label>
+            <input id="professionalName" name="name" required placeholder="Nombre y apellidos">
+          </div>
+          <div>
+            <label for="professionalCity">Ciudad</label>
+            <input id="professionalCity" name="city" required placeholder="Ciudad principal de atención">
+          </div>
+          <div>
+            <label for="professionalMatter">Materia principal</label>
+            <select id="professionalMatter" name="matter" required>
+              <option value="">Selecciona una materia</option>
+              <option value="laboral">Laboral</option>
+              <option value="administrativo">Administrativo</option>
+              <option value="civil">Civil</option>
+              <option value="familia">Familia</option>
+              <option value="penal">Penal</option>
+            </select>
+          </div>
+          <div>
+            <label for="professionalExperience">Experiencia</label>
+            <input id="professionalExperience" name="experience" placeholder="Ej. 8 años">
+          </div>
+          <div>
+            <label for="professionalEmail">Correo</label>
+            <input id="professionalEmail" name="email" type="email" required placeholder="correo@ejemplo.com">
+          </div>
+          <div>
+            <label for="professionalPhone">Contacto</label>
+            <input id="professionalPhone" name="phone" placeholder="Teléfono o WhatsApp">
+          </div>
+          <div class="full">
+            <label for="professionalBio">Perfil profesional</label>
+            <textarea id="professionalBio" name="bio" placeholder="Describe brevemente las materias o actuaciones que atiendes."></textarea>
+          </div>
+        </div>
+
+        <div class="professional-register-actions">
+          <button type="button" id="cancelProfessionalRegister" class="professionals-tab">CANCELAR</button>
+          <button type="submit">REGISTRAR PERFIL</button>
+        </div>
+        <div id="professionalRegistrationSuccess" class="professional-registration-success" hidden></div>
+      </form>
+    </div>
+  </div>
 </div>
 
 <footer>
@@ -2736,8 +3574,10 @@ function typeDisplayLabel(type,unit){
   if(type==="business")
     return"Días hábiles";
 
-  if(type==="state")
-    return`Régimen especial: contratación estatal (Ley 80) — ${unitWord} calendario`;
+  if(type==="legal"){
+    const term=selectedLegalTerm||"Término frecuente";
+    return`Término frecuente: ${term} — ${unitWord} calendario`;
+  }
 
   return`Días calendario (${unitWord})`;
 }
@@ -3367,6 +4207,22 @@ calculateBtn.addEventListener(
     }
 
     if(
+      type==="legal" &&
+      currentCountry==="CO" &&
+      !selectedLegalTerm
+    ){
+
+      showError(
+        "Busca o selecciona un término jurídico para continuar."
+      );
+
+      legalTermsPanel.hidden=false;
+      legalTermSearch.focus();
+
+      return;
+    }
+
+    if(
       unit==="months" &&
       amount>MAX_MONTHS
     ){
@@ -3490,7 +4346,11 @@ calculateBtn.addEventListener(
       amount,
       type,
       unit,
-      country:currentCountry
+      country:currentCountry,
+      legalTerm:
+        type==="legal"
+          ?selectedLegalTerm
+          :""
     };
 
     result.hidden=false;
@@ -3502,6 +4362,8 @@ calculateBtn.addEventListener(
     document.getElementById(
       "feedbackCard"
     ).hidden=false;
+
+    updateAdviceVisibility();
 
     certificationView.hidden=true;
 
@@ -3542,19 +4404,13 @@ document.addEventListener(
    ========================================================= */
 
 const termTypeNote=
-  document.getElementById(
-    "termTypeNote"
-  );
+  document.getElementById("termTypeNote");
 
 const daysLabel=
-  document.getElementById(
-    "daysLabel"
-  );
+  document.getElementById("daysLabel");
 
 const startHint=
-  document.getElementById(
-    "startHint"
-  );
+  document.getElementById("startHint");
 
 const monthsRadio=
   document.querySelector(
@@ -3567,12 +4423,524 @@ const daysRadio=
   );
 
 
+/* =========================================================
+   CATÁLOGO DE TÉRMINOS FRECUENTES — COLOMBIA
+   ========================================================= */
+
+const COLOMBIA_LEGAL_TERMS=[
+
+  {id:"constitucional-administrativo",name:"Derecho Constitucional y Administrativo",terms:[
+    {name:"Acción de tutela",refs:[{label:"10 días",amount:10,unit:"days",detail:"Plazo para proferir el fallo · Decreto 2591 de 1991, art. 29"},{label:"3 días",amount:3,unit:"days",detail:"Impugnación del fallo · art. 31"},{label:"48 horas",amount:null,unit:null,detail:"Plazo máximo fijado en el fallo para su cumplimiento · art. 29"}]},
+    {name:"Derecho de petición",refs:[{label:"15 días",amount:15,unit:"days",detail:"Regla general para resolver · Ley 1755 de 2015, art. 14"},{label:"10 días",amount:10,unit:"days",detail:"Documentos e información · art. 14.1"},{label:"30 días",amount:30,unit:"days",detail:"Consultas a las autoridades · art. 14.2"}]},
+    {name:"Habeas corpus",refs:[{label:"36 horas",amount:null,unit:null,detail:"Decisión sobre la solicitud · Constitución, art. 30; Ley 1095 de 2006"}]},
+    {name:"Habeas data",refs:[]},{name:"Debido proceso",refs:[]},
+    {name:"Acción popular",refs:[{label:"10 días",amount:10,unit:"days",detail:"Traslado para contestar la demanda · Ley 472 de 1998, art. 22"},{label:"20 días",amount:20,unit:"days",detail:"Plazo del juez para sentencia después de alegar · art. 34"}]},
+    {name:"Acción de cumplimiento",refs:[{label:"10 días",amount:10,unit:"days",detail:"Término para que la autoridad atienda la solicitud de renuencia · Ley 393 de 1997, art. 8"},{label:"20 días",amount:20,unit:"days",detail:"Plazo para proferir decisión después de la admisión · art. 13"},{label:"3 días",amount:3,unit:"days",detail:"Corrección de la solicitud / decisión sobre admisión según el trámite · arts. 12 y 13"}]},
+    {name:"Nulidad",refs:[{label:"En cualquier tiempo",amount:null,unit:null,detail:"Regla general para la nulidad en los supuestos del CPACA · Ley 1437 de 2011, art. 164.1"}]},
+    {name:"Nulidad y restablecimiento del derecho",refs:[{label:"4 meses",amount:4,unit:"months",detail:"Regla general de caducidad · CPACA, art. 164.2.d"}]},
+    {name:"Reparación directa",refs:[{label:"2 años",amount:24,unit:"months",detail:"Regla general de caducidad · CPACA, art. 164.2.i"}]}
+  ]},
+
+  {id:"laboral",name:"Derecho Laboral",terms:[
+    {name:"Contrato de trabajo",refs:[]},{name:"Despido sin justa causa",refs:[]},{name:"Indemnización laboral",refs:[]},{name:"Liquidación laboral",refs:[]},
+    {name:"Acoso laboral",refs:[]},{name:"Estabilidad laboral reforzada",refs:[]},{name:"Fuero de salud",refs:[]},
+    {name:"Prestaciones sociales",refs:[]},{name:"Seguridad social",refs:[]},
+    {name:"Pensión",refs:[]}
+  ]},
+
+  {id:"civil",name:"Derecho Civil",terms:[
+    {name:"Responsabilidad civil",refs:[]},{name:"Daños y perjuicios",refs:[]},{name:"Incumplimiento contractual",refs:[]},{name:"Obligaciones",refs:[]},{name:"Contrato",refs:[]},{name:"Compraventa",refs:[]},{name:"Arrendamiento",refs:[]},
+    {name:"Prescripción",refs:[{label:"3 años",amount:36,unit:"months",detail:"Regla general de prescripción de obligaciones civiles no sometidas a término especial: verificar naturaleza de la acción y norma aplicable."}]},
+    {name:"Conciliación",refs:[]},{name:"Transacción",refs:[]}
+  ]},
+
+  {id:"familia",name:"Derecho de Familia",terms:[
+    {name:"Divorcio",refs:[]},{name:"Unión marital de hecho",refs:[]},{name:"Pensión alimentaria",refs:[]},{name:"Custodia y cuidado personal",refs:[]},{name:"Patria potestad",refs:[]},{name:"Sucesión",refs:[]},{name:"Herencia",refs:[]},{name:"Testamento",refs:[]}
+  ]},
+
+  {id:"penal",name:"Derecho Penal",terms:[
+    {name:"Denuncia penal",refs:[{label:"Depende del delito y actuación",amount:null,unit:null,detail:"No existe un único plazo procesal asociado a la simple denuncia; deben identificarse delito, etapa y actuación concreta."}]},
+    {name:"Estafa",refs:[]},{name:"Fraude",refs:[]},{name:"Delito informático",refs:[]},{name:"Lavado de activos",refs:[]},{name:"Prevaricato",refs:[]},{name:"Extinción de dominio",refs:[]}
+  ]},
+
+  {id:"corporativo-comercial",name:"Derecho Corporativo y Comercial",terms:[
+    {name:"Sociedad por Acciones Simplificada (SAS)",refs:[]},{name:"Cámara de Comercio",refs:[]},{name:"Due Diligence (debida diligencia)",refs:[]},{name:"Gobierno corporativo",refs:[]},{name:"Protección de datos personales",refs:[]}
+  ]},
+
+  {id:"empresas-entidades",name:"Empresas y entidades públicas",terms:[
+    {name:"Contratación estatal",refs:[]},{name:"SECOP II",refs:[]},{name:"Pliegos tipo",refs:[]},{name:"Equilibrio económico del contrato",refs:[]},{name:"Incumplimiento contractual",refs:[]},{name:"Multas y cláusula penal",refs:[]},{name:"Liquidación contractual",refs:[]},{name:"Debida diligencia (Due Diligence)",refs:[]},{name:"Protección de datos personales",refs:[]},{name:"Compliance o cumplimiento normativo",refs:[]}
+  ]}
+
+];
+
+
+const legalTermsPanel=
+  document.getElementById("legalTermsPanel");
+
+const legalTermSearch=
+  document.getElementById("legalTermSearch");
+
+const legalTermSearchClear=
+  document.getElementById("legalTermSearchClear");
+
+const legalSearchResults=
+  document.getElementById("legalSearchResults");
+
+const legalCategories=
+  document.getElementById("legalCategories");
+
+const legalSelectedTerm=
+  document.getElementById("legalSelectedTerm");
+
+const legalSelectedTermName=
+  document.getElementById("legalSelectedTermName");
+
+const legalSelectedTermClear=
+  document.getElementById("legalSelectedTermClear");
+
+const legalTermSelect=
+  document.getElementById("legalTermSelect");
+
+const legalTermHint=
+  document.getElementById("legalTermHint");
+
+let selectedLegalTerm="";
+
+
+function normalizeSearchText(value){
+
+  return(
+    value
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g,"")
+      .toLowerCase()
+      .trim()
+  );
+
+}
+
+
+function flattenLegalTerms(){
+
+  const list=[];
+
+  COLOMBIA_LEGAL_TERMS.forEach(
+    category=>{
+      category.terms.forEach(
+        term=>{
+          list.push({
+            term:term.name,
+            refs:term.refs||[],
+            categoryId:category.id,
+            categoryName:category.name
+          });
+        }
+      );
+    }
+  );
+
+  return list;
+
+}
+
+
+function renderLegalCategories(){
+
+  legalCategories.innerHTML="";
+
+  COLOMBIA_LEGAL_TERMS.forEach(
+    (category,index)=>{
+
+      const wrapper=
+        document.createElement("div");
+
+      wrapper.className="legal-category";
+
+      /* La primera materia queda abierta por defecto:
+         el usuario puede empezar a explorar con un solo clic. */
+      if(index===0)
+        wrapper.classList.add("open");
+
+      const header=
+        document.createElement("button");
+
+      header.type="button";
+      header.className="legal-category-button";
+      header.setAttribute(
+        "aria-expanded",
+        index===0 ? "true" : "false"
+      );
+
+      header.innerHTML=`
+        <span>${escapeHtml(category.name)}</span>
+        <span class="chevron">›</span>
+      `;
+
+      const terms=
+        document.createElement("div");
+
+      terms.className="legal-category-terms";
+      terms.hidden=index!==0;
+
+      category.terms.forEach(
+        term=>{
+
+          const button=
+            document.createElement("button");
+
+          button.type="button";
+          button.className="legal-term-option";
+
+          const refLabel=
+            term.refs?.length
+              ?term.refs[0].label
+              :"Requiere verificar el plazo aplicable";
+
+          button.innerHTML=`
+            <span>${escapeHtml(term.name)}</span>
+            <small class="legal-reference-badge">${escapeHtml(refLabel)}</small>
+          `;
+
+          if(term.name===selectedLegalTerm)
+            button.classList.add("selected");
+
+          button.addEventListener(
+            "click",
+            ()=>{
+              selectLegalTerm(
+                term.name,
+                category.name
+              );
+            }
+          );
+
+          terms.appendChild(button);
+
+        }
+      );
+
+      header.addEventListener(
+        "click",
+        ()=>{
+
+          const isOpen=
+            wrapper.classList.contains("open");
+
+          wrapper.classList.toggle(
+            "open",
+            !isOpen
+          );
+
+          header.setAttribute(
+            "aria-expanded",
+            String(!isOpen)
+          );
+
+          terms.hidden=isOpen;
+
+        }
+      );
+
+      wrapper.appendChild(header);
+      wrapper.appendChild(terms);
+      legalCategories.appendChild(wrapper);
+
+    }
+  );
+
+}
+
+
+function populateLegalSelect(){
+
+  legalTermSelect.innerHTML=
+    `<option value="">Selecciona un término</option>`;
+
+  COLOMBIA_LEGAL_TERMS.forEach(
+    category=>{
+
+      const group=
+        document.createElement("optgroup");
+
+      group.label=category.name;
+
+      category.terms.forEach(
+        term=>{
+
+          const option=
+            document.createElement("option");
+
+          option.value=term.name;
+          option.textContent=term.name;
+
+          group.appendChild(option);
+
+        }
+      );
+
+      legalTermSelect.appendChild(group);
+
+    }
+  );
+
+}
+
+
+function selectLegalTerm(term,categoryName){
+
+  selectedLegalTerm=term;
+
+  legalTermSelect.value=term;
+
+  legalSelectedTermName.textContent=term;
+  legalSelectedTerm.hidden=false;
+
+  const selectedInfo=
+    flattenLegalTerms().find(
+      item=>item.term===term
+    );
+
+  renderLegalReferenceOptions(
+    selectedInfo?.refs||[]
+  );
+
+  legalTermHint.textContent=
+    selectedInfo?.refs?.length
+      ? `${categoryName} · La legislación contempla una o más referencias de plazo. Selecciona la actuación que quieres calcular.`
+      : `${categoryName} · No hay un único plazo general para este concepto. Aquí puedes identificar la actuación concreta o solicitar asesoría.`;
+
+  legalTermSearch.value="";
+  legalTermSearchClear.hidden=true;
+  legalSearchResults.hidden=true;
+  legalSearchResults.innerHTML="";
+
+  renderLegalCategories();
+  syncUnitAvailability();
+  updateAdviceVisibility();
+
+}
+
+
+function renderLegalReferenceOptions(refs){
+
+  let box=document.getElementById("legalSelectedReference");
+
+  if(!box){
+    box=document.createElement("div");
+    box.id="legalSelectedReference";
+    box.className="legal-selected-reference";
+    legalSelectedTerm.insertAdjacentElement("afterend",box);
+  }
+
+  box.innerHTML="";
+
+  const title=document.createElement("span");
+  title.className="legal-reference-title";
+  title.textContent=refs.length
+    ?"Referencia de plazo según la legislación"
+    :"Plazo";
+  box.appendChild(title);
+
+  const options=document.createElement("div");
+  options.className="legal-reference-options";
+
+  if(!refs.length){
+    const p=document.createElement("span");
+    p.style.cssText="display:block;margin-top:5px;color:var(--muted);font-size:.62rem;line-height:1.4";
+    p.textContent="No existe un único término que pueda asignarse automáticamente a este concepto. Conviene identificar la actuación concreta antes de calcular.";
+    options.appendChild(p);
+  }else{
+    refs.forEach(ref=>{
+      const b=document.createElement("button");
+      b.type="button";
+      b.className="legal-reference-option";
+      b.innerHTML=`<strong>${escapeHtml(ref.label)}</strong><span>${escapeHtml(ref.detail)}</span>`;
+      b.addEventListener("click",()=>applyLegalReference(ref));
+      options.appendChild(b);
+    });
+  }
+
+  box.appendChild(options);
+  box.hidden=false;
+
+}
+
+function applyLegalReference(ref){
+
+  if(ref.amount==null || !ref.unit){
+    legalTermHint.textContent=
+      "Esta referencia no puede convertirse automáticamente en un número para el cálculo. Debe precisarse la actuación y la norma aplicable.";
+    return;
+  }
+
+  daysInput.value=String(ref.amount);
+
+  const unitRadio=document.querySelector(
+    `input[name="unit"][value="${ref.unit}"]`
+  );
+
+  if(unitRadio){
+    unitRadio.checked=true;
+    updateDaysLabel();
+  }
+
+  legalTermHint.textContent=
+    `Referencia aplicada: ${ref.label}. Revisa la norma y las circunstancias del caso antes de usar el resultado.`;
+
+  syncUnitAvailability();
+
+  daysInput.focus();
+
+}
+
+function clearLegalTerm(){
+
+  selectedLegalTerm="";
+  legalTermSelect.value="";
+  legalSelectedTerm.hidden=true;
+
+  const referenceBox=document.getElementById("legalSelectedReference");
+  if(referenceBox) referenceBox.remove();
+
+  legalTermSearch.value="";
+  legalTermSearchClear.hidden=true;
+  legalSearchResults.hidden=true;
+  legalSearchResults.innerHTML="";
+
+  legalTermHint.textContent=
+    "Selecciona un término para usarlo como contexto de la consulta.";
+
+  renderLegalCategories();
+  syncUnitAvailability();
+  updateAdviceVisibility();
+
+}
+
+
+function searchLegalTerms(){
+
+  const query=
+    normalizeSearchText(
+      legalTermSearch.value
+    );
+
+  legalTermSearchClear.hidden=!query;
+
+  if(!query){
+
+    legalSearchResults.hidden=true;
+    legalSearchResults.innerHTML="";
+    return;
+
+  }
+
+  const matches=
+    flattenLegalTerms()
+      .filter(item=>
+        normalizeSearchText(item.term).includes(query) ||
+        normalizeSearchText(item.categoryName).includes(query)
+      )
+      .slice(0,10);
+
+  legalSearchResults.hidden=false;
+  legalSearchResults.innerHTML="";
+
+  if(matches.length===0){
+
+    legalSearchResults.innerHTML=
+      `<div class="legal-search-empty">
+        No encontramos una coincidencia. Prueba con otra palabra, por ejemplo: tutela, contrato, despido, pensión o prescripción. Si no sabes qué actuación corresponde, puedes solicitar asesoría jurídica.
+      </div>`;
+
+    return;
+
+  }
+
+  matches.forEach(
+    item=>{
+
+      const button=
+        document.createElement("button");
+
+      button.type="button";
+      button.className="legal-search-result";
+
+      button.innerHTML=`
+        <strong>${escapeHtml(item.term)}</strong>
+        <span>${escapeHtml(item.categoryName)}</span>
+      `;
+
+      button.addEventListener(
+        "click",
+        ()=>{
+          selectLegalTerm(
+            item.term,
+            item.categoryName
+          );
+        }
+      );
+
+      legalSearchResults.appendChild(button);
+
+    }
+  );
+
+}
+
+
+legalTermSearch.addEventListener(
+  "input",
+  searchLegalTerms
+);
+
+legalTermSearchClear.addEventListener(
+  "click",
+  clearLegalTerm
+);
+
+legalSelectedTermClear.addEventListener(
+  "click",
+  clearLegalTerm
+);
+
+legalTermSelect.addEventListener(
+  "change",
+  ()=>{
+
+    if(!legalTermSelect.value){
+
+      clearLegalTerm();
+      return;
+
+    }
+
+    const found=
+      flattenLegalTerms()
+        .find(
+          item=>
+            item.term===
+            legalTermSelect.value
+        );
+
+    selectLegalTerm(
+      legalTermSelect.value,
+      found?.categoryName||
+        "Término frecuente"
+    );
+
+  }
+);
+
+
+populateLegalSelect();
+
+
 const TERM_TYPE_NOTES_BY_COUNTRY={
 
   CO:{
     business:"Excluye sábados, domingos y festivos según el calendario de referencia de la jurisdicción. Las reglas especiales de cada trámite pueden modificar el cómputo y deben verificarse en la norma aplicable.",
     calendar:"Cuenta todos los días de forma continua e ininterrumpida, sin excluir fines de semana ni festivos.",
-    state:"Plazo de ejecución de un contrato estatal (p. ej., prestación de servicios) bajo la Ley 80 de 1993 y Colombia Compra Eficiente. Se cuenta en días o meses calendario, salvo que la minuta pacte expresamente días hábiles. Verifica siempre el acta de inicio y el contrato."
+    legal:"Explora términos jurídicos frecuentes de Colombia por materia o mediante búsqueda. La selección sirve como guía de contexto; la duración y la forma de conteo deben determinarse según la norma específica aplicable."
   },
 
   DEFAULT:{
@@ -3623,14 +4991,21 @@ function syncUnitAvailability(){
   }else{
 
     monthsRadio.disabled=false;
-
     monthsLabel.title="";
+
   }
 
   termTypeNote.textContent=
     getTermTypeNotes()[type]||"";
 
+  legalTermsPanel.hidden=
+    !(
+      type==="legal" &&
+      currentCountry==="CO"
+    );
+
   updateDaysLabel();
+
 }
 
 
@@ -3650,6 +5025,7 @@ function updateDaysLabel(){
     unit==="months"
       ?"El plazo se cuenta de fecha a fecha desde el día indicado (p. ej., el acta de inicio)."
       :"El conteo inicia el día siguiente a la fecha indicada.";
+
 }
 
 
@@ -3678,6 +5054,313 @@ document
 
 
 /* =========================================================
+   ASESORÍA + DIRECTORIO DE PROFESIONALES — PROTOTIPO
+   ========================================================= */
+
+const legalAdvicePanel=document.getElementById("legalAdvicePanel");
+const findLegalProfessionalBtn=document.getElementById("findLegalProfessionalBtn");
+const openProfessionalsBtn=document.getElementById("openProfessionalsBtn");
+const closeProfessionalsBtn=document.getElementById("closeProfessionalsBtn");
+const professionalsView=document.getElementById("professionalsView");
+const professionalsDirectoryTab=document.getElementById("professionalsDirectoryTab");
+const professionalsRegisterTab=document.getElementById("professionalsRegisterTab");
+const professionalsDirectoryPane=document.getElementById("professionalsDirectoryPane");
+const professionalsRegisterPane=document.getElementById("professionalsRegisterPane");
+const professionalsSearch=document.getElementById("professionalsSearch");
+const professionalsFilter=document.getElementById("professionalsFilter");
+const professionalsList=document.getElementById("professionalsList");
+const professionalRegisterForm=document.getElementById("professionalRegisterForm");
+const cancelProfessionalRegister=document.getElementById("cancelProfessionalRegister");
+const professionalRegistrationSuccess=document.getElementById("professionalRegistrationSuccess");
+
+function typeIsLegalAndNeedsAdvice(){
+  if(!selectedLegalTerm)
+    return false;
+
+  const info=flattenLegalTerms().find(
+    x=>x.term===selectedLegalTerm
+  );
+
+  return !info?.refs?.length;
+}
+
+function updateAdviceVisibility(){
+  if(!legalAdvicePanel)
+    return;
+
+  legalAdvicePanel.hidden=!(
+    currentCountry==="CO" &&
+    typeIsLegalAndNeedsAdvice()
+  );
+}
+
+const DEMO_PROFESSIONALS=[
+  {
+    id:"demo-1",
+    name:"Profesional laboral",
+    matter:"laboral",
+    city:"Bogotá D.C.",
+    experience:"8 años",
+    bio:"Orientación en términos laborales y actuaciones relacionadas.",
+    email:"",
+    phone:"",
+    status:"demo"
+  },
+  {
+    id:"demo-2",
+    name:"Profesional administrativo",
+    matter:"administrativo",
+    city:"Bogotá D.C.",
+    experience:"10 años",
+    bio:"Orientación en actuaciones administrativas y términos procedimentales.",
+    email:"",
+    phone:"",
+    status:"demo"
+  },
+  {
+    id:"demo-3",
+    name:"Profesional civil",
+    matter:"civil",
+    city:"Medellín",
+    experience:"7 años",
+    bio:"Contratos, obligaciones y responsabilidad civil.",
+    email:"",
+    phone:"",
+    status:"demo"
+  }
+];
+
+function getRegisteredProfessionals(){
+  try{
+    const stored=JSON.parse(
+      localStorage.getItem("terminoLegalProfessionals")||"[]"
+    );
+    return Array.isArray(stored)?stored:[];
+  }catch(err){
+    return [];
+  }
+}
+
+function saveRegisteredProfessional(profile){
+  const list=getRegisteredProfessionals();
+  list.push(profile);
+  localStorage.setItem(
+    "terminoLegalProfessionals",
+    JSON.stringify(list)
+  );
+}
+
+function getAllProfessionals(){
+  return [
+    ...DEMO_PROFESSIONALS,
+    ...getRegisteredProfessionals()
+  ];
+}
+
+function matterLabel(value){
+  const labels={
+    laboral:"Laboral",
+    administrativo:"Administrativo",
+    civil:"Civil",
+    familia:"Familia",
+    penal:"Penal"
+  };
+  return labels[value]||value||"Asesoría jurídica";
+}
+
+function initials(name){
+  return String(name||"TL")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0,2)
+    .map(x=>x.charAt(0).toUpperCase())
+    .join("") || "TL";
+}
+
+function categoryToMarket(categoryName){
+  const n=normalizeSearchText(categoryName||"");
+  if(n.includes("labor")) return "laboral";
+  if(n.includes("administr")) return "administrativo";
+  if(n.includes("civil")) return "civil";
+  if(n.includes("famil")) return "familia";
+  if(n.includes("penal")) return "penal";
+  return "all";
+}
+
+function renderProfessionals(){
+  if(!professionalsList)
+    return;
+
+  const query=normalizeSearchText(
+    professionalsSearch?.value||""
+  );
+  const filter=professionalsFilter?.value||"all";
+
+  const matches=getAllProfessionals().filter(profile=>{
+    const matchesFilter=
+      filter==="all" ||
+      profile.matter===filter;
+
+    const haystack=normalizeSearchText([
+      profile.name,
+      profile.city,
+      profile.matter,
+      profile.bio
+    ].join(" "));
+
+    return matchesFilter && (!query || haystack.includes(query));
+  });
+
+  if(!matches.length){
+    professionalsList.innerHTML=`
+      <div class="legal-search-empty">
+        No encontramos profesionales con esos criterios. Prueba con otra materia, nombre o ciudad.
+      </div>
+    `;
+    return;
+  }
+
+  professionalsList.innerHTML=matches.map(profile=>`
+    <div class="professional-profile-card">
+      <div class="professional-avatar-lg">${escapeHtml(initials(profile.name))}</div>
+      <div class="professional-profile-info">
+        <strong>${escapeHtml(profile.name)}</strong>
+        <span>${escapeHtml(matterLabel(profile.matter))} · ${escapeHtml(profile.city||"Atención remota")}${profile.experience?` · ${escapeHtml(profile.experience)}`:""}</span>
+        <span>${escapeHtml(profile.bio||"Perfil profesional en Término Legal.")}</span>
+      </div>
+      <button type="button" class="professional-profile-action" data-professional-id="${escapeHtml(profile.id)}">SOLICITAR</button>
+    </div>
+  `).join("");
+
+  professionalsList.querySelectorAll(".professional-profile-action").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const profile=getAllProfessionals().find(
+        x=>x.id===btn.dataset.professionalId
+      );
+      btn.textContent="PRÓXIMAMENTE";
+      btn.disabled=true;
+      btn.title=profile?.email
+        ?"El contacto directo quedará habilitado en la siguiente fase de la plataforma."
+        :"El sistema de contacto con profesionales se incorporará en la siguiente fase.";
+    });
+  });
+}
+
+function showProfessionalsTab(tab){
+  const register=tab==="register";
+  professionalsDirectoryPane.hidden=register;
+  professionalsRegisterPane.hidden=!register;
+  professionalsDirectoryTab.classList.toggle("active",!register);
+  professionalsRegisterTab.classList.toggle("active",register);
+
+  if(!register)
+    renderProfessionals();
+}
+
+function openProfessionalsDirectory(matter="",categoryName=""){
+  if(!professionalsView)
+    return;
+
+  professionalsView.hidden=false;
+  showProfessionalsTab("directory");
+
+  const inferred=categoryToMarket(categoryName);
+  const filter=matter||inferred||"all";
+  if(professionalsFilter)
+    professionalsFilter.value=filter;
+
+  if(professionalsSearch && !professionalsSearch.value && selectedLegalTerm){
+    professionalsSearch.value="";
+  }
+
+  renderProfessionals();
+  professionalsView.scrollIntoView({
+    behavior:"smooth",
+    block:"start"
+  });
+}
+
+function closeProfessionalsDirectory(){
+  if(professionalsView)
+    professionalsView.hidden=true;
+}
+
+findLegalProfessionalBtn?.addEventListener("click",()=>{
+  const info=flattenLegalTerms().find(
+    x=>x.term===selectedLegalTerm
+  );
+  openProfessionalsDirectory(
+    categoryToMarket(info?.categoryName),
+    info?.categoryName||""
+  );
+});
+
+openProfessionalsBtn?.addEventListener("click",()=>{
+  openProfessionalsDirectory();
+});
+
+closeProfessionalsBtn?.addEventListener(
+  "click",
+  closeProfessionalsDirectory
+);
+
+professionalsDirectoryTab?.addEventListener(
+  "click",
+  ()=>showProfessionalsTab("directory")
+);
+
+professionalsRegisterTab?.addEventListener(
+  "click",
+  ()=>showProfessionalsTab("register")
+);
+
+cancelProfessionalRegister?.addEventListener(
+  "click",
+  ()=>showProfessionalsTab("directory")
+);
+
+professionalsSearch?.addEventListener(
+  "input",
+  renderProfessionals
+);
+
+professionalsFilter?.addEventListener(
+  "change",
+  renderProfessionals
+);
+
+professionalRegisterForm?.addEventListener(
+  "submit",
+  event=>{
+    event.preventDefault();
+
+    const formData=new FormData(
+      professionalRegisterForm
+    );
+
+    const profile={
+      id:`reg-${Date.now()}`,
+      name:String(formData.get("name")||"").trim(),
+      city:String(formData.get("city")||"").trim(),
+      matter:String(formData.get("matter")||"").trim(),
+      experience:String(formData.get("experience")||"").trim(),
+      email:String(formData.get("email")||"").trim(),
+      phone:String(formData.get("phone")||"").trim(),
+      bio:String(formData.get("bio")||"").trim(),
+      status:"pending"
+    };
+
+    saveRegisteredProfessional(profile);
+
+    professionalRegistrationSuccess.hidden=false;
+    professionalRegistrationSuccess.textContent=
+      "Registro recibido en modo prototipo. El perfil quedó guardado en este navegador como solicitud pendiente de validación. En la versión conectada a la plataforma, aquí se realizará el proceso de verificación y publicación.";
+
+    professionalRegisterForm.reset();
+  }
+);
+
+/* =========================================================
    PAÍS DE REFERENCIA
    ========================================================= */
 
@@ -3696,14 +5379,14 @@ const countryInline=
     "countryInline"
   );
 
-const stateTermLabel=
+const legalTermTypeLabel=
   document.getElementById(
-    "stateTermLabel"
+    "legalTermTypeLabel"
   );
 
-const stateTermRadio=
+const legalTermRadio=
   document.getElementById(
-    "stateTermRadio"
+    "legalTermRadio"
   );
 
 const COUNTRY_STORAGE_KEY=
@@ -3746,18 +5429,19 @@ function applyCountryUI(){
   countryInline.title=
     `${info.name} — ${info.note} Haz clic para cambiar de jurisdicción.`;
 
-  /* "Contratación estatal" (Ley 80) solo aplica a Colombia */
-  const showStateOption=
+  /* La guía de términos frecuentes se encuentra
+     disponible actualmente para Colombia. */
+  const showLegalOption=
     currentCountry==="CO";
 
-  stateTermLabel.style.display=
-    showStateOption
+  legalTermTypeLabel.style.display=
+    showLegalOption
       ?""
       :"none";
 
   if(
-    !showStateOption &&
-    stateTermRadio.checked
+    !showLegalOption &&
+    legalTermRadio.checked
   ){
 
     document.querySelector(
@@ -3765,6 +5449,9 @@ function applyCountryUI(){
     ).checked=true;
 
   }
+
+  if(!showLegalOption)
+    clearLegalTerm();
 
 }
 
@@ -4012,14 +5699,104 @@ function wrapText(
 }
 
 
+function buildColombiaLegalReference(term){
+
+  const references={
+
+    "Acción de tutela":"Derecho Constitucional y Administrativo · mecanismo de protección de derechos fundamentales.",
+    "Derecho de petición":"Derecho Constitucional y Administrativo · actuación administrativa y derecho fundamental de petición.",
+    "Habeas corpus":"Derecho Constitucional y Administrativo · garantía relacionada con la libertad personal.",
+    "Habeas data":"Derecho Constitucional y Administrativo · protección y tratamiento de datos personales.",
+    "Debido proceso":"Derecho Constitucional y Administrativo · garantía transversal aplicable a actuaciones administrativas y judiciales.",
+    "Acción popular":"Derecho Constitucional y Administrativo · mecanismo de protección de derechos e intereses colectivos.",
+    "Acción de cumplimiento":"Derecho Constitucional y Administrativo · mecanismo orientado a hacer efectivo el cumplimiento de normas aplicables.",
+    "Nulidad":"Derecho Constitucional y Administrativo · medio de control de legalidad de actos administrativos.",
+    "Nulidad y restablecimiento del derecho":"Derecho Constitucional y Administrativo · medio de control con componente de restablecimiento de una situación jurídica individual.",
+    "Reparación directa":"Derecho Constitucional y Administrativo · medio de control relacionado con la responsabilidad extracontractual del Estado.",
+
+    "Contrato de trabajo":"Derecho Laboral · relación laboral y obligaciones derivadas del contrato de trabajo.",
+    "Despido sin justa causa":"Derecho Laboral · terminación del vínculo laboral y sus posibles consecuencias indemnizatorias.",
+    "Indemnización laboral":"Derecho Laboral · consecuencias económicas que pueden surgir de la terminación o incumplimiento de obligaciones laborales.",
+    "Liquidación laboral":"Derecho Laboral · determinación y pago de conceptos derivados de la terminación de la relación laboral.",
+    "Acoso laboral":"Derecho Laboral · conductas y procedimientos relacionados con la Ley de Acoso Laboral.",
+    "Estabilidad laboral reforzada":"Derecho Laboral · protección especial frente a determinadas situaciones de vulnerabilidad o protección constitucional.",
+    "Fuero de salud":"Derecho Laboral · protección laboral relacionada con condiciones de salud y estabilidad ocupacional.",
+    "Prestaciones sociales":"Derecho Laboral · derechos económicos derivados de la relación laboral.",
+    "Seguridad social":"Derecho Laboral · obligaciones y prestaciones del sistema de seguridad social.",
+    "Pensión":"Derecho Laboral · reconocimiento, requisitos y actuaciones relacionadas con prestaciones pensionales.",
+
+    "Responsabilidad civil":"Derecho Civil · régimen de responsabilidad y consecuencias por daños jurídicamente imputables.",
+    "Daños y perjuicios":"Derecho Civil · determinación y reclamación de consecuencias patrimoniales o extrapatrimoniales del daño.",
+    "Incumplimiento contractual":"Derecho Civil · consecuencias derivadas del incumplimiento de obligaciones contractuales.",
+    "Obligaciones":"Derecho Civil · cumplimiento, exigibilidad y extinción de obligaciones.",
+    "Contrato":"Derecho Civil · formación, ejecución, interpretación y terminación de relaciones contractuales.",
+    "Compraventa":"Derecho Civil · obligaciones derivadas del contrato de compraventa.",
+    "Arrendamiento":"Derecho Civil · derechos y obligaciones derivados del contrato de arrendamiento.",
+    "Prescripción":"Derecho Civil · efectos jurídicos asociados al transcurso del tiempo en los supuestos previstos por la ley.",
+    "Conciliación":"Derecho Civil · mecanismo alternativo de solución de controversias y acuerdos entre las partes.",
+    "Transacción":"Derecho Civil · contrato destinado a terminar o prevenir un litigio mediante concesiones recíprocas.",
+
+    "Divorcio":"Derecho de Familia · actuaciones y efectos relacionados con la disolución del vínculo matrimonial.",
+    "Unión marital de hecho":"Derecho de Familia · reconocimiento y efectos de la unión marital de hecho.",
+    "Pensión alimentaria":"Derecho de Familia · obligación alimentaria y actuaciones relacionadas con su fijación o cumplimiento.",
+    "Custodia y cuidado personal":"Derecho de Familia · decisiones y actuaciones relativas al cuidado personal de niños, niñas y adolescentes.",
+    "Patria potestad":"Derecho de Familia · ejercicio, suspensión, privación y demás actuaciones relacionadas con la patria potestad.",
+    "Sucesión":"Derecho de Familia · actuaciones relacionadas con la transmisión de derechos y obligaciones por causa de muerte.",
+    "Herencia":"Derecho de Familia · derechos y actuaciones derivados de la sucesión por causa de muerte.",
+    "Testamento":"Derecho de Familia · disposición de bienes y voluntad sucesoral mediante testamento.",
+
+    "Denuncia penal":"Derecho Penal · puesta en conocimiento de hechos que pueden constituir delito; la actuación y los términos dependen del caso concreto y la autoridad competente.",
+    "Estafa":"Derecho Penal · conducta tipificada en el Código Penal; los términos procesales dependen de la actuación concreta.",
+    "Fraude":"Derecho Penal · categoría que puede involucrar distintas conductas; debe precisarse el tipo penal y la actuación concreta.",
+    "Delito informático":"Derecho Penal · conductas relacionadas con delitos informáticos; debe precisarse el tipo penal y la actuación concreta.",
+    "Lavado de activos":"Derecho Penal · conducta tipificada en la legislación penal; los términos dependen de la actuación concreta.",
+    "Prevaricato":"Derecho Penal · conducta tipificada en la legislación penal; los términos dependen de la actuación concreta.",
+    "Extinción de dominio":"Derecho Penal · actuación de naturaleza especial relacionada con bienes en los supuestos previstos por la ley.",
+
+    "Sociedad por Acciones Simplificada (SAS)":"Derecho Corporativo y Comercial · constitución, funcionamiento y actuaciones de sociedades por acciones simplificadas.",
+    "Cámara de Comercio":"Derecho Corporativo y Comercial · trámites y actuaciones relacionados con el registro mercantil.",
+    "Due Diligence (debida diligencia)":"Derecho Corporativo y Comercial · proceso de revisión y análisis de información relevante para una operación o decisión.",
+    "Gobierno corporativo":"Derecho Corporativo y Comercial · reglas y prácticas de dirección, administración y control empresarial.",
+    "Protección de datos personales":"Derecho Corporativo y Comercial · tratamiento, protección y cumplimiento de obligaciones relacionadas con datos personales.",
+
+    "Contratación estatal":"Empresas y entidades públicas · contratación pública, ejecución, supervisión y actuaciones relacionadas con contratos estatales.",
+    "SECOP II":"Empresas y entidades públicas · gestión electrónica de actuaciones y procedimientos de contratación pública.",
+    "Pliegos tipo":"Empresas y entidades públicas · documentos estandarizados aplicables a determinados procesos de contratación estatal.",
+    "Equilibrio económico del contrato":"Empresas y entidades públicas · equilibrio de la ecuación económica del contrato estatal y sus mecanismos de restablecimiento.",
+    "Multas y cláusula penal":"Empresas y entidades públicas · consecuencias contractuales previstas para determinados incumplimientos.",
+    "Liquidación contractual":"Empresas y entidades públicas · cierre y definición de las relaciones derivadas de determinados contratos estatales.",
+    "Debida diligencia (Due Diligence)":"Empresas y entidades públicas · revisión estructurada de información, riesgos y obligaciones relevantes.",
+    "Compliance o cumplimiento normativo":"Empresas y entidades públicas · sistemas, controles y procedimientos destinados a gestionar obligaciones y riesgos de cumplimiento."
+
+  };
+
+  return(
+    references[term]||
+    "Término jurídico frecuente seleccionado como referencia temática. La duración y forma de cómputo deben verificarse en la norma, actuación y autoridad aplicables."
+  );
+
+}
+
+
 function buildLegalText(type){
 
   if(
-    type==="state" &&
+    type==="legal" &&
     currentCountry==="CO"
   ){
 
-    return`FUNDAMENTO LEGAL: Este documento presenta el cómputo de un plazo contractual bajo el Estatuto General de Contratación de la Administración Pública (Ley 80 de 1993, Ley 1150 de 2007 y Decreto 1082 de 2015), en concordancia con los lineamientos de Colombia Compra Eficiente. El plazo de ejecución de un contrato estatal, como uno de prestación de servicios, se cuenta por regla general en días o meses calendario, de fecha a fecha desde el inicio pactado (usualmente el acta de inicio), salvo que la minuta del contrato establezca expresamente un cómputo en días hábiles. Las actuaciones propias del proceso de selección (observaciones, adendas, traslado de informes de evaluación, recursos en SECOP) se rigen por el Código de Procedimiento Administrativo y de lo Contencioso Administrativo (Ley 1437 de 2011) y se cuentan en días hábiles. Este documento es una herramienta de cálculo de referencia; se recomienda verificar el plazo exacto contra el acta de inicio, la minuta del contrato y las instrucciones del supervisor o interventor antes de su presentación formal ante terceros o entidades estatales.`;
+    const term=
+      selectedLegalTerm||
+      "Término frecuente no especificado";
+
+    const info=flattenLegalTerms().find(x=>x.term===term);
+    const refs=info?.refs||[];
+    const refText=refs.length
+      ?` Referencias disponibles: ${refs.map(r=>r.label).join("; ")}.`
+      :` No existe un único plazo general asociado a este concepto; debe precisarse la actuación y la norma aplicable.`;
+
+    return`REFERENCIA JURÍDICA SELECCIONADA: ${term}. ${buildColombiaLegalReference(term)}${refText} El resultado del cómputo debe verificarse frente a la norma específica, la actuación, la autoridad y las circunstancias del caso.`;
+
   }
 
   if(currentCountry==="CO"){
@@ -4402,7 +6179,8 @@ function buildVerificationData(termData){
     amount,
     type,
     unit,
-    country
+    country,
+    legalTerm
   }=termData;
 
   const canonical=[
@@ -4411,7 +6189,8 @@ function buildVerificationData(termData){
     amount,
     type,
     unit,
-    country
+    country,
+    legalTerm||""
   ].join("|");
 
   const digest=
@@ -4487,8 +6266,12 @@ function buildCertificationHTML(termData,includeCalendar=true){
     amount,
     type,
     unit,
-    country
+    country,
+    legalTerm
   }=termData;
+
+  if(type==="legal" && legalTerm)
+    selectedLegalTerm=legalTerm;
 
   const countryInfo=
     COUNTRIES[country]||
@@ -4568,6 +6351,12 @@ function buildCertificationHTML(termData,includeCalendar=true){
           <span>Jurisdicción de referencia</span>
           <strong>${escapeHtml(countryInfo.flag || "")} ${escapeHtml(countryInfo.name || country)}</strong>
         </div>
+
+        ${type==="legal" && legalTerm ? `
+        <div class="certification-item">
+          <span>Término jurídico seleccionado</span>
+          <strong>${escapeHtml(legalTerm)}</strong>
+        </div>` : ""}
 
         <div class="certification-item">
           <span>Identificador del cálculo</span>
@@ -4807,8 +6596,10 @@ function buildShareText(
       );
 
   const suffix=
-    type==="state" && (country||currentCountry)==="CO"
-      ?" (contratación estatal — Ley 80)"
+    type==="legal" &&
+    (country||currentCountry)==="CO" &&
+    selectedLegalTerm
+      ?` (${selectedLegalTerm})`
       :"";
 
   return`Término Legal: contando desde el ${formatShortDate(start)}, ${amount} ${label}${suffix}, vence el ${formatDate(end)}.`;
