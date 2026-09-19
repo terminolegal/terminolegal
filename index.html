@@ -632,6 +632,17 @@ body.dark .error{
   text-align:left
 }
 
+.result>.details:last-child{margin-bottom:0}
+
+.result-actions{
+  margin-top:18px;
+  text-align:center
+}
+
+.result-actions .notice{
+  text-align:center
+}
+
 /* EXPORTACIÓN */
 .export-row{
   display:flex;
@@ -2408,6 +2419,27 @@ footer{
 
   </div>
 
+</div>
+
+<!-- CERTIFICACIÓN DE CÓMPUTO (se muestra automáticamente al correr el término) -->
+<div id="certificationView"
+     class="certification-view"
+     hidden>
+
+  <div class="certification-toolbar">
+    <strong data-i18n="certToolbar">CERTIFICACIÓN DE CÓMPUTO</strong>
+  </div>
+
+  <div id="certificationDocument"
+       class="certification-document"></div>
+
+</div>
+
+<!-- ACCIONES DEL RESULTADO (debajo de la certificación) -->
+<div id="resultActions"
+     class="card result-actions"
+     hidden>
+
   <p class="notice" id="versionNotice">
     Versión <span id="appVersionLabel">11.1</span> — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.
   </p>
@@ -2459,21 +2491,6 @@ footer{
     </button>
 
   </div>
-
-
-</div>
-
-<!-- CERTIFICACIÓN DE CÓMPUTO (se muestra automáticamente al correr el término) -->
-<div id="certificationView"
-     class="certification-view"
-     hidden>
-
-  <div class="certification-toolbar">
-    <strong data-i18n="certToolbar">CERTIFICACIÓN DE CÓMPUTO</strong>
-  </div>
-
-  <div id="certificationDocument"
-       class="certification-document"></div>
 
 </div>
 
@@ -2657,6 +2674,7 @@ const daysInput=document.getElementById("days");
 const calculateBtn=document.getElementById("calculateBtn");
 const errorBox=document.getElementById("error");
 const result=document.getElementById("result");
+const resultActions=document.getElementById("resultActions");
 const resultDate=document.getElementById("resultDate");
 const resultSummary=document.getElementById("resultSummary");
 const detailStart=document.getElementById("detailStart");
@@ -2906,6 +2924,7 @@ function applyOutputLanguage(lang){
 
   [
     "result",
+    "resultActions",
     "certificationView",
     "postResultNote",
     "feedbackCard"
@@ -4048,6 +4067,7 @@ function showError(message){
   errorBox.textContent=message;
   errorBox.hidden=false;
   result.hidden=true;
+  resultActions.hidden=true;
   certificationView.hidden=true;
 
   document.getElementById(
@@ -4076,6 +4096,7 @@ function resetResultView(){
   lastTermData=null;
 
   result.hidden=true;
+  resultActions.hidden=true;
   certificationView.hidden=true;
   certificationDocument.innerHTML="";
 
@@ -4848,6 +4869,7 @@ calculateBtn.addEventListener(
     applyOutputLanguage(lang);
 
     result.hidden=false;
+    resultActions.hidden=false;
 
     document.getElementById(
       "postResultNote"
