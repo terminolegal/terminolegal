@@ -8,6 +8,10 @@
 <style>
 *{box-sizing:border-box}
 
+/* Garantiza que el atributo [hidden] siempre oculte el elemento,
+   aunque una clase defina display:flex / grid / etc. */
+[hidden]{display:none!important}
+
 :root{
   --navy:#10243e;
   --gold:#b9964f;
@@ -546,13 +550,17 @@ button:hover{
 }
 
 .error{
-  color:#e28b8b;
+  color:#a12a2a;
   background:var(--surface-alt);
   border:1px solid #b23a3a;
   border-radius:8px;
   padding:10px;
   margin:14px 0 0;
   font-size:.8rem
+}
+
+body.dark .error{
+  color:#e28b8b
 }
 
 /* RESULTADO */
@@ -1584,24 +1592,6 @@ footer{
   color:var(--navy)
 }
 
-.certification-close{
-  width:auto;
-  height:32px;
-  padding:0 12px;
-  border:1px solid var(--line);
-  border-radius:8px;
-  background:transparent;
-  color:var(--muted);
-  font-size:.68rem;
-  letter-spacing:.04em
-}
-
-.certification-close:hover{
-  background:var(--surface);
-  color:var(--navy);
-  filter:none
-}
-
 .certification-document{
   max-width:780px;
   margin:0 auto;
@@ -2419,30 +2409,10 @@ footer{
   </div>
 
   <p class="notice" id="versionNotice">
-    Versión 1.0 — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.
+    Versión <span id="appVersionLabel">11.1</span> — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.
   </p>
 
   <div class="export-row">
-
-    <button type="button"
-            id="viewComputationBtn"
-            class="export-btn">
-
-      <svg viewBox="0 0 24 24"
-           fill="none"
-           stroke="currentColor"
-           stroke-width="2"
-           stroke-linecap="round"
-           stroke-linejoin="round">
-
-        <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path>
-        <circle cx="12" cy="12" r="2.5"></circle>
-
-      </svg>
-
-      VER CÓMPUTO
-
-    </button>
 
     <button type="button"
             id="exportPdfBtn"
@@ -2493,19 +2463,13 @@ footer{
 
 </div>
 
-<!-- CERTIFICACIÓN VISIBLE -->
+<!-- CERTIFICACIÓN DE CÓMPUTO (se muestra automáticamente al correr el término) -->
 <div id="certificationView"
      class="certification-view"
      hidden>
 
   <div class="certification-toolbar">
     <strong>CERTIFICACIÓN DE CÓMPUTO</strong>
-
-    <button type="button"
-            id="closeCertificationBtn"
-            class="certification-close">
-      CERRAR
-    </button>
   </div>
 
   <div id="certificationDocument"
@@ -2572,6 +2536,8 @@ footer{
   </a>
 
 </div>
+
+</div><!-- /feedbackCard -->
 
 <!-- DIRECTORIO Y REGISTRO DE PROFESIONALES -->
 <div id="professionalsView" class="professionals-view" hidden>
@@ -2665,7 +2631,7 @@ footer{
   <span>Calculador jurídico — versión experimental</span>
 </footer>
 
-</div>
+</div><!-- /app -->
 
 <script>
 
@@ -2697,8 +2663,6 @@ const detailStart=document.getElementById("detailStart");
 const detailEnd=document.getElementById("detailEnd");
 const detailType=document.getElementById("detailType");
 const exportPdfBtn=document.getElementById("exportPdfBtn");
-const viewComputationBtn=document.getElementById("viewComputationBtn");
-const closeCertificationBtn=document.getElementById("closeCertificationBtn");
 const certificationView=document.getElementById("certificationView");
 const certificationDocument=document.getElementById("certificationDocument");
 const exportShareBtn=document.getElementById("exportShareBtn");
@@ -3070,9 +3034,14 @@ function getCanadaHolidays(year){
     "Canada Labour Code — general holiday"
   );
 
+  /* Victoria Day: el lunes inmediatamente anterior al 25 de mayo
+     (no siempre es el tercer lunes de mayo). */
+  const victoriaDay=new Date(year,4,24);
+  victoriaDay.setDate(24-((victoriaDay.getDay()+6)%7));
+
   addHoliday(
     holidays,
-    nthWeekday(year,4,1,3),
+    victoriaDay,
     "Victoria Day",
     "Canada Labour Code — general holiday"
   );
@@ -3844,6 +3813,8 @@ function showError(message){
   errorBox.textContent=message;
   errorBox.hidden=false;
   result.hidden=true;
+  certificationView.hidden=true;
+
   document.getElementById(
     "postResultNote"
   ).hidden=true;
@@ -3860,6 +3831,28 @@ function clearError(){
 
   errorBox.hidden=true;
   errorBox.textContent="";
+}
+
+
+/* Oculta el resultado y su certificación (p. ej. al cambiar de jurisdicción,
+   porque el cómputo anterior ya no corresponde al calendario activo). */
+function resetResultView(){
+
+  lastTermData=null;
+
+  result.hidden=true;
+  certificationView.hidden=true;
+  certificationDocument.innerHTML="";
+
+  document.getElementById(
+    "postResultNote"
+  ).hidden=true;
+
+  document.getElementById(
+    "feedbackCard"
+  ).hidden=true;
+
+  holidayListEl.style.display="none";
 }
 
 
@@ -4070,6 +4063,8 @@ function renderDayView(){
 
         startDateDisplay.value=
           formatShortDate(date);
+
+        startDateDisplay.classList.remove("invalid");
 
         closeCalendar();
 
@@ -4623,7 +4618,26 @@ calculateBtn.addEventListener(
 
     updateAdviceVisibility();
 
-    certificationView.hidden=true;
+    /* La certificación técnica se muestra automáticamente
+       junto con el resultado, sin necesidad de un botón adicional. */
+    try{
+
+      renderCertification(
+        lastTermData
+      );
+
+      certificationView.hidden=false;
+
+    }catch(err){
+
+      console.error(
+        "No se pudo generar la certificación de cómputo:",
+        err
+      );
+
+      certificationView.hidden=true;
+
+    }
 
     result.scrollIntoView({
       behavior:"smooth",
@@ -4814,9 +4828,17 @@ function renderLegalCategories(){
 
       wrapper.className="legal-category";
 
-      /* La primera materia queda abierta por defecto:
-         el usuario puede empezar a explorar con un solo clic. */
-      if(index===0)
+      /* Queda abierta la materia del término seleccionado; si no hay
+         selección, la primera materia queda abierta por defecto para que
+         el usuario pueda empezar a explorar con un solo clic. */
+      const shouldOpen=
+        selectedLegalTerm
+          ?category.terms.some(
+            t=>t.name===selectedLegalTerm
+          )
+          :index===0;
+
+      if(shouldOpen)
         wrapper.classList.add("open");
 
       const header=
@@ -4826,7 +4848,7 @@ function renderLegalCategories(){
       header.className="legal-category-button";
       header.setAttribute(
         "aria-expanded",
-        index===0 ? "true" : "false"
+        shouldOpen ? "true" : "false"
       );
 
       header.innerHTML=`
@@ -4838,7 +4860,7 @@ function renderLegalCategories(){
         document.createElement("div");
 
       terms.className="legal-category-terms";
-      terms.hidden=index!==0;
+      terms.hidden=!shouldOpen;
 
       category.terms.forEach(
         term=>{
@@ -5879,6 +5901,11 @@ countrySelect.addEventListener(
       true
     );
 
+    /* El resultado y la certificación mostrados pertenecen al calendario
+       anterior; se ocultan para que no queden mezclados con la nueva
+       jurisdicción. Basta con volver a correr el término. */
+    resetResultView();
+
   }
 );
 
@@ -6253,16 +6280,31 @@ function buildCalendarCanvas(termData){
     FOOTER_H+
     PADDING;
 
-  const scale=2;
+  /* Escala 2x para nitidez, pero se reduce automáticamente en términos
+     muy largos (p. ej. 60 meses): varios navegadores móviles (Safari/iOS)
+     no dibujan canvas de más de ~16,7 millones de píxeles. */
+  const MAX_CANVAS_PIXELS=14000000;
+
+  const scale=
+    Math.max(
+      0.5,
+      Math.min(
+        2,
+        Math.sqrt(
+          MAX_CANVAS_PIXELS/
+          (canvasWidth*canvasHeight)
+        )
+      )
+    );
 
   const canvas=
     document.createElement("canvas");
 
   canvas.width=
-    canvasWidth*scale;
+    Math.floor(canvasWidth*scale);
 
   canvas.height=
-    canvasHeight*scale;
+    Math.floor(canvasHeight*scale);
 
   const ctx=
     canvas.getContext("2d");
@@ -6867,44 +6909,6 @@ function renderCertification(termData){
 }
 
 
-function showCertification(){
-
-  if(!lastTermData)
-    return;
-
-  renderCertification(
-    lastTermData
-  );
-
-  certificationView.hidden=false;
-
-  certificationView.scrollIntoView({
-    behavior:"smooth",
-    block:"start"
-  });
-
-}
-
-
-function closeCertification(){
-
-  certificationView.hidden=true;
-
-}
-
-
-viewComputationBtn.addEventListener(
-  "click",
-  showCertification
-);
-
-
-closeCertificationBtn.addEventListener(
-  "click",
-  closeCertification
-);
-
-
 /* =========================================================
    GUARDAR PDF
    ========================================================= */
@@ -6989,6 +6993,19 @@ const CALCULATION_SHEET_ENDPOINT=
   "https://script.google.com/macros/s/AKfycbyLmfwSEO0NosEyYR5qOEicUauybR2TQdO94bqbqtComlSto60-GWVFyhnDIAzKNnrd/exec";
 
 const APP_VERSION="11.1";
+
+/* Mantiene el número de versión mostrado en el resultado
+   sincronizado con APP_VERSION. */
+{
+  const versionLabel=
+    document.getElementById(
+      "appVersionLabel"
+    );
+
+  if(versionLabel)
+    versionLabel.textContent=
+      APP_VERSION;
+}
 
 function getAnonymousVisitorId(){
 
