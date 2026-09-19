@@ -7620,8 +7620,30 @@ function sendFeedback(value){
 
   /* Registro en la hoja de Google (fire-and-forget: no bloquea
      la interfaz ni depende de que la respuesta se pueda leer) */
+  /* Contexto del voto: país del cálculo, código de trazabilidad, versión
+     y visitante anónimo (sin datos personales). */
+  const term=lastTermData;
+
+  const countryCode=
+    (term&&term.country)||
+    currentCountry;
+
+  const voteParams=
+    new URLSearchParams({
+      voto:value,
+      app_version:APP_VERSION,
+      country_code:countryCode,
+      country_name:
+        COUNTRIES[countryCode]?.name||
+        countryCode,
+      calculation_code:
+        term?.traceCode||"",
+      visitor_id:
+        getAnonymousVisitorId()
+    });
+
   fetch(
-    `${FEEDBACK_SHEET_ENDPOINT}?voto=${value}`,
+    `${FEEDBACK_SHEET_ENDPOINT}?${voteParams.toString()}`,
     {mode:"no-cors"}
   ).catch(()=>{});
 
