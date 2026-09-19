@@ -6986,9 +6986,9 @@ const SHARE_URL=
    Se deja vacío para que el documento siga funcionando sin backend.
    Cuando se publique el Apps Script, pega aquí la URL /exec. */
 const CALCULATION_SHEET_ENDPOINT=
-  "";
+  "https://script.google.com/macros/s/AKfycbyLmfwSEO0NosEyYR5qOEicUauybR2TQdO94bqbqtComlSto60-GWVFyhnDIAzKNnrd/exec";
 
-const APP_VERSION="11.0";
+const APP_VERSION="11.1";
 
 function getAnonymousVisitorId(){
 
@@ -7016,6 +7016,91 @@ function getAnonymousVisitorId(){
   }
 }
 
+function buildCalculationMetrics(termData){
+
+  const countedDates =
+    Array.isArray(termData?.countedDates)
+      ? termData.countedDates
+      : [];
+
+  /*
+     El conteo de métricas se hace sobre las fechas efectivamente
+     recorridas por el cálculo, desde el día siguiente a la fecha
+     de inicio hasta la fecha de resultado.
+
+     - totalDaysCounted: número de fechas que componen el conteo.
+     - businessDaysCounted: fechas no laborables excluidas por fin de
+       semana o festivo, según el calendario de la jurisdicción.
+     - weekendDaysCounted: sábados y domingos presentes en el intervalo.
+     - holidayDaysCounted: festivos presentes en el intervalo.
+
+     Para términos de días hábiles, los días efectivamente contados
+     son necesariamente hábiles; los fines de semana y festivos se
+     identifican en el intervalo recorrido aunque no entren al conteo.
+  */
+
+  const totalDaysCounted =
+    countedDates.length;
+
+  let businessDaysCounted=0;
+  let weekendDaysCounted=0;
+  let holidayDaysCounted=0;
+
+  countedDates.forEach(date=>{
+
+    const weekend=isWeekend(date);
+    const holiday=getHoliday(date);
+
+    if(weekend)
+      weekendDaysCounted++;
+
+    if(holiday)
+      holidayDaysCounted++;
+
+    if(!weekend && !holiday)
+      businessDaysCounted++;
+
+  });
+
+  /*
+     En un término de días hábiles, countedDates solamente contiene
+     los días que sí fueron contabilizados. Por tanto, businessDays
+     coincide con el total contado.
+  */
+  if(termData.type==="business"){
+    businessDaysCounted=totalDaysCounted;
+
+    /*
+       Para obtener el número real de fines de semana y festivos
+       excluidos, recorremos todo el intervalo entre inicio y resultado.
+    */
+    weekendDaysCounted=0;
+    holidayDaysCounted=0;
+
+    let cursor=new Date(termData.start);
+
+    while(dateKey(cursor)!==dateKey(termData.end)){
+
+      cursor=addDays(cursor,1);
+
+      if(isWeekend(cursor))
+        weekendDaysCounted++;
+
+      if(getHoliday(cursor))
+        holidayDaysCounted++;
+
+    }
+  }
+
+  return{
+    totalDaysCounted,
+    businessDaysCounted,
+    weekendDaysCounted,
+    holidayDaysCounted
+  };
+}
+
+
 function buildCalculationRecord(termData){
 
   const verification=
@@ -7024,44 +7109,66 @@ function buildCalculationRecord(termData){
   const countryInfo=
     COUNTRIES[termData.country]||COUNTRIES[currentCountry];
 
+  const metrics=
+    buildCalculationMetrics(termData);
+
   return{
     event:"calculo",
+    action:"log_calculation",
+
     app_version:APP_VERSION,
     timestamp:new Date().toISOString(),
+
     visitor_id:getAnonymousVisitorId(),
+
     calculation_code:verification.code,
     trace_country:verification.country,
     trace_date:verification.date,
     trace_sequence:verification.sequence,
     verification_hash:verification.digest,
+
     country_code:termData.country,
     country_name:countryInfo?.name||termData.country,
+
     start_date:dateKey(termData.start),
     end_date:dateKey(termData.end),
+
     amount:termData.amount,
     unit:termData.unit,
     term_type:termData.type,
     legal_term:termData.legalTerm||"",
-    counted_days:Array.isArray(termData.countedDates)
-      ?termData.countedDates.length
-      :0,
+
+    counted_days:metrics.totalDaysCounted,
+    total_days_counted:metrics.totalDaysCounted,
+    business_days_counted:metrics.businessDaysCounted,
+    weekend_days_counted:metrics.weekendDaysCounted,
+    holiday_days_counted:metrics.holidayDaysCounted,
+
     page_source:location.href,
     referrer:document.referrer||""
   };
 }
+
 
 function recordCalculation(termData){
 
   if(!CALCULATION_SHEET_ENDPOINT)
     return;
 
-  const data=buildCalculationRecord(termData);
+  const data=
+    buildCalculationRecord(termData);
 
-  const params=new URLSearchParams();
+  const params=
+    new URLSearchParams();
 
-  Object.entries(data).forEach(([key,value])=>{
-    params.append(key,String(value??""));
-  });
+  Object.entries(data).forEach(
+    ([key,value])=>{
+      params.append(
+        key,
+        String(value??"")
+      );
+    }
+  );
 
   fetch(
     CALCULATION_SHEET_ENDPOINT,
@@ -7069,7 +7176,8 @@ function recordCalculation(termData){
       method:"POST",
       mode:"no-cors",
       headers:{
-        "Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"
+        "Content-Type":
+          "application/x-www-form-urlencoded;charset=UTF-8"
       },
       body:params.toString(),
       keepalive:true
@@ -7199,7 +7307,7 @@ const feedbackThanks=
 
 /* ⚠️ Reemplaza esta URL por la que te entregue Google al
    implementar el Apps Script como aplicación web (termina en /exec) */
-const FEEDBACK_SHEET_ENDPOINT="https://script.google.com/macros/s/AKfycbyK4TtNAJfpOtV8mCaDGswNmCVR3NRbVcVz5ZWhvqEFqm2Lvwx6CXOyd_YQbbUusP-Y/exec";
+const FEEDBACK_SHEET_ENDPOINT="https://script.google.com/macros/s/AKfycbyLmfwSEO0NosEyYR5qOEicUauybR2TQdO94bqbqtComlSto60-GWVFyhnDIAzKNnrd/exec";
 
 
 function sendFeedback(value){
