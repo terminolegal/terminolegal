@@ -1553,15 +1553,6 @@ footer{
   line-height:1.45;
 }
 
-
-/* Marketplace / cuentas */
-.account-pane{padding-top:12px}
-.account-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.account-grid .full{grid-column:1 / -1}
-.account-note{margin:8px 0;color:var(--muted);font-size:.62rem;line-height:1.45}
-.account-status{margin-top:9px;padding:10px;border:1px solid #ccd9cf;border-radius:8px;background:#f3f7f4;color:#385443;font-size:.64rem;line-height:1.45}
-@media(max-width:560px){.account-grid{grid-template-columns:1fr}}
-
 @media(max-width:560px){
   .legal-advice-row{
     align-items:stretch;
@@ -2576,7 +2567,6 @@ footer{
     <div class="professionals-tabs" role="tablist" aria-label="Profesionales">
       <button type="button" id="professionalsDirectoryTab" class="professionals-tab active" role="tab">Buscar profesional</button>
       <button type="button" id="professionalsRegisterTab" class="professionals-tab" role="tab">Soy profesional</button>
-      <button type="button" id="accountTab" class="professionals-tab" role="tab">Crear cuenta</button>
     </div>
 
     <div id="professionalsDirectoryPane">
@@ -2598,51 +2588,7 @@ footer{
         </select>
       </div>
       <div id="professionalsList" class="professionals-list"></div>
-      <p class="professionals-note">Los perfiles públicos se gestionan desde el registro central de Término Legal. Los profesionales quedan sujetos a revisión y verificación antes de su publicación.</p>
-    </div>
-
-    <div id="accountPane" class="account-pane" hidden>
-      <form id="clientRegisterForm" class="professional-register-form">
-        <div class="account-grid">
-          <div>
-            <label for="accountName">Nombre completo</label>
-            <input id="accountName" name="name" required placeholder="Nombre y apellidos">
-          </div>
-          <div>
-            <label for="accountEmail">Correo electrónico</label>
-            <input id="accountEmail" name="email" type="email" required placeholder="correo@ejemplo.com">
-          </div>
-          <div>
-            <label for="accountPhone">Teléfono</label>
-            <input id="accountPhone" name="phone" placeholder="Teléfono o WhatsApp">
-          </div>
-          <div>
-            <label for="accountCity">Ciudad</label>
-            <input id="accountCity" name="city" required placeholder="Ciudad">
-          </div>
-          <div>
-            <label for="accountCountry">País</label>
-            <input id="accountCountry" name="country" value="Colombia" required>
-          </div>
-          <div>
-            <label for="accountPassword">Contraseña</label>
-            <input id="accountPassword" name="password" type="password" minlength="8" required placeholder="Mínimo 8 caracteres">
-          </div>
-          <div class="full">
-            <label for="accountPurpose">Soy</label>
-            <select id="accountPurpose" name="purpose" required>
-              <option value="client">Cliente: busco asesoría jurídica</option>
-              <option value="professional">Profesional: quiero ofrecer servicios jurídicos</option>
-            </select>
-          </div>
-        </div>
-        <p class="account-note">La contraseña no se guarda en texto plano. El sistema registra únicamente un hash criptográfico y un identificador de cuenta.</p>
-        <div class="professional-register-actions">
-          <button type="button" id="cancelAccountRegister" class="professionals-tab">CANCELAR</button>
-          <button type="submit">CREAR CUENTA</button>
-        </div>
-        <div id="accountRegistrationSuccess" class="account-status" hidden></div>
-      </form>
+      <p class="professionals-note">Directorio en construcción. Los perfiles registrados en esta versión se almacenan localmente como prototipo; la validación profesional, disponibilidad y contacto en línea requieren conexión con el servicio definitivo.</p>
     </div>
 
     <div id="professionalsRegisterPane" hidden>
@@ -2680,10 +2626,6 @@ footer{
           <div>
             <label for="professionalPhone">Contacto</label>
             <input id="professionalPhone" name="phone" placeholder="Teléfono o WhatsApp">
-          </div>
-          <div>
-            <label for="professionalPassword">Contraseña de cuenta</label>
-            <input id="professionalPassword" name="password" type="password" minlength="8" required placeholder="Mínimo 8 caracteres">
           </div>
           <div class="full">
             <label for="professionalBio">Perfil profesional</label>
@@ -5670,11 +5612,6 @@ const closeProfessionalsBtn=document.getElementById("closeProfessionalsBtn");
 const professionalsView=document.getElementById("professionalsView");
 const professionalsDirectoryTab=document.getElementById("professionalsDirectoryTab");
 const professionalsRegisterTab=document.getElementById("professionalsRegisterTab");
-const accountTab=document.getElementById("accountTab");
-const accountPane=document.getElementById("accountPane");
-const clientRegisterForm=document.getElementById("clientRegisterForm");
-const cancelAccountRegister=document.getElementById("cancelAccountRegister");
-const accountRegistrationSuccess=document.getElementById("accountRegistrationSuccess");
 const professionalsDirectoryPane=document.getElementById("professionalsDirectoryPane");
 const professionalsRegisterPane=document.getElementById("professionalsRegisterPane");
 const professionalsSearch=document.getElementById("professionalsSearch");
@@ -5789,53 +5726,29 @@ const DEMO_PROFESSIONALS=[
 
 function getRegisteredProfessionals(){
   try{
-    const stored=JSON.parse(localStorage.getItem("terminoLegalProfessionals")||"[]");
+    const stored=JSON.parse(
+      localStorage.getItem("terminoLegalProfessionals")||"[]"
+    );
     return Array.isArray(stored)?stored:[];
-  }catch(err){ return []; }
+  }catch(err){
+    return [];
+  }
 }
 
 function saveRegisteredProfessional(profile){
-  /* El backend central es la fuente principal. Se mantiene una copia local
-     solo para que el directorio no desaparezca mientras se sincroniza. */
-  try{
-    const list=getRegisteredProfessionals().filter(x=>x.id!==profile.id);
-    list.push(profile);
-    localStorage.setItem("terminoLegalProfessionals",JSON.stringify(list));
-  }catch(err){}
-}
-
-function marketplacePost(action,data){
-  if(!CALCULATION_SHEET_ENDPOINT) return;
-  const params=new URLSearchParams({action,...data});
-  fetch(CALCULATION_SHEET_ENDPOINT,{
-    method:"POST", mode:"no-cors",
-    headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},
-    body:params.toString(), keepalive:true
-  }).catch(()=>{});
-}
-
-function loadMarketplaceProfessionals(){
-  if(!CALCULATION_SHEET_ENDPOINT) return;
-  const callback="tlProfessionals_"+Date.now();
-  window[callback]=function(data){
-    try{
-      if(data&&Array.isArray(data.professionals)){
-        data.professionals.forEach(p=>saveRegisteredProfessional(p));
-        renderProfessionals();
-      }
-    }finally{
-      delete window[callback];
-      script.remove();
-    }
-  };
-  const script=document.createElement("script");
-  script.src=CALCULATION_SHEET_ENDPOINT+"?action=list_professionals&callback="+encodeURIComponent(callback);
-  script.onerror=()=>{delete window[callback];script.remove();};
-  document.head.appendChild(script);
+  const list=getRegisteredProfessionals();
+  list.push(profile);
+  localStorage.setItem(
+    "terminoLegalProfessionals",
+    JSON.stringify(list)
+  );
 }
 
 function getAllProfessionals(){
-  return [...DEMO_PROFESSIONALS,...getRegisteredProfessionals()];
+  return [
+    ...DEMO_PROFESSIONALS,
+    ...getRegisteredProfessionals()
+  ];
 }
 
 function matterLabel(value){
@@ -5963,19 +5876,16 @@ function renderProfessionals(){
 
 function showProfessionalsTab(tab){
   const register=tab==="register";
-  const account=tab==="account";
 
-  if(register) trackEvent("profesional_registro_abrir");
-  if(account) trackEvent("cuenta_registro_abrir");
-
-  professionalsDirectoryPane.hidden=register||account;
+  if(register)
+    trackEvent("profesional_registro_abrir");
+  professionalsDirectoryPane.hidden=register;
   professionalsRegisterPane.hidden=!register;
-  accountPane.hidden=!account;
-  professionalsDirectoryTab.classList.toggle("active",!register&&!account);
+  professionalsDirectoryTab.classList.toggle("active",!register);
   professionalsRegisterTab.classList.toggle("active",register);
-  accountTab.classList.toggle("active",account);
 
-  if(!register&&!account) renderProfessionals();
+  if(!register)
+    renderProfessionals();
 }
 
 function openProfessionalsDirectory(matter="",categoryName=""){
@@ -6023,7 +5933,6 @@ function closeProfessionalsDirectory(){
 }
 
 populateProfessionalMatterOptions();
-loadMarketplaceProfessionals();
 
 findLegalProfessionalBtn?.addEventListener("click",()=>{
   const info=flattenLegalTerms().find(
@@ -6066,30 +5975,6 @@ professionalsRegisterTab?.addEventListener(
   ()=>showProfessionalsTab("register")
 );
 
-accountTab?.addEventListener("click",()=>showProfessionalsTab("account"));
-cancelAccountRegister?.addEventListener("click",()=>showProfessionalsTab("directory"));
-
-clientRegisterForm?.addEventListener("submit",event=>{
-  event.preventDefault();
-  const fd=new FormData(clientRegisterForm);
-  const data={
-    name:String(fd.get("name")||"").trim(),
-    email:String(fd.get("email")||"").trim().toLowerCase(),
-    phone:String(fd.get("phone")||"").trim(),
-    city:String(fd.get("city")||"").trim(),
-    country:String(fd.get("country")||"Colombia").trim(),
-    password:String(fd.get("password")||""),
-    purpose:String(fd.get("purpose")||"client")
-  };
-  marketplacePost(data.purpose==="professional"?"register_account":"register_client",data);
-  accountRegistrationSuccess.hidden=false;
-  accountRegistrationSuccess.textContent=data.purpose==="professional"
-    ?"Cuenta recibida. El siguiente paso es completar el perfil profesional y solicitar la verificación."
-    :"Cuenta recibida. Tu registro quedó pendiente de activación.";
-  trackEvent("cuenta_registro",{tipo:data.purpose});
-  clientRegisterForm.reset();
-});
-
 cancelProfessionalRegister?.addEventListener(
   "click",
   ()=>showProfessionalsTab("directory")
@@ -6123,13 +6008,10 @@ professionalRegisterForm?.addEventListener(
       email:String(formData.get("email")||"").trim(),
       phone:String(formData.get("phone")||"").trim(),
       bio:String(formData.get("bio")||"").trim(),
-      password:String(formData.get("password")||""),
-      country:"Colombia",
       status:"pending"
     };
 
-    marketplacePost("register_professional",profile);
-    saveRegisteredProfessional({...profile,password:undefined});
+    saveRegisteredProfessional(profile);
 
     trackEvent(
       "profesional_registro",
@@ -6141,7 +6023,7 @@ professionalRegisterForm?.addEventListener(
 
     professionalRegistrationSuccess.hidden=false;
     professionalRegistrationSuccess.textContent=
-      "Registro recibido. La cuenta y el perfil quedaron enviados al registro central de Término Legal como solicitud pendiente de verificación.";
+      "Registro recibido en modo prototipo. El perfil quedó guardado en este navegador como solicitud pendiente de validación. En la versión conectada a la plataforma, aquí se realizará el proceso de verificación y publicación.";
 
     professionalRegisterForm.reset();
   }
