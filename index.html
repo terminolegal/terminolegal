@@ -4834,6 +4834,17 @@ calculateBtn.addEventListener(
     /* Registro analítico no bloqueante: no almacena nombre, correo ni otro dato personal. */
     recordCalculation(lastTermData);
 
+    trackEvent(
+      "calculo",
+      {
+        tipo:type,
+        unidad:unit,
+        cantidad:amount,
+        termino:type==="legal"?selectedLegalTerm:""
+      },
+      lastTermData
+    );
+
     applyOutputLanguage(lang);
 
     result.hidden=false;
@@ -5825,6 +5836,13 @@ function renderProfessionals(){
       const profile=getAllProfessionals().find(
         x=>x.id===btn.dataset.professionalId
       );
+      trackEvent(
+        "profesional_solicitar",
+        {
+          materia:profile?.matter,
+          perfil:profile?.status
+        }
+      );
       btn.textContent="PRÓXIMAMENTE";
       btn.disabled=true;
       btn.title=profile?.email
@@ -5836,6 +5854,9 @@ function renderProfessionals(){
 
 function showProfessionalsTab(tab){
   const register=tab==="register";
+
+  if(register)
+    trackEvent("profesional_registro_abrir");
   professionalsDirectoryPane.hidden=register;
   professionalsRegisterPane.hidden=!register;
   professionalsDirectoryTab.classList.toggle("active",!register);
@@ -5895,6 +5916,14 @@ findLegalProfessionalBtn?.addEventListener("click",()=>{
   const info=flattenLegalTerms().find(
     x=>x.term===selectedLegalTerm
   );
+  trackEvent(
+    "profesionales_abrir",
+    {
+      origen:"asesoria",
+      termino:selectedLegalTerm,
+      materia:categoryToMarket(info?.categoryName)
+    }
+  );
   openProfessionalsDirectory(
     categoryToMarket(info?.categoryName),
     info?.categoryName||""
@@ -5902,6 +5931,10 @@ findLegalProfessionalBtn?.addEventListener("click",()=>{
 });
 
 openProfessionalsBtn?.addEventListener("click",()=>{
+  trackEvent(
+    "profesionales_abrir",
+    {origen:"icono"}
+  );
   openProfessionalsDirectory();
 });
 
@@ -5957,6 +5990,14 @@ professionalRegisterForm?.addEventListener(
     };
 
     saveRegisteredProfessional(profile);
+
+    trackEvent(
+      "profesional_registro",
+      {
+        materia:profile.matter,
+        ciudad:profile.city
+      }
+    );
 
     professionalRegistrationSuccess.hidden=false;
     professionalRegistrationSuccess.textContent=
@@ -7187,6 +7228,8 @@ exportPdfBtn.addEventListener(
     if(!lastTermData)
       return;
 
+    trackEvent("pdf","",lastTermData);
+
     const printArea=
       document.getElementById(
         "printArea"
@@ -7470,6 +7513,215 @@ function recordCalculation(termData){
 }
 
 
+/* =========================================================
+   ANALÍTICA DE USO (eventos anónimos)
+   Registra visitas y acciones (calcular, PDF, compartir, profesionales)
+   en la pestaña "Eventos". No envía nombres, correos ni textos libres.
+   ========================================================= */
+
+/* "clave=valor · clave=valor", omitiendo vacíos y limitando el largo. */
+function eventDetail(obj){
+
+  if(!obj) return "";
+
+  if(typeof obj==="string")
+    return obj.slice(0,120);
+
+  return Object.entries(obj)
+    .filter(([,v])=>v!==undefined&&v!==null&&v!=="")
+    .map(([k,v])=>`${k}=${String(v).slice(0,60)}`)
+    .join(" · ")
+    .slice(0,240);
+}
+
+
+function getDeviceType(){
+
+  const ua=navigator.userAgent||"";
+
+  if(/iPad|Tablet/i.test(ua))
+    return "tablet";
+
+  if(
+    /Mobi|Android|iPhone|iPod/i.test(ua) ||
+    window.innerWidth<768
+  )
+    return "movil";
+
+  return "escritorio";
+}
+
+
+/* Identificador de sesión (una por pestaña abierta) */
+function getSessionId(){
+
+  const key="TL_SESSION_ID";
+
+  try{
+
+    let id=sessionStorage.getItem(key);
+
+    if(!id){
+      id=Math.random().toString(36).slice(2,10);
+      sessionStorage.setItem(key,id);
+    }
+
+    return id;
+
+  }catch{
+
+    return "s-"+Date.now().toString(36);
+
+  }
+}
+
+
+/* Parámetros de campaña (utm_*), guardados durante la sesión */
+const TL_UTM=(()=>{
+
+  const key="TL_UTM";
+  const empty={source:"",medium:"",campaign:""};
+
+  try{
+
+    const q=new URLSearchParams(location.search);
+
+    const fromUrl={
+      source:(q.get("utm_source")||"").slice(0,40),
+      medium:(q.get("utm_medium")||"").slice(0,40),
+      campaign:(q.get("utm_campaign")||"").slice(0,60)
+    };
+
+    if(fromUrl.source||fromUrl.medium||fromUrl.campaign){
+      sessionStorage.setItem(key,JSON.stringify(fromUrl));
+      return fromUrl;
+    }
+
+    const saved=sessionStorage.getItem(key);
+    return saved?JSON.parse(saved):empty;
+
+  }catch{
+
+    return empty;
+
+  }
+
+})();
+
+
+function trackEvent(name,detail,termData,extra){
+
+  if(!CALCULATION_SHEET_ENDPOINT)
+    return;
+
+  try{
+
+    const countryCode=
+      (termData&&termData.country)||
+      currentCountry;
+
+    const data={
+      action:"log_event",
+      event:name,
+      timestamp:new Date().toISOString(),
+      app_version:APP_VERSION,
+      visitor_id:getAnonymousVisitorId(),
+      session_id:getSessionId(),
+      country_code:countryCode,
+      country_name:COUNTRIES[countryCode]?.name||countryCode,
+      calculation_code:termData?.traceCode||"",
+      detail:eventDetail(detail),
+      device:getDeviceType(),
+      browser_lang:(navigator.language||"").slice(0,10),
+      utm_source:TL_UTM.source,
+      utm_medium:TL_UTM.medium,
+      utm_campaign:TL_UTM.campaign,
+      ...(extra||{})
+    };
+
+    const params=new URLSearchParams();
+
+    Object.entries(data).forEach(
+      ([key,value])=>{
+        params.append(
+          key,
+          String(value??"")
+        );
+      }
+    );
+
+    fetch(
+      CALCULATION_SHEET_ENDPOINT,
+      {
+        method:"POST",
+        mode:"no-cors",
+        headers:{
+          "Content-Type":
+            "application/x-www-form-urlencoded;charset=UTF-8"
+        },
+        body:params.toString(),
+        keepalive:true
+      }
+    ).catch(()=>{});
+
+  }catch{}
+}
+
+
+/* Una visita por sesión (no se repite al recargar la página). */
+function trackVisit(){
+
+  const key="TL_VISIT_SENT";
+
+  try{
+
+    if(sessionStorage.getItem(key))
+      return;
+
+    sessionStorage.setItem(key,"1");
+
+  }catch{}
+
+  let returning=false;
+
+  try{
+    returning=!!localStorage.getItem("TL_ANON_VISITOR_ID");
+  }catch{}
+
+  trackEvent(
+    "visita",
+    "",
+    null,
+    {
+      referrer:(document.referrer||"").slice(0,200),
+      new_visitor:returning?"no":"si"
+    }
+  );
+}
+
+
+/* Enlace de compartir con campaña, para medir cuántas visitas nuevas
+   llegan gracias a resultados compartidos. */
+function buildShareUrl(termData){
+
+  const country=
+    String(
+      (termData&&termData.country)||
+      currentCountry||
+      "xx"
+    ).toLowerCase();
+
+  const params=
+    new URLSearchParams({
+      utm_source:"compartir",
+      utm_medium:"resultado",
+      utm_campaign:country
+    });
+
+  return`${SHARE_URL}?${params.toString()}`;
+}
+
+
 function buildShareText(
   termData
 ){
@@ -7517,7 +7769,7 @@ function buildShareText(
       amount,
       label,
       suffix,
-      url:SHARE_URL
+      url:buildShareUrl(termData)
     }
   );
 }
@@ -7527,6 +7779,14 @@ async function shareTermData(){
 
   if(!lastTermData)
     return;
+
+  trackEvent(
+    "compartir",
+    {
+      metodo:typeof navigator.share==="function"?"nativo":"copiar"
+    },
+    lastTermData
+  );
 
   const text=
     buildShareText(
@@ -7543,7 +7803,7 @@ async function shareTermData(){
       await navigator.share({
         title:SHARE_TITLE,
         text,
-        url:SHARE_URL
+        url:buildShareUrl(lastTermData)
       });
 
     }catch(err){
@@ -7757,6 +8017,9 @@ increaseTextBtn.addEventListener(
 
   }
 );
+
+/* Visita: se registra al final, cuando todo lo demás ya está listo. */
+trackVisit();
 
 </script>
 
