@@ -2392,17 +2392,17 @@ footer{
   <div class="details">
 
     <div>
-      <span>Fecha de inicio</span>
+      <span data-i18n="lblStart">Fecha de inicio</span>
       <strong id="detailStart">-</strong>
     </div>
 
     <div>
-      <span>Fecha de vencimiento</span>
+      <span data-i18n="lblEnd">Fecha de vencimiento</span>
       <strong id="detailEnd">-</strong>
     </div>
 
     <div>
-      <span>Tipo de días</span>
+      <span data-i18n="lblType">Tipo de días</span>
       <strong id="detailType">-</strong>
     </div>
 
@@ -2431,7 +2431,7 @@ footer{
 
       </svg>
 
-      GUARDAR PDF
+      <span data-i18n="btnPdf">GUARDAR PDF</span>
 
     </button>
 
@@ -2454,7 +2454,7 @@ footer{
 
       </svg>
 
-      COMPARTIR
+      <span data-i18n="btnShare">COMPARTIR</span>
 
     </button>
 
@@ -2469,7 +2469,7 @@ footer{
      hidden>
 
   <div class="certification-toolbar">
-    <strong>CERTIFICACIÓN DE CÓMPUTO</strong>
+    <strong data-i18n="certToolbar">CERTIFICACIÓN DE CÓMPUTO</strong>
   </div>
 
   <div id="certificationDocument"
@@ -2491,7 +2491,7 @@ footer{
 <!-- FEEDBACK / PQRS (compacto, todo en una línea) -->
 <div class="feedback-card card" id="feedbackCard" hidden>
 
-  <span class="feedback-inline-label">¿Te sirvió?</span>
+  <span class="feedback-inline-label" id="feedbackLabel">¿Te sirvió?</span>
 
   <div class="feedback-buttons">
     <button type="button" class="feedback-btn" id="feedbackUpBtn" onclick="sendFeedback('up')" aria-label="Me sirvió">👍</button>
@@ -2685,6 +2685,240 @@ let calendarCursor=new Date();
 const pad=n=>String(n).padStart(2,"0");
 
 
+/* =========================================================
+   IDIOMA DE SALIDA
+   El resultado, la certificación, el PDF y el texto para compartir
+   se presentan en portugués cuando la jurisdicción es Brasil (BR);
+   en las demás jurisdicciones se mantienen en español.
+   ========================================================= */
+
+const LOCALES={es:"es-CO",pt:"pt-BR"};
+
+function outputLang(countryCode){
+
+  return countryCode==="BR"?"pt":"es";
+}
+
+const I18N={
+
+  es:{
+    lblStart:"Fecha de inicio",
+    lblEnd:"Fecha de vencimiento",
+    lblType:"Tipo de días",
+    btnPdf:"GUARDAR PDF",
+    btnShare:"COMPARTIR",
+    certToolbar:"CERTIFICACIÓN DE CÓMPUTO",
+    notice:"Versión {version} — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.",
+    postNote:"El cálculo se realiza según el tipo de término seleccionado y la jurisdicción de referencia. Los días hábiles excluyen los días de descanso semanal y los festivos disponibles para esa jurisdicción. Las reglas especiales pueden variar según la materia, autoridad o territorio aplicable.",
+    feedbackLabel:"¿Te sirvió?",
+    thanks:"¡Gracias!",
+    holidaysExcluded:"Festivos excluidos del conteo: {names}.",
+
+    month:"mes",
+    months:"meses",
+    unitDays:"días",
+    businessDays:"días hábiles",
+    calendarDays:"días calendario",
+    typeBusiness:"Días hábiles",
+    typeCalendar:"Días calendario ({unit})",
+    typeLegal:"Término frecuente: {term} — {unit} calendario",
+    frequentTerm:"Término frecuente",
+
+    seqStart:"Fecha de inicio — no contabilizada",
+    seqCounted:"Día contabilizado",
+    seqBusinessHoliday:"Día hábil contabilizado — {name}",
+    seqRest:"Día de descanso — excluido",
+
+    legalBase:"BASE DEL CÓMPUTO: El resultado se obtiene aplicando la regla de conteo seleccionada sobre la fecha de inicio y el calendario de referencia de {name}. En días hábiles se excluyen los días de descanso semanal y los festivos incorporados al calendario disponible; en días calendario se cuentan consecutivamente todos los días. Referencia territorial: {note} Pueden existir reglas especiales por materia, órgano, nivel territorial, convenio, contrato o procedimiento que modifiquen el cómputo. Este documento es una herramienta de referencia y no sustituye la verificación de la norma específica aplicable al término.",
+
+    certBrandSub:"Herramienta de cómputo y trazabilidad de términos",
+    certTitle:"CERTIFICACIÓN DE CÓMPUTO DE TÉRMINO",
+    certSubtitle:"Constancia técnica del cálculo realizado por el sistema. Este documento identifica los parámetros utilizados y la secuencia del cómputo.",
+    certSec1:"1. IDENTIFICACIÓN DEL CÓMPUTO",
+    certLblEnd:"Fecha de resultado",
+    certLblAmount:"Número de días / unidad",
+    certLblMode:"Modalidad",
+    certLblJurisdiction:"Jurisdicción de referencia",
+    certLblLegalTerm:"Término jurídico seleccionado",
+    certLblResult:"Fecha resultante",
+    certSec2:"2. MÉTODO UTILIZADO",
+    methodMonths:"La fecha de inicio es {start}. El sistema suma {amountLabel} mediante la regla de meses calendario definida por el motor y obtiene como fecha resultante {end}.",
+    methodDays:"La fecha de inicio {start} no se contabiliza. El conteo comienza al día siguiente y continúa hasta completar {amountLabel}. En días hábiles se excluyen los días de descanso semanal y los festivos incorporados al calendario de referencia.",
+    certSec3:"3. TRAZABILIDAD DEL CONTEO",
+    certCalAlt:"Calendario de trazabilidad del término legal",
+    certSec4:"4. SECUENCIA DEL CONTEO",
+    certSec5:"5. BASE DEL CÓMPUTO",
+    certTraceLabel:"Trazabilidad del cálculo",
+    certTraceNote:"Código de trazabilidad: país · fecha de inicio · correlativo de uso en esta instalación. El registro analítico conserva además una huella técnica de los parámetros del cálculo.",
+    certScope1:"El código anterior se genera a partir de los parámetros del cálculo y permite cotejar la consistencia de esta representación con dichos parámetros. No constituye firma electrónica, certificación de autoridad pública ni garantía de la procedencia jurídica del término.",
+    certScope2:"La procedencia, duración, suspensión, interrupción, prórroga o vencimiento de un término concreto dependerán de la norma especial aplicable, de la materia, autoridad, actuación, contrato o circunstancia territorial correspondiente. Este documento acredita el cómputo realizado por Término Legal bajo los parámetros indicados, no la interpretación jurídica del término.",
+    certFooter:"Término Legal · Certificación generada automáticamente a partir del resultado del motor de cómputo. Fecha de generación: {date}.",
+
+    shareText:"Contando desde el {start}, {amount} {label}{suffix}, vence el {end}.\n\nCalcula o verifica tu término: {url}"
+  },
+
+  pt:{
+    lblStart:"Data de início",
+    lblEnd:"Data de vencimento",
+    lblType:"Tipo de dias",
+    btnPdf:"SALVAR PDF",
+    btnShare:"COMPARTILHAR",
+    certToolbar:"CERTIFICAÇÃO DE CÁLCULO",
+    notice:"Versão {version} — motor de cálculo com calendário de referência por jurisdição, validação de datas e limites de intervalo. Os feriados afetam apenas a contagem de dias úteis.",
+    postNote:"O cálculo é feito conforme o tipo de prazo selecionado e a jurisdição de referência. Os dias úteis excluem os dias de descanso semanal e os feriados disponíveis para essa jurisdição. As regras especiais podem variar conforme a matéria, a autoridade ou o território aplicável.",
+    feedbackLabel:"Foi útil?",
+    thanks:"Obrigado!",
+    holidaysExcluded:"Feriados excluídos da contagem: {names}.",
+
+    month:"mês",
+    months:"meses",
+    unitDays:"dias",
+    businessDays:"dias úteis",
+    calendarDays:"dias corridos",
+    typeBusiness:"Dias úteis",
+    typeCalendar:"Dias corridos ({unit})",
+    typeLegal:"Prazo frequente: {term} — {unit} corridos",
+    frequentTerm:"Prazo frequente",
+
+    seqStart:"Data de início — não contabilizada",
+    seqCounted:"Dia contabilizado",
+    seqBusinessHoliday:"Dia útil contabilizado — {name}",
+    seqRest:"Dia de descanso — excluído",
+
+    legalBase:"BASE DA CONTAGEM: O resultado é obtido aplicando a regra de contagem selecionada sobre a data de início e o calendário de referência de {name}. Em dias úteis, excluem-se os dias de descanso semanal e os feriados incorporados ao calendário disponível; em dias corridos, contam-se consecutivamente todos os dias. Referência territorial: {note} Podem existir regras especiais por matéria, órgão, nível territorial, convênio, contrato ou procedimento que modifiquem a contagem. Este documento é uma ferramenta de referência e não substitui a verificação da norma específica aplicável ao prazo.",
+
+    certBrandSub:"Ferramenta de cálculo e rastreabilidade de prazos",
+    certTitle:"CERTIFICAÇÃO DE CÁLCULO DE PRAZO",
+    certSubtitle:"Comprovante técnico do cálculo realizado pelo sistema. Este documento identifica os parâmetros utilizados e a sequência da contagem.",
+    certSec1:"1. IDENTIFICAÇÃO DO CÁLCULO",
+    certLblEnd:"Data do resultado",
+    certLblAmount:"Número de dias / unidade",
+    certLblMode:"Modalidade",
+    certLblJurisdiction:"Jurisdição de referência",
+    certLblLegalTerm:"Prazo jurídico selecionado",
+    certLblResult:"Data resultante",
+    certSec2:"2. MÉTODO UTILIZADO",
+    methodMonths:"A data de início é {start}. O sistema soma {amountLabel} pela regra de meses de calendário definida pelo motor e obtém como data resultante {end}.",
+    methodDays:"A data de início {start} não é contabilizada. A contagem começa no dia seguinte e continua até completar {amountLabel}. Em dias úteis, excluem-se os dias de descanso semanal e os feriados incorporados ao calendário de referência.",
+    certSec3:"3. RASTREABILIDADE DA CONTAGEM",
+    certCalAlt:"Calendário de rastreabilidade do prazo",
+    certSec4:"4. SEQUÊNCIA DA CONTAGEM",
+    certSec5:"5. BASE DA CONTAGEM",
+    certTraceLabel:"Rastreabilidade do cálculo",
+    certTraceNote:"Código de rastreabilidade: país · data de início · sequencial de uso nesta instalação. O registro analítico conserva também uma impressão técnica dos parâmetros do cálculo.",
+    certScope1:"O código acima é gerado a partir dos parâmetros do cálculo e permite conferir a consistência desta representação com esses parâmetros. Não constitui assinatura eletrônica, certificação de autoridade pública nem garantia da procedência jurídica do prazo.",
+    certScope2:"A procedência, duração, suspensão, interrupção, prorrogação ou vencimento de um prazo concreto dependerão da norma especial aplicável, da matéria, da autoridade, do ato processual, do contrato ou da circunstância territorial correspondente. Este documento comprova o cálculo realizado pelo Término Legal sob os parâmetros indicados, e não a interpretação jurídica do prazo.",
+    certFooter:"Término Legal · Certificação gerada automaticamente a partir do resultado do motor de cálculo. Data de geração: {date}.",
+
+    shareText:"Contando a partir de {start}, {amount} {label}{suffix}, vence em {end}.\n\nCalcule ou verifique o seu prazo: {url}"
+  }
+
+};
+
+
+function tr(lang,key,vars){
+
+  const dict=I18N[lang]||I18N.es;
+
+  let text=
+    dict[key]!==undefined
+      ?dict[key]
+      :I18N.es[key];
+
+  if(vars){
+
+    Object.keys(vars).forEach(
+      k=>{
+        text=text.split("{"+k+"}").join(vars[k]);
+      }
+    );
+
+  }
+
+  return text;
+}
+
+
+function amountText(amount,type,unit,lang){
+
+  if(unit==="months"){
+
+    return`${amount} ${
+      amount===1
+        ?tr(lang,"month")
+        :tr(lang,"months")
+    }`;
+
+  }
+
+  return`${amount} ${
+    type==="business"
+      ?tr(lang,"businessDays")
+      :tr(lang,"calendarDays")
+  }`;
+}
+
+
+/* Traduce los elementos estáticos del bloque de resultado. */
+function applyOutputLanguage(lang){
+
+  const htmlLang=
+    lang==="pt"
+      ?"pt-BR"
+      :"es";
+
+  document
+    .querySelectorAll("[data-i18n]")
+    .forEach(
+      el=>{
+        el.textContent=
+          tr(lang,el.dataset.i18n);
+      }
+    );
+
+  const notice=
+    document.getElementById("versionNotice");
+
+  if(notice)
+    notice.textContent=
+      tr(lang,"notice",{version:APP_VERSION});
+
+  const post=
+    document.getElementById("postResultNote");
+
+  if(post)
+    post.textContent=
+      tr(lang,"postNote");
+
+  const feedbackLabel=
+    document.getElementById("feedbackLabel");
+
+  if(feedbackLabel)
+    feedbackLabel.textContent=
+      tr(lang,"feedbackLabel");
+
+  const thanks=
+    document.getElementById("feedbackThanks");
+
+  if(thanks)
+    thanks.textContent=
+      tr(lang,"thanks");
+
+  [
+    "result",
+    "certificationView",
+    "postResultNote",
+    "feedbackCard"
+  ].forEach(
+    id=>{
+      const el=document.getElementById(id);
+      if(el) el.lang=htmlLang;
+    }
+  );
+
+}
+
+
 /* FECHAS */
 function parseLocalDate(value){
 
@@ -2731,10 +2965,10 @@ function addDays(date,days){
 }
 
 
-function formatDate(date){
+function formatDate(date,lang="es"){
 
   return new Intl.DateTimeFormat(
-    "es-CO",
+    LOCALES[lang]||LOCALES.es,
     {
       day:"2-digit",
       month:"long",
@@ -2744,10 +2978,10 @@ function formatDate(date){
 }
 
 
-function formatShortDate(date){
+function formatShortDate(date,lang="es"){
 
   return new Intl.DateTimeFormat(
-    "es-CO",
+    LOCALES[lang]||LOCALES.es,
     {
       day:"2-digit",
       month:"2-digit",
@@ -3439,7 +3673,8 @@ const COUNTRIES={
     name:"Brasil",
     flag:"🇧🇷",
     getHolidays:getBrazilHolidays,
-    note:"Feriados nacionais. Estados y municipios pueden tener feriados adicionales."
+    note:"Feriados nacionales. Estados y municipios pueden tener feriados adicionales.",
+    notePt:"Feriados nacionais. Estados e municípios podem ter feriados adicionais."
   },
   CL:{
     name:"Chile",
@@ -3788,22 +4023,22 @@ function getCountedDates(
 
 
 /* ETIQUETAS */
-function typeDisplayLabel(type,unit){
+function typeDisplayLabel(type,unit,lang="es"){
 
   const unitWord=
     unit==="months"
-      ?"meses"
-      :"días";
+      ?tr(lang,"months")
+      :tr(lang,"unitDays");
 
   if(type==="business")
-    return"Días hábiles";
+    return tr(lang,"typeBusiness");
 
   if(type==="legal"){
-    const term=selectedLegalTerm||"Término frecuente";
-    return`Término frecuente: ${term} — ${unitWord} calendario`;
+    const term=selectedLegalTerm||tr(lang,"frequentTerm");
+    return tr(lang,"typeLegal",{term,unit:unitWord});
   }
 
-  return`Días calendario (${unitWord})`;
+  return tr(lang,"typeCalendar",{unit:unitWord});
 }
 
 
@@ -3866,11 +4101,11 @@ function capitalize(t){
 }
 
 
-function monthName(i){
+function monthName(i,lang="es"){
 
   return capitalize(
     new Intl.DateTimeFormat(
-      "es-CO",
+      LOCALES[lang]||LOCALES.es,
       {month:"long"}
     ).format(
       new Date(2000,i,1)
@@ -4535,35 +4770,28 @@ calculateBtn.addEventListener(
           countedDates.length-1
         ];
 
+    const lang=outputLang(currentCountry);
+
     const amountLabel=
-      unit==="months"
-        ?`${amount} ${
-          amount===1
-            ?"mes"
-            :"meses"
-        }`
-        :`${amount} ${
-          type==="business"
-            ?"días hábiles"
-            :"días calendario"
-        }`;
+      amountText(amount,type,unit,lang);
 
     resultDate.textContent=
-      formatDate(end).toLowerCase();
+      formatDate(end,lang).toLowerCase();
 
     resultSummary.textContent=
       amountLabel;
 
     detailStart.textContent=
-      formatShortDate(start);
+      formatShortDate(start,lang);
 
     detailEnd.textContent=
-      formatShortDate(end);
+      formatShortDate(end,lang);
 
     detailType.textContent=
       typeDisplayLabel(
         type,
-        unit
+        unit,
+        lang
       );
 
     if(
@@ -4580,7 +4808,7 @@ calculateBtn.addEventListener(
         "inline-block";
 
       holidayListEl.textContent=
-        `Festivos excluidos del conteo: ${names}.`;
+        tr(lang,"holidaysExcluded",{names});
 
     }else{
 
@@ -4605,6 +4833,8 @@ calculateBtn.addEventListener(
 
     /* Registro analítico no bloqueante: no almacena nombre, correo ni otro dato personal. */
     recordCalculation(lastTermData);
+
+    applyOutputLanguage(lang);
 
     result.hidden=false;
 
@@ -5945,6 +6175,11 @@ const WEEKDAY_LABELS=[
   "Do","Lu","Ma","Mi","Ju","Vi","Sa"
 ];
 
+const WEEKDAY_LABELS_BY_LANG={
+  es:WEEKDAY_LABELS,
+  pt:["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"]
+};
+
 
 function monthMatrix(
   year,
@@ -6159,7 +6394,22 @@ function buildColombiaLegalReference(term){
 }
 
 
-function buildLegalText(type){
+function buildLegalText(type,lang="es"){
+
+  if(lang==="pt"){
+
+    const info=COUNTRIES[currentCountry];
+
+    return tr(
+      lang,
+      "legalBase",
+      {
+        name:info.name,
+        note:info.notePt||info.note
+      }
+    );
+
+  }
 
   if(
     type==="legal" &&
@@ -6232,6 +6482,11 @@ function buildCalendarCanvas(termData){
 
   const startKey=
     dateKey(start);
+
+  const lang=
+    outputLang(
+      termData.country||currentCountry
+    );
 
   const months=
     monthsInRange(
@@ -6352,7 +6607,7 @@ function buildCalendarCanvas(termData){
       ctx.textAlign="center";
 
       ctx.fillText(
-        `${monthName(m.month)} ${m.year}`,
+        `${monthName(m.month,lang)} ${m.year}`,
         originX+MONTH_W/2,
         originY+18
       );
@@ -6363,7 +6618,7 @@ function buildCalendarCanvas(termData){
 
       ctx.fillStyle="#687383";
 
-      WEEKDAY_LABELS.forEach(
+      (WEEKDAY_LABELS_BY_LANG[lang]||WEEKDAY_LABELS).forEach(
         (wd,i)=>{
 
           ctx.fillText(
@@ -6671,13 +6926,18 @@ function buildCertificationSequence(termData){
     type
   }=termData;
 
+  const lang=
+    outputLang(
+      termData.country||currentCountry
+    );
+
   const rows=[];
 
   rows.push(`
     <div class="certification-sequence-row start-row">
       <span class="n">—</span>
-      <span class="date">${escapeHtml(formatShortDate(start))}</span>
-      <span class="status">Fecha de inicio — no contabilizada</span>
+      <span class="date">${escapeHtml(formatShortDate(start,lang))}</span>
+      <span class="status">${escapeHtml(tr(lang,"seqStart"))}</span>
     </div>
   `);
 
@@ -6687,23 +6947,23 @@ function buildCertificationSequence(termData){
       const holiday=getHoliday(date);
       const weekend=isWeekend(date);
 
-      let status="Día contabilizado";
+      let status=tr(lang,"seqCounted");
 
       if(type==="business"){
 
         if(holiday)
-          status=`Día hábil contabilizado — ${escapeHtml(holiday.name)}`;
+          status=tr(lang,"seqBusinessHoliday",{name:holiday.name});
 
         else if(weekend)
-          status="Día de descanso — excluido";
+          status=tr(lang,"seqRest");
 
       }
 
       rows.push(`
         <div class="certification-sequence-row">
           <span class="n">${index+1}</span>
-          <span class="date">${escapeHtml(formatShortDate(date))}</span>
-          <span class="status">${status}</span>
+          <span class="date">${escapeHtml(formatShortDate(date,lang))}</span>
+          <span class="status">${escapeHtml(status)}</span>
         </div>
       `);
 
@@ -6726,6 +6986,11 @@ function buildCertificationHTML(termData,includeCalendar=true){
     legalTerm
   }=termData;
 
+  const lang=
+    outputLang(
+      country||currentCountry
+    );
+
   if(type==="legal" && legalTerm)
     selectedLegalTerm=legalTerm;
 
@@ -6736,31 +7001,44 @@ function buildCertificationHTML(termData,includeCalendar=true){
   const verification=
     buildVerificationData(termData);
 
+  const startText=
+    formatShortDate(start,lang);
+
+  const endText=
+    formatShortDate(end,lang);
+
   const amountLabel=
-    unit==="months"
-      ?`${amount} ${amount===1?"mes":"meses"}`
-      :`${amount} ${type==="business"?"días hábiles":"días calendario"}`;
+    amountText(amount,type,unit,lang);
 
   const typeLabel=
     typeDisplayLabel(
       type,
-      unit
+      unit,
+      lang
     );
 
   const legalText=
-    buildLegalText(type);
+    buildLegalText(type,lang);
 
   const methodText=
-    unit==="months"
-      ?`La fecha de inicio es ${escapeHtml(formatShortDate(start))}. El sistema suma ${amountLabel} mediante la regla de meses calendario definida por el motor y obtiene como fecha resultante ${escapeHtml(formatShortDate(end))}.`
-      :`La fecha de inicio ${escapeHtml(formatShortDate(start))} no se contabiliza. El conteo comienza al día siguiente y continúa hasta completar ${escapeHtml(String(amount))} ${type==="business"?"días hábiles":"días calendario"}. En días hábiles se excluyen los días de descanso semanal y los festivos incorporados al calendario de referencia.`;
+    tr(
+      lang,
+      unit==="months"
+        ?"methodMonths"
+        :"methodDays",
+      {
+        start:startText,
+        end:endText,
+        amountLabel
+      }
+    );
 
   const calendarHtml=
     includeCalendar
       ?`
         <div class="certification-calendar">
           <img id="certificationCalendarImage"
-               alt="Calendario de trazabilidad del término legal">
+               alt="${escapeHtml(tr(lang,"certCalAlt"))}">
         </div>
       `
       :"";
@@ -6768,109 +7046,98 @@ function buildCertificationHTML(termData,includeCalendar=true){
   return`
     <div class="certification-brand">
       <p class="certification-brand-name">TÉRMINO LEGAL</p>
-      <p class="certification-brand-sub">Herramienta de cómputo y trazabilidad de términos</p>
+      <p class="certification-brand-sub">${escapeHtml(tr(lang,"certBrandSub"))}</p>
     </div>
 
-    <h1 class="certification-title">CERTIFICACIÓN DE CÓMPUTO DE TÉRMINO</h1>
+    <h1 class="certification-title">${escapeHtml(tr(lang,"certTitle"))}</h1>
 
     <p class="certification-subtitle">
-      Constancia técnica del cálculo realizado por el sistema. Este documento
-      identifica los parámetros utilizados y la secuencia del cómputo.
+      ${escapeHtml(tr(lang,"certSubtitle"))}
     </p>
 
     <section class="certification-section">
-      <h3>1. IDENTIFICACIÓN DEL CÓMPUTO</h3>
+      <h3>${escapeHtml(tr(lang,"certSec1"))}</h3>
 
       <div class="certification-grid">
 
         <div class="certification-item">
-          <span>Fecha de inicio</span>
-          <strong>${escapeHtml(formatShortDate(start))}</strong>
+          <span>${escapeHtml(tr(lang,"lblStart"))}</span>
+          <strong>${escapeHtml(startText)}</strong>
         </div>
 
         <div class="certification-item">
-          <span>Fecha de resultado</span>
-          <strong>${escapeHtml(formatShortDate(end))}</strong>
+          <span>${escapeHtml(tr(lang,"certLblEnd"))}</span>
+          <strong>${escapeHtml(endText)}</strong>
         </div>
 
         <div class="certification-item">
-          <span>Número de días / unidad</span>
+          <span>${escapeHtml(tr(lang,"certLblAmount"))}</span>
           <strong>${escapeHtml(amountLabel)}</strong>
         </div>
 
         <div class="certification-item">
-          <span>Modalidad</span>
+          <span>${escapeHtml(tr(lang,"certLblMode"))}</span>
           <strong>${escapeHtml(typeLabel)}</strong>
         </div>
 
         <div class="certification-item">
-          <span>Jurisdicción de referencia</span>
+          <span>${escapeHtml(tr(lang,"certLblJurisdiction"))}</span>
           <strong>${escapeHtml(countryInfo.flag || "")} ${escapeHtml(countryInfo.name || country)}</strong>
         </div>
 
         ${type==="legal" && legalTerm ? `
         <div class="certification-item">
-          <span>Término jurídico seleccionado</span>
+          <span>${escapeHtml(tr(lang,"certLblLegalTerm"))}</span>
           <strong>${escapeHtml(legalTerm)}</strong>
         </div>` : ""}
 
       </div>
 
       <div class="certification-result">
-        <div class="certification-result-label">Fecha resultante</div>
-        <div class="certification-result-date">${escapeHtml(formatDate(end))}</div>
+        <div class="certification-result-label">${escapeHtml(tr(lang,"certLblResult"))}</div>
+        <div class="certification-result-date">${escapeHtml(formatDate(end,lang))}</div>
       </div>
     </section>
 
     <section class="certification-section">
-      <h3>2. MÉTODO UTILIZADO</h3>
+      <h3>${escapeHtml(tr(lang,"certSec2"))}</h3>
       <p class="certification-method">${escapeHtml(methodText)}</p>
     </section>
 
     <section class="certification-section certification-calendar-block">
-      <h3>3. TRAZABILIDAD DEL CONTEO</h3>
+      <h3>${escapeHtml(tr(lang,"certSec3"))}</h3>
       ${calendarHtml}
     </section>
 
     <section class="certification-section certification-sequence-section">
-      <h3>4. SECUENCIA DEL CONTEO</h3>
+      <h3>${escapeHtml(tr(lang,"certSec4"))}</h3>
       <div class="certification-sequence" style="margin-top:0">
         ${buildCertificationSequence(termData)}
       </div>
     </section>
 
     <section class="certification-section">
-      <h3>5. BASE DEL CÓMPUTO</h3>
+      <h3>${escapeHtml(tr(lang,"certSec5"))}</h3>
       <p class="certification-legal">${escapeHtml(legalText)}</p>
     </section>
 
     <div class="certification-end">
       <div class="certification-trace">
-        <span class="certification-trace-label">Trazabilidad del cálculo</span>
+        <span class="certification-trace-label">${escapeHtml(tr(lang,"certTraceLabel"))}</span>
         <strong class="certification-trace-code">${escapeHtml(verification.code)}</strong>
-        <span class="certification-trace-note">Código de trazabilidad: país · fecha de inicio · correlativo de uso en esta instalación. El registro analítico conserva además una huella técnica de los parámetros del cálculo.</span>
+        <span class="certification-trace-note">${escapeHtml(tr(lang,"certTraceNote"))}</span>
       </div>
 
       <p class="certification-scope">
-        El código anterior se genera a partir de los parámetros del cálculo y
-        permite cotejar la consistencia de esta representación con dichos
-        parámetros. No constituye firma electrónica, certificación de autoridad
-        pública ni garantía de la procedencia jurídica del término.
+        ${escapeHtml(tr(lang,"certScope1"))}
       </p>
 
       <p class="certification-scope">
-        La procedencia, duración, suspensión, interrupción, prórroga o vencimiento
-        de un término concreto dependerán de la norma especial aplicable, de la
-        materia, autoridad, actuación, contrato o circunstancia territorial
-        correspondiente. Este documento acredita el cómputo realizado por
-        Término Legal bajo los parámetros indicados, no la interpretación jurídica
-        del término.
+        ${escapeHtml(tr(lang,"certScope2"))}
       </p>
 
       <div class="certification-footer">
-        Término Legal · Certificación generada automáticamente a partir del
-        resultado del motor de cómputo. Fecha de generación:
-        ${escapeHtml(formatDate(new Date()))}.
+        ${escapeHtml(tr(lang,"certFooter",{date:formatDate(new Date(),lang)}))}
       </div>
     </div>
   `;
@@ -7216,13 +7483,22 @@ function buildShareText(
     country
   }=termData;
 
+  const lang=
+    outputLang(
+      country||currentCountry
+    );
+
   const label=
     unit==="months"
-      ?`${amount===1?"mes":"meses"}`
+      ?(
+        amount===1
+          ?tr(lang,"month")
+          :tr(lang,"months")
+      )
       :(
         type==="business"
-          ?"días hábiles"
-          :"días calendario"
+          ?tr(lang,"businessDays")
+          :tr(lang,"calendarDays")
       );
 
   const suffix=
@@ -7232,7 +7508,18 @@ function buildShareText(
       ?` (${selectedLegalTerm})`
       :"";
 
-  return`Contando desde el ${formatShortDate(start)}, ${amount} ${label}${suffix}, vence el ${formatDate(end)}.\n\nCalcula o verifica tu término: ${SHARE_URL}`;
+  return tr(
+    lang,
+    "shareText",
+    {
+      start:formatShortDate(start,lang),
+      end:formatDate(end,lang),
+      amount,
+      label,
+      suffix,
+      url:SHARE_URL
+    }
+  );
 }
 
 
