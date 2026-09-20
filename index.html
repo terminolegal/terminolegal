@@ -1573,6 +1573,116 @@ footer{
   }
 }
 
+/* Marketplace */
+.professional-item{display:grid;gap:6px}
+
+.hp-field{
+  position:absolute;
+  left:-9999px;
+  width:1px;
+  height:1px;
+  overflow:hidden
+}
+
+.professional-register-form .consent-row{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  margin:0;
+  font-size:.62rem;
+  font-weight:500;
+  line-height:1.5;
+  color:var(--muted)
+}
+
+.professional-register-form .consent-row input{
+  width:auto;
+  height:auto;
+  margin-top:2px;
+  flex:0 0 auto
+}
+
+.form-status{
+  padding:10px;
+  border:1px solid #ccd9cf;
+  border-radius:8px;
+  background:#f3f7f4;
+  color:#385443;
+  font-size:.64rem;
+  line-height:1.45
+}
+
+.form-status.is-error{
+  border-color:#b23a3a;
+  background:var(--surface-alt);
+  color:#a12a2a
+}
+
+body.dark .form-status.is-error{color:#e28b8b}
+
+.professional-request{
+  padding:9px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:var(--surface);
+  display:grid;
+  gap:7px
+}
+
+.professional-request label{
+  font-size:.64rem;
+  margin-bottom:4px
+}
+
+.professional-request input,
+.professional-request textarea{
+  width:100%;
+  border:1px solid var(--input-border);
+  border-radius:8px;
+  padding:8px 9px;
+  font:inherit;
+  font-size:.7rem;
+  color:var(--ink);
+  background:var(--input-bg)
+}
+
+.professional-request input{height:36px}
+.professional-request textarea{min-height:70px;resize:vertical}
+
+.professional-request .consent-row{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  margin:0;
+  font-size:.6rem;
+  font-weight:500;
+  line-height:1.5;
+  color:var(--muted)
+}
+
+.professional-request .consent-row input{
+  width:auto;
+  height:auto;
+  margin-top:2px;
+  flex:0 0 auto
+}
+
+.professional-request button[type=submit]{
+  height:34px;
+  border-radius:8px;
+  font-size:.6rem
+}
+
+.professionals-empty{
+  padding:12px;
+  border:1px dashed var(--input-border);
+  border-radius:9px;
+  color:var(--muted);
+  font-size:.66rem;
+  line-height:1.5;
+  text-align:center
+}
+
 /* =========================================================
    CERTIFICACIÓN DE CÓMPUTO
    ========================================================= */
@@ -2565,8 +2675,9 @@ footer{
 
   <div class="professionals-body">
     <div class="professionals-tabs" role="tablist" aria-label="Profesionales">
-      <button type="button" id="professionalsDirectoryTab" class="professionals-tab active" role="tab">Buscar profesional</button>
-      <button type="button" id="professionalsRegisterTab" class="professionals-tab" role="tab">Soy profesional</button>
+      <button type="button" id="professionalsDirectoryTab" class="professionals-tab active" role="tab" aria-selected="true">Buscar profesional</button>
+      <button type="button" id="professionalsRegisterTab" class="professionals-tab" role="tab" aria-selected="false">Soy profesional</button>
+      <button type="button" id="clientTab" class="professionals-tab" role="tab" aria-selected="false">Soy cliente</button>
     </div>
 
     <div id="professionalsDirectoryPane">
@@ -2588,7 +2699,7 @@ footer{
         </select>
       </div>
       <div id="professionalsList" class="professionals-list"></div>
-      <p class="professionals-note">Directorio en construcción. Los perfiles registrados en esta versión se almacenan localmente como prototipo; la validación profesional, disponibilidad y contacto en línea requieren conexión con el servicio definitivo.</p>
+      <p class="professionals-note">Los profesionales publicados fueron verificados por Término Legal antes de aparecer aquí. Término Legal es un directorio: no presta asesoría jurídica ni garantiza resultados.</p>
     </div>
 
     <div id="professionalsRegisterPane" hidden>
@@ -2596,11 +2707,11 @@ footer{
         <div class="professional-register-grid">
           <div>
             <label for="professionalName">Nombre profesional</label>
-            <input id="professionalName" name="name" required placeholder="Nombre y apellidos">
+            <input id="professionalName" name="name" required maxlength="120" autocomplete="name" placeholder="Nombre y apellidos">
           </div>
           <div>
             <label for="professionalCity">Ciudad</label>
-            <input id="professionalCity" name="city" required placeholder="Ciudad principal de atención">
+            <input id="professionalCity" name="city" required maxlength="80" autocomplete="address-level2" placeholder="Ciudad principal de atención">
           </div>
           <div>
             <label for="professionalMatter">Materia principal</label>
@@ -2616,28 +2727,69 @@ footer{
             </select>
           </div>
           <div>
-            <label for="professionalExperience">Experiencia</label>
-            <input id="professionalExperience" name="experience" placeholder="Ej. 8 años">
+            <label for="professionalLicense">Tarjeta profesional (N.º)</label>
+            <input id="professionalLicense" name="license" required maxlength="40" autocomplete="off" placeholder="Para verificar tu registro">
           </div>
           <div>
             <label for="professionalEmail">Correo</label>
-            <input id="professionalEmail" name="email" type="email" required placeholder="correo@ejemplo.com">
+            <input id="professionalEmail" name="email" type="email" required maxlength="120" autocomplete="email" placeholder="correo@ejemplo.com">
           </div>
           <div>
             <label for="professionalPhone">Contacto</label>
-            <input id="professionalPhone" name="phone" placeholder="Teléfono o WhatsApp">
+            <input id="professionalPhone" name="phone" maxlength="40" autocomplete="tel" placeholder="Teléfono o WhatsApp">
+          </div>
+          <div>
+            <label for="professionalExperience">Experiencia</label>
+            <input id="professionalExperience" name="experience" maxlength="40" placeholder="Ej. 8 años">
           </div>
           <div class="full">
             <label for="professionalBio">Perfil profesional</label>
-            <textarea id="professionalBio" name="bio" placeholder="Describe brevemente las materias o actuaciones que atiendes."></textarea>
+            <textarea id="professionalBio" name="bio" maxlength="600" placeholder="Describe brevemente las materias o actuaciones que atiendes."></textarea>
           </div>
         </div>
+
+        <div class="hp-field" aria-hidden="true"><label>Sitio web<input name="website" tabindex="-1" autocomplete="off"></label></div>
+
+        <label class="consent-row"><input type="checkbox" name="consent" required><span>Autorizo el tratamiento de mis datos personales para gestionar este registro en Término Legal, conforme a la política de tratamiento de datos. Tu correo y teléfono no se muestran públicamente.</span></label>
 
         <div class="professional-register-actions">
           <button type="button" id="cancelProfessionalRegister" class="professionals-tab">CANCELAR</button>
           <button type="submit">REGISTRAR PERFIL</button>
         </div>
-        <div id="professionalRegistrationSuccess" class="professional-registration-success" hidden></div>
+        <div id="professionalRegistrationSuccess" class="form-status" hidden></div>
+      </form>
+    </div>
+
+    <div id="clientPane" hidden>
+      <form id="clientRegisterForm" class="professional-register-form">
+        <div class="professional-register-grid">
+          <div>
+            <label for="clientName">Nombre completo</label>
+            <input id="clientName" name="name" required maxlength="120" autocomplete="name" placeholder="Nombre y apellidos">
+          </div>
+          <div>
+            <label for="clientEmail">Correo electrónico</label>
+            <input id="clientEmail" name="email" type="email" required maxlength="120" autocomplete="email" placeholder="correo@ejemplo.com">
+          </div>
+          <div>
+            <label for="clientPhone">Teléfono</label>
+            <input id="clientPhone" name="phone" maxlength="40" autocomplete="tel" placeholder="Teléfono o WhatsApp">
+          </div>
+          <div>
+            <label for="clientCity">Ciudad</label>
+            <input id="clientCity" name="city" required maxlength="80" autocomplete="address-level2" placeholder="Ciudad">
+          </div>
+        </div>
+
+        <div class="hp-field" aria-hidden="true"><label>Sitio web<input name="website" tabindex="-1" autocomplete="off"></label></div>
+
+        <label class="consent-row"><input type="checkbox" name="consent" required><span>Autorizo el tratamiento de mis datos personales para gestionar este registro en Término Legal, conforme a la política de tratamiento de datos.</span></label>
+
+        <div class="professional-register-actions">
+          <button type="button" id="cancelClientRegister" class="professionals-tab">CANCELAR</button>
+          <button type="submit">REGISTRARME</button>
+        </div>
+        <div id="clientRegistrationStatus" class="form-status" hidden></div>
       </form>
     </div>
   </div>
@@ -5612,8 +5764,10 @@ const closeProfessionalsBtn=document.getElementById("closeProfessionalsBtn");
 const professionalsView=document.getElementById("professionalsView");
 const professionalsDirectoryTab=document.getElementById("professionalsDirectoryTab");
 const professionalsRegisterTab=document.getElementById("professionalsRegisterTab");
+const clientTab=document.getElementById("clientTab");
 const professionalsDirectoryPane=document.getElementById("professionalsDirectoryPane");
 const professionalsRegisterPane=document.getElementById("professionalsRegisterPane");
+const clientPane=document.getElementById("clientPane");
 const professionalsSearch=document.getElementById("professionalsSearch");
 const professionalsFilter=document.getElementById("professionalsFilter");
 const professionalsContext=document.getElementById("professionalsContext");
@@ -5622,6 +5776,9 @@ const professionalsList=document.getElementById("professionalsList");
 const professionalRegisterForm=document.getElementById("professionalRegisterForm");
 const cancelProfessionalRegister=document.getElementById("cancelProfessionalRegister");
 const professionalRegistrationSuccess=document.getElementById("professionalRegistrationSuccess");
+const clientRegisterForm=document.getElementById("clientRegisterForm");
+const cancelClientRegister=document.getElementById("cancelClientRegister");
+const clientRegistrationStatus=document.getElementById("clientRegistrationStatus");
 
 function typeIsLegalAndNeedsAdvice(){
   if(!selectedLegalTerm)
@@ -5644,146 +5801,166 @@ function updateAdviceVisibility(){
   );
 }
 
-const DEMO_PROFESSIONALS=[
-  {
-    id:"demo-1",
-    name:"Profesional laboral",
-    matter:"laboral",
-    city:"Bogotá D.C.",
-    experience:"8 años",
-    bio:"Orientación en términos laborales y actuaciones relacionadas.",
-    email:"",
-    phone:"",
-    status:"demo"
-  },
-  {
-    id:"demo-2",
-    name:"Profesional constitucional / administrativo",
-    matter:"constitucional-administrativo",
-    city:"Bogotá D.C.",
-    experience:"10 años",
-    bio:"Acciones constitucionales, actuaciones administrativas y términos procedimentales.",
-    email:"",
-    phone:"",
-    status:"demo"
-  },
-  {
-    id:"demo-3",
-    name:"Profesional civil",
-    matter:"civil",
-    city:"Medellín",
-    experience:"7 años",
-    bio:"Contratos, obligaciones, responsabilidad civil y prescripción.",
-    email:"",
-    phone:"",
-    status:"demo"
-  },
-  {
-    id:"demo-4",
-    name:"Profesional de familia",
-    matter:"familia",
-    city:"Cali",
-    experience:"9 años",
-    bio:"Familia, alimentos, custodia, sucesiones y actuaciones relacionadas.",
-    email:"",
-    phone:"",
-    status:"demo"
-  },
-  {
-    id:"demo-5",
-    name:"Profesional penal",
-    matter:"penal",
-    city:"Barranquilla",
-    experience:"11 años",
-    bio:"Orientación en actuaciones penales y términos procesales.",
-    email:"",
-    phone:"",
-    status:"demo"
-  },
-  {
-    id:"demo-6",
-    name:"Profesional corporativo / comercial",
-    matter:"corporativo-comercial",
-    city:"Medellín",
-    experience:"12 años",
-    bio:"Sociedades, contratos comerciales, gobierno corporativo y debida diligencia.",
-    email:"",
-    phone:"",
-    status:"demo"
-  },
-  {
-    id:"demo-7",
-    name:"Profesional empresas / entidades públicas",
-    matter:"empresas-entidades",
-    city:"Bogotá D.C.",
-    experience:"12 años",
-    bio:"Contratación estatal, SECOP, cumplimiento y asuntos de entidades públicas.",
-    email:"",
-    phone:"",
-    status:"demo"
-  }
+/* =========================================================
+   MARKETPLACE (datos en el Google Sheet, vía Apps Script)
+   · Solo se muestran profesionales VERIFICADOS por el servidor.
+   · No se guardan datos personales en el navegador.
+   · La página no envía identificadores ni estados: los asigna el servidor.
+   ========================================================= */
+
+const MARKETPLACE_MATTERS=[
+  {value:"constitucional-administrativo",label:"Constitucional / administrativo"},
+  {value:"laboral",label:"Laboral"},
+  {value:"civil",label:"Civil"},
+  {value:"familia",label:"Familia"},
+  {value:"penal",label:"Penal"},
+  {value:"corporativo-comercial",label:"Corporativo / comercial"},
+  {value:"empresas-entidades",label:"Empresas / entidades públicas"}
 ];
 
-function getRegisteredProfessionals(){
+const MARKETPLACE_TTL_MS=5*60*1000;
+
+let marketplaceProfessionals=[];
+let marketplaceLoadedAt=0;
+let marketplaceState="idle"; /* idle | loading | ready | error */
+
+/* Limpieza: versiones anteriores guardaban perfiles (con correo y teléfono)
+   en el navegador de cada visitante. */
+try{
+  localStorage.removeItem("terminoLegalProfessionals");
+}catch{}
+
+const MARKETPLACE_ERRORS={
+  duplicate:"Este correo ya está registrado.",
+  invalid:"Revisa los datos: hay campos incompletos o con formato no válido.",
+  consent:"Debes autorizar el tratamiento de tus datos para continuar.",
+  rate_limited:"Hay muchas solicitudes en este momento. Intenta de nuevo más tarde.",
+  not_found:"Este profesional ya no está disponible.",
+  network:"No pudimos confirmar el envío. Revisa tu conexión e intenta de nuevo.",
+  default:"No pudimos completar la operación. Intenta de nuevo más tarde."
+};
+
+function marketplaceErrorMessage(code){
+  return MARKETPLACE_ERRORS[code]||MARKETPLACE_ERRORS.default;
+}
+
+function setFormStatus(el,message,isError){
+  if(!el) return;
+  el.hidden=false;
+  el.textContent=message;
+  el.classList.toggle("is-error",!!isError);
+}
+
+/* Envía al Apps Script y LEE la respuesta (text/plain evita el preflight CORS). */
+async function marketplaceRequest(action,data){
+
+  if(!CALCULATION_SHEET_ENDPOINT)
+    return {ok:false,error:"default"};
+
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),20000);
+
   try{
-    const stored=JSON.parse(
-      localStorage.getItem("terminoLegalProfessionals")||"[]"
+
+    const response=await fetch(
+      CALCULATION_SHEET_ENDPOINT,
+      {
+        method:"POST",
+        headers:{"Content-Type":"text/plain;charset=utf-8"},
+        body:JSON.stringify({
+          action,
+          visitor_id:getAnonymousVisitorId(),
+          ...data
+        }),
+        signal:controller.signal
+      }
     );
-    return Array.isArray(stored)?stored:[];
-  }catch(err){
-    return [];
+
+    const json=await response.json();
+
+    return json&&typeof json==="object"
+      ?json
+      :{ok:false,error:"default"};
+
+  }catch{
+
+    return {ok:false,error:"network"};
+
+  }finally{
+
+    clearTimeout(timer);
+
   }
 }
 
-function saveRegisteredProfessional(profile){
-  const list=getRegisteredProfessionals();
-  list.push(profile);
-  localStorage.setItem(
-    "terminoLegalProfessionals",
-    JSON.stringify(list)
-  );
+/* Solo se conservan los campos públicos y se limita su largo. */
+function sanitizeProfessional(p){
+  return{
+    id:String(p.id).slice(0,60),
+    name:String(p.name||"").slice(0,120),
+    matter:String(p.matter||"").slice(0,60),
+    city:String(p.city||"").slice(0,80),
+    experience:String(p.experience||"").slice(0,40),
+    bio:String(p.bio||"").slice(0,600)
+  };
 }
 
-function getAllProfessionals(){
-  return [
-    ...DEMO_PROFESSIONALS,
-    ...getRegisteredProfessionals()
-  ];
+async function loadMarketplaceProfessionals(force=false){
+
+  if(!CALCULATION_SHEET_ENDPOINT)
+    return;
+
+  const fresh=
+    marketplaceState==="ready" &&
+    (Date.now()-marketplaceLoadedAt)<MARKETPLACE_TTL_MS;
+
+  if(marketplaceState==="loading" || (fresh&&!force))
+    return;
+
+  marketplaceState="loading";
+  renderProfessionals();
+
+  try{
+
+    const response=await fetch(
+      `${CALCULATION_SHEET_ENDPOINT}?action=list_professionals`
+    );
+
+    const json=await response.json();
+
+    if(!json||!json.ok||!Array.isArray(json.professionals))
+      throw new Error("respuesta no válida");
+
+    marketplaceProfessionals=
+      json.professionals
+        .filter(p=>p&&p.id&&p.name)
+        .map(sanitizeProfessional);
+
+    marketplaceLoadedAt=Date.now();
+    marketplaceState="ready";
+
+  }catch{
+
+    marketplaceState="error";
+
+  }
+
+  renderProfessionals();
 }
 
 function matterLabel(value){
-  const labels={
-    "constitucional-administrativo":"Constitucional / administrativo",
-    laboral:"Laboral",
-    administrativo:"Administrativo",
-    civil:"Civil",
-    familia:"Familia",
-    penal:"Penal",
-    "corporativo-comercial":"Corporativo / comercial",
-    "empresas-entidades":"Empresas / entidades públicas"
-  };
-  return labels[value]||value||"Asesoría jurídica";
+  const found=MARKETPLACE_MATTERS.find(m=>m.value===value);
+  return found?found.label:(value||"Asesoría jurídica");
 }
 
 function populateProfessionalMatterOptions(){
   const select=document.getElementById("professionalMatter");
-  if(!select || typeof COLOMBIA_LEGAL_TERMS==="undefined")
-    return;
-
-  const options=[
-    {value:"constitucional-administrativo",label:"Constitucional / administrativo"},
-    {value:"laboral",label:"Laboral"},
-    {value:"civil",label:"Civil"},
-    {value:"familia",label:"Familia"},
-    {value:"penal",label:"Penal"},
-    {value:"corporativo-comercial",label:"Corporativo / comercial"},
-    {value:"empresas-entidades",label:"Empresas / entidades públicas"}
-  ];
+  if(!select) return;
 
   select.innerHTML=
     `<option value="">Selecciona una materia</option>`+
-    options.map(
-      item=>`<option value="${item.value}">${escapeHtml(item.label)}</option>`
+    MARKETPLACE_MATTERS.map(
+      item=>`<option value="${escapeHtml(item.value)}">${escapeHtml(item.label)}</option>`
     ).join("");
 }
 
@@ -5812,12 +5989,24 @@ function renderProfessionals(){
   if(!professionalsList)
     return;
 
+  if(marketplaceState==="loading" && !marketplaceProfessionals.length){
+    professionalsList.innerHTML=
+      `<div class="professionals-empty">Cargando profesionales…</div>`;
+    return;
+  }
+
+  if(marketplaceState==="error" && !marketplaceProfessionals.length){
+    professionalsList.innerHTML=
+      `<div class="professionals-empty">No pudimos cargar el directorio en este momento. Intenta de nuevo en unos minutos.</div>`;
+    return;
+  }
+
   const query=normalizeSearchText(
     professionalsSearch?.value||""
   );
   const filter=professionalsFilter?.value||"all";
 
-  const matches=getAllProfessionals().filter(profile=>{
+  const matches=marketplaceProfessionals.filter(profile=>{
     const matchesFilter=
       filter==="all" ||
       profile.matter===filter;
@@ -5825,7 +6014,7 @@ function renderProfessionals(){
     const haystack=normalizeSearchText([
       profile.name,
       profile.city,
-      profile.matter,
+      matterLabel(profile.matter),
       profile.bio
     ].join(" "));
 
@@ -5833,58 +6022,157 @@ function renderProfessionals(){
   });
 
   if(!matches.length){
-    professionalsList.innerHTML=`
-      <div class="legal-search-empty">
-        No encontramos profesionales con esos criterios. Prueba con otra materia, nombre o ciudad.
-      </div>
-    `;
+    professionalsList.innerHTML=
+      marketplaceProfessionals.length
+        ?`<div class="professionals-empty">No encontramos profesionales con esos criterios. Prueba con otra materia, nombre o ciudad.</div>`
+        :`<div class="professionals-empty">Estamos verificando a los primeros profesionales. Si eres profesional, puedes registrarte en la pestaña “Soy profesional”.</div>`;
     return;
   }
 
   professionalsList.innerHTML=matches.map(profile=>`
-    <div class="professional-profile-card">
-      <div class="professional-avatar-lg">${escapeHtml(initials(profile.name))}</div>
-      <div class="professional-profile-info">
-        <strong>${escapeHtml(profile.name)}</strong>
-        <span>${escapeHtml(matterLabel(profile.matter))} · ${escapeHtml(profile.city||"Atención remota")}${profile.experience?` · ${escapeHtml(profile.experience)}`:""}</span>
-        <span>${escapeHtml(profile.bio||"Perfil profesional en Término Legal.")}</span>
+    <div class="professional-item" data-matter="${escapeHtml(profile.matter)}">
+      <div class="professional-profile-card">
+        <div class="professional-avatar-lg">${escapeHtml(initials(profile.name))}</div>
+        <div class="professional-profile-info">
+          <strong>${escapeHtml(profile.name)}</strong>
+          <span>${escapeHtml(matterLabel(profile.matter))} · ${escapeHtml(profile.city||"Atención remota")}${profile.experience?` · ${escapeHtml(profile.experience)}`:""}</span>
+          <span>${escapeHtml(profile.bio||"Perfil profesional en Término Legal.")}</span>
+        </div>
+        <button type="button" class="professional-profile-action">SOLICITAR</button>
       </div>
-      <button type="button" class="professional-profile-action" data-professional-id="${escapeHtml(profile.id)}">SOLICITAR</button>
+      <form class="professional-request" data-professional-id="${escapeHtml(profile.id)}" hidden>
+        <div>
+          <label>Tu nombre</label>
+          <input name="name" required maxlength="120" autocomplete="name">
+        </div>
+        <div>
+          <label>Correo o teléfono de contacto</label>
+          <input name="contact" required maxlength="120" autocomplete="email">
+        </div>
+        <div>
+          <label>Cuéntanos brevemente tu caso</label>
+          <textarea name="message" required minlength="10" maxlength="500" placeholder="Sin datos sensibles ni números de proceso."></textarea>
+        </div>
+        <div class="hp-field" aria-hidden="true"><label>Sitio web<input name="website" tabindex="-1" autocomplete="off"></label></div>
+        <label class="consent-row"><input type="checkbox" name="consent" required><span>Autorizo que Término Legal use estos datos para poner mi solicitud en contacto con el profesional, conforme a la política de tratamiento de datos.</span></label>
+        <button type="submit">ENVIAR SOLICITUD</button>
+        <div class="form-status" hidden></div>
+      </form>
     </div>
   `).join("");
+}
 
-  professionalsList.querySelectorAll(".professional-profile-action").forEach(btn=>{
-    btn.addEventListener("click",()=>{
-      const profile=getAllProfessionals().find(
-        x=>x.id===btn.dataset.professionalId
-      );
-      trackEvent(
-        "profesional_solicitar",
-        {
-          materia:profile?.matter,
-          perfil:profile?.status
-        }
-      );
-      btn.textContent="PRÓXIMAMENTE";
-      btn.disabled=true;
-      btn.title=profile?.email
-        ?"El contacto directo quedará habilitado en la siguiente fase de la plataforma."
-        :"El sistema de contacto con profesionales se incorporará en la siguiente fase.";
-    });
-  });
+/* Abrir / cerrar el formulario de solicitud de cada tarjeta */
+professionalsList?.addEventListener("click",event=>{
+
+  const button=event.target.closest(".professional-profile-action");
+
+  if(!button)
+    return;
+
+  const item=button.closest(".professional-item");
+  const form=item?.querySelector(".professional-request");
+
+  if(!form)
+    return;
+
+  form.hidden=!form.hidden;
+  button.textContent=form.hidden?"SOLICITAR":"CERRAR";
+
+  if(!form.hidden){
+    trackEvent(
+      "profesional_solicitar",
+      {materia:item.dataset.matter}
+    );
+    form.querySelector("input[name=name]")?.focus();
+  }
+
+});
+
+/* Enviar la solicitud a un profesional */
+professionalsList?.addEventListener("submit",async event=>{
+
+  const form=event.target.closest(".professional-request");
+
+  if(!form)
+    return;
+
+  event.preventDefault();
+
+  const data=new FormData(form);
+  const submit=form.querySelector("button[type=submit]");
+  const status=form.querySelector(".form-status");
+  const label=submit.textContent;
+
+  submit.disabled=true;
+  submit.textContent="ENVIANDO…";
+
+  const response=await marketplaceRequest(
+    "create_request",
+    {
+      professional_id:form.dataset.professionalId,
+      name:String(data.get("name")||"").trim(),
+      contact:String(data.get("contact")||"").trim(),
+      message:String(data.get("message")||"").trim(),
+      consent:data.get("consent")==="on",
+      website:String(data.get("website")||"")
+    }
+  );
+
+  submit.disabled=false;
+  submit.textContent=label;
+
+  if(response.ok){
+
+    setFormStatus(
+      status,
+      "Solicitud recibida. Término Legal la hará llegar al profesional y te contactarán por el medio que indicaste.",
+      false
+    );
+
+    trackEvent(
+      "solicitud_profesional",
+      {materia:form.closest(".professional-item")?.dataset.matter}
+    );
+
+    form.reset();
+
+  }else{
+
+    setFormStatus(
+      status,
+      marketplaceErrorMessage(response.error),
+      true
+    );
+
+  }
+
+});
+
+function setProfessionalsTabState(button,active){
+  button.classList.toggle("active",active);
+  button.setAttribute("aria-selected",String(active));
 }
 
 function showProfessionalsTab(tab){
   const register=tab==="register";
+  const client=tab==="client";
 
   if(register)
     trackEvent("profesional_registro_abrir");
-  professionalsDirectoryPane.hidden=register;
-  professionalsRegisterPane.hidden=!register;
-  professionalsDirectoryTab.classList.toggle("active",!register);
-  professionalsRegisterTab.classList.toggle("active",register);
 
-  if(!register)
+  if(client)
+    trackEvent("cliente_registro_abrir");
+
+  professionalsDirectoryPane.hidden=register||client;
+  professionalsRegisterPane.hidden=!register;
+  clientPane.hidden=!client;
+
+  setProfessionalsTabState(professionalsDirectoryTab,!register&&!client);
+  setProfessionalsTabState(professionalsRegisterTab,register);
+  setProfessionalsTabState(clientTab,client);
+
+  if(!register&&!client)
     renderProfessionals();
 }
 
@@ -5894,6 +6182,7 @@ function openProfessionalsDirectory(matter="",categoryName=""){
 
   professionalsView.hidden=false;
   showProfessionalsTab("directory");
+  loadMarketplaceProfessionals();
 
   const info=selectedLegalTerm
     ?flattenLegalTerms().find(x=>x.term===selectedLegalTerm)
@@ -5975,7 +6264,17 @@ professionalsRegisterTab?.addEventListener(
   ()=>showProfessionalsTab("register")
 );
 
+clientTab?.addEventListener(
+  "click",
+  ()=>showProfessionalsTab("client")
+);
+
 cancelProfessionalRegister?.addEventListener(
+  "click",
+  ()=>showProfessionalsTab("directory")
+);
+
+cancelClientRegister?.addEventListener(
   "click",
   ()=>showProfessionalsTab("directory")
 );
@@ -5990,42 +6289,101 @@ professionalsFilter?.addEventListener(
   renderProfessionals
 );
 
+/* Envío de un formulario de registro con estado visible */
+async function submitRegistration(form,statusEl,action,data,onSuccess,successMessage){
+
+  const submit=form.querySelector("button[type=submit]");
+  const label=submit.textContent;
+
+  submit.disabled=true;
+  submit.textContent="ENVIANDO…";
+
+  const response=await marketplaceRequest(action,data);
+
+  submit.disabled=false;
+  submit.textContent=label;
+
+  if(response.ok){
+
+    setFormStatus(statusEl,successMessage,false);
+    onSuccess();
+    form.reset();
+
+  }else{
+
+    setFormStatus(
+      statusEl,
+      marketplaceErrorMessage(response.error),
+      true
+    );
+
+  }
+}
+
 professionalRegisterForm?.addEventListener(
   "submit",
   event=>{
+
     event.preventDefault();
 
-    const formData=new FormData(
-      professionalRegisterForm
-    );
+    const fd=new FormData(professionalRegisterForm);
 
-    const profile={
-      id:`reg-${Date.now()}`,
-      name:String(formData.get("name")||"").trim(),
-      city:String(formData.get("city")||"").trim(),
-      matter:String(formData.get("matter")||"").trim(),
-      experience:String(formData.get("experience")||"").trim(),
-      email:String(formData.get("email")||"").trim(),
-      phone:String(formData.get("phone")||"").trim(),
-      bio:String(formData.get("bio")||"").trim(),
-      status:"pending"
+    const data={
+      name:String(fd.get("name")||"").trim(),
+      city:String(fd.get("city")||"").trim(),
+      matter:String(fd.get("matter")||"").trim(),
+      license:String(fd.get("license")||"").trim(),
+      email:String(fd.get("email")||"").trim().toLowerCase(),
+      phone:String(fd.get("phone")||"").trim(),
+      experience:String(fd.get("experience")||"").trim(),
+      bio:String(fd.get("bio")||"").trim(),
+      country:"Colombia",
+      consent:fd.get("consent")==="on",
+      website:String(fd.get("website")||"")
     };
 
-    saveRegisteredProfessional(profile);
-
-    trackEvent(
-      "profesional_registro",
-      {
-        materia:profile.matter,
-        ciudad:profile.city
-      }
+    submitRegistration(
+      professionalRegisterForm,
+      professionalRegistrationSuccess,
+      "register_professional",
+      data,
+      ()=>trackEvent(
+        "profesional_registro",
+        {materia:data.matter,ciudad:data.city}
+      ),
+      "Registro recibido. Verificaremos tu tarjeta profesional; cuando tu perfil sea aprobado aparecerá en el directorio."
     );
 
-    professionalRegistrationSuccess.hidden=false;
-    professionalRegistrationSuccess.textContent=
-      "Registro recibido en modo prototipo. El perfil quedó guardado en este navegador como solicitud pendiente de validación. En la versión conectada a la plataforma, aquí se realizará el proceso de verificación y publicación.";
+  }
+);
 
-    professionalRegisterForm.reset();
+clientRegisterForm?.addEventListener(
+  "submit",
+  event=>{
+
+    event.preventDefault();
+
+    const fd=new FormData(clientRegisterForm);
+
+    const data={
+      name:String(fd.get("name")||"").trim(),
+      email:String(fd.get("email")||"").trim().toLowerCase(),
+      phone:String(fd.get("phone")||"").trim(),
+      city:String(fd.get("city")||"").trim(),
+      country:"Colombia",
+      consent:fd.get("consent")==="on",
+      website:String(fd.get("website")||"")
+    };
+
+    submitRegistration(
+      clientRegisterForm,
+      clientRegistrationStatus,
+      "register_client",
+      data,
+      ()=>trackEvent("cliente_registro"),
+      "Registro recibido. Gracias por registrarte en Término Legal."
+    );
+
   }
 );
 
