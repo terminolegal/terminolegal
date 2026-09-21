@@ -81,6 +81,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(185,150,79,.3);bo
 .tipos{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}
 @media(max-width:520px){.tipos{grid-template-columns:1fr}}
 .tipos label{display:flex;gap:8px;align-items:center;font-weight:500;font-size:.8rem;margin:0;color:var(--ink)}
+.svc{font-size:.84rem;color:var(--ink);line-height:1.4}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 
 button.primary,button.secondary,button.link{font:inherit;cursor:pointer}
@@ -245,6 +246,12 @@ const PAY={
   transferencia:"Transferencia",
   a_convenir:"Forma de pago a convenir"
 };
+const MATTERS={
+  "constitucional-administrativo":"Constitucional / administrativo",
+  laboral:"Laboral", civil:"Civil", familia:"Familia", penal:"Penal",
+  "corporativo-comercial":"Corporativo / comercial",
+  "empresas-entidades":"Empresas / entidades públicas"
+};
 const STATUS={abierta:"Buscando",asignada:"Asignada",cumplida:"Cumplida",cancelada:"Cancelada",vencida:"Vencida"};
 const OFFER_STATUS={pendiente:"Pendiente",aceptada:"Aceptada",rechazada:"No elegida"};
 const MONTHS=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
@@ -259,6 +266,7 @@ const ERRORS={
   rate_limited:"Demasiadas solicitudes seguidas. Espera un momento.",
   country:"Todavía no operamos en ese país.",
   limit:"Ya tienes 10 solicitudes abiertas. Cierra alguna antes de publicar otra.",
+  claim_required:"Ese correo ya tiene un perfil. Vincúlalo con un código.",
   network:"No pudimos conectar. Revisa tu conexión e intenta de nuevo.",
   server:"Algo falló de nuestro lado. Intenta de nuevo en un momento."
 };
@@ -801,7 +809,8 @@ function renderTakeShell(){
           <strong style="color:var(--navy)">${esc(p.name)}</strong>
           <span class="chip">${esc(ROLES[p.role]||p.role)}</span>
           ${p.verified?`<span class="chip ok">Verificado</span>`:`<span class="chip warn">En verificación</span>`}
-          <p class="muted">Cubres ${p.radius_km} km alrededor de ${esc(p.city)}${p.dept?`, ${esc(p.dept)}`:""}</p>
+          ${p.offers_gestiones?`<span class="chip">Gestiones</span>`:""}${p.offers_advice?`<span class="chip">Asesoría${p.matter?`: ${esc(MATTERS[p.matter]||p.matter)}`:""}</span>`:""}
+          <p class="muted">${p.offers_gestiones?`Cubres ${p.radius_km} km alrededor de ${esc(p.city)}${p.dept?`, ${esc(p.dept)}`:""}`:`Base en ${esc(p.city)}${p.dept?`, ${esc(p.dept)}`:""}`}</p>
         </div>
         <button type="button" class="secondary" id="editProfile">Editar perfil</button>
       </div>
@@ -839,6 +848,12 @@ async function loadTake(silent,force){
   }
   if(!near.ok){
     body.innerHTML=`<div class="notice ${near.error==="not_verified"?"warn":"bad"}">${esc(errText(near.error))}</div>`;
+    return;
+  }
+  if(near.disabled){
+    body.innerHTML=`<div class="notice warn">Tu perfil todavía no ofrece gestiones. Actívalas para ver las solicitudes de tu zona y ofertar.</div>
+      <button class="primary" type="button" id="enableGest" style="margin-top:0">ACTIVAR GESTIONES EN MI PERFIL</button>`;
+    $("#enableGest").onclick=()=>renderProviderForm(S.provider,{enableGest:true});
     return;
   }
   /* No pisar un formulario de contraoferta que el usuario está llenando */
@@ -894,22 +909,31 @@ function offerCard(o){
     ${contact}</div></article>`;
 }
 
-/* ───────── Registro / edición de prestador ───────── */
-function renderProviderForm(p){
+/* ───────── Registro / edición de prestador (perfil único) ───────── */
+function renderProviderForm(p,opts={}){
   clearInterval(S.timer);
   S._refresh=null;
   const editing=!!p;
   const country=(p&&p.country)||(S.loc&&ENABLED.includes(S.loc.country)?S.loc.country:ENABLED[0]);
-  const chosen=new Set(p?p.tipos:["radicacion","entrega","secuestro"]);
+  const chosen=new Set(p&&p.tipos&&p.tipos.length?p.tipos:["radicacion","entrega","secuestro"]);
   const role=p?p.role:"abogado";
+  const wantsGest=opts.enableGest?true:(p?p.offers_gestiones:true);
+  const wantsAdv=p?p.offers_advice:false;
 
   $("#view").innerHTML=`
   <form id="provForm" class="card" novalidate>
-    <h2>${editing?"Editar mi perfil":"Regístrate para tomar gestiones"}</h2>
-    <p class="muted">Cuéntanos quién eres y qué zona cubres. Revisamos cada perfil antes de marcarlo como verificado.</p>
+    <h2>${editing?"Editar mi perfil":"Crea tu perfil profesional"}</h2>
+    <p class="muted">Un solo perfil para todo. Revisamos cada perfil antes de marcarlo como verificado.</p>
+    ${editing?"":`<button type="button" class="link" id="haveProfile">¿Ya te registraste antes? Recupera tu perfil con tu correo</button>`}
 
     <label for="prole">Soy</label>
     <select id="prole" name="role">${Object.entries(ROLES).map(([k,v])=>`<option value="${k}" ${k===role?"selected":""}>${v}</option>`).join("")}</select>
+
+    <label>Qué quieres ofrecer</label>
+    <label class="check svc"><input type="checkbox" name="offers_gestiones" ${wantsGest?"checked":""}>
+      <span><b>Gestiones y diligencias</b> en mi zona: recibo solicitudes cercanas y ofrezco por ellas.</span></label>
+    <label class="check svc" id="advRow"><input type="checkbox" name="offers_advice" ${wantsAdv?"checked":""}>
+      <span><b>Asesoría jurídica</b>: aparecer en el directorio de abogados (solo abogados).</span></label>
 
     <label for="pname">Nombre completo</label>
     <input id="pname" name="name" type="text" maxlength="100" required autocomplete="name" value="${esc(p?p.name:"")}">
@@ -933,11 +957,22 @@ function renderProviderForm(p){
     <button type="button" class="link" id="useHereP">Usar mi ubicación actual</button>
     <p class="hint">Guardamos solo una ubicación aproximada (a ~1 km) y nunca la mostramos a otros.</p>
 
-    <label for="radius">Hasta dónde te desplazas</label>
-    <select id="radius" name="radius_km">${[10,25,50,100,200].map(k=>`<option value="${k}" ${k===(p?p.radius_km:50)?"selected":""}>${k} km a la redonda</option>`).join("")}</select>
+    <div id="secAdvice">
+      <div class="grid2">
+        <div><label for="pmatter">Materia principal</label>
+          <select id="pmatter" name="matter"><option value="">Selecciona</option>${Object.entries(MATTERS).map(([k,v])=>`<option value="${k}" ${p&&p.matter===k?"selected":""}>${v}</option>`).join("")}</select></div>
+        <div><label for="pexp">Experiencia</label>
+          <input id="pexp" name="experience" type="text" maxlength="40" placeholder="Ej.: 8 años" value="${esc(p?p.experience:"")}"></div>
+      </div>
+    </div>
 
-    <label>Gestiones que aceptas</label>
-    <div class="tipos">${Object.entries(TIPOS).map(([k,v])=>`<label><input type="checkbox" name="tipos" value="${k}" ${chosen.has(k)?"checked":""}> ${v}</label>`).join("")}</div>
+    <div id="secGest">
+      <label for="radius">Hasta dónde te desplazas</label>
+      <select id="radius" name="radius_km">${[10,25,50,100,200].map(k=>`<option value="${k}" ${k===((p&&p.radius_km)||50)?"selected":""}>${k} km a la redonda</option>`).join("")}</select>
+
+      <label>Gestiones que aceptas</label>
+      <div class="tipos">${Object.entries(TIPOS).map(([k,v])=>`<label><input type="checkbox" name="tipos" value="${k}" ${chosen.has(k)?"checked":""}> ${v}</label>`).join("")}</div>
+    </div>
 
     <div class="grid2">
       <div><label for="pphone">WhatsApp</label>
@@ -945,7 +980,7 @@ function renderProviderForm(p){
       <div><label for="pemail">Correo</label>
         <input id="pemail" name="email" type="email" maxlength="120" required autocomplete="email"></div>
     </div>
-    <p class="hint">Tu teléfono y tu correo solo se comparten con quien acepte tu oferta.${editing?" Vuelve a escribirlos para guardar cambios.":""}</p>
+    <p class="hint">Tu teléfono y tu correo solo se comparten con quien acepte tu oferta o te contacte.${editing?" Vuelve a escribirlos para guardar cambios.":""}</p>
 
     <label for="bio">Presentación <span class="muted">(opcional)</span></label>
     <textarea id="bio" name="bio" maxlength="400" placeholder="Experiencia, despachos que conoces, disponibilidad.">${esc(p?p.bio:"")}</textarea>
@@ -953,21 +988,26 @@ function renderProviderForm(p){
     <div class="hp" aria-hidden="true"><label>Sitio web<input name="website" tabindex="-1" autocomplete="off"></label></div>
 
     <label class="check"><input type="checkbox" name="consent" required>
-      <span>Autorizo el tratamiento de mis datos personales para gestionar mi registro y conectarme con solicitudes de mi zona, conforme a la política de tratamiento de datos.</span></label>
+      <span>Autorizo el tratamiento de mis datos personales para gestionar mi registro y conectarme con solicitudes de mi zona o con personas que busquen asesoría, conforme a la política de tratamiento de datos.</span></label>
 
-    <button class="primary" type="submit">${editing?"GUARDAR CAMBIOS":"REGISTRARME"}</button>
+    <button class="primary" type="submit">${editing?"GUARDAR CAMBIOS":"CREAR MI PERFIL"}</button>
     ${editing?`<button class="link" type="button" id="cancelEdit">Cancelar</button>`:""}
   </form>`;
 
   const f=$("#provForm");
-  const syncRole=()=>{
-    const r=field(f,"role").value;
-    $("#credLabel").textContent=r==="abogado"?"Número de tarjeta profesional":
+  const sync=()=>{
+    const r=field(f,"role").value, lawyer=r==="abogado";
+    $("#advRow").hidden=!lawyer;
+    if(!lawyer)field(f,"offers_advice").checked=false;
+    $("#secAdvice").hidden=!(lawyer&&field(f,"offers_advice").checked);
+    $("#secGest").hidden=!field(f,"offers_gestiones").checked;
+    $("#credLabel").textContent=lawyer?"Número de tarjeta profesional":
       (r==="dependiente"?"Experiencia (opcional)":"Universidad y semestre o año de grado");
-    $("#credHint").textContent=r==="abogado"?"Lo usamos para verificar tu registro. No se muestra públicamente.":
+    $("#credHint").textContent=lawyer?"Lo usamos para verificar tu registro. No se muestra públicamente.":
       (r==="dependiente"?"Por ejemplo: años de experiencia en trámites y despachos.":"Ej.: Universidad Nacional, 9.º semestre.");
   };
-  field(f,"role").onchange=syncRole;syncRole();
+  ["role","offers_advice","offers_gestiones"].forEach(n=>field(f,n).addEventListener("change",sync));
+  sync();
 
   $("#useHereP").onclick=async()=>{
     const b=$("#useHereP");b.disabled=true;b.textContent="Buscando tu ubicación…";
@@ -980,6 +1020,7 @@ function renderProviderForm(p){
   };
   ["city","dept"].forEach(n=>field(f,n).addEventListener("input",()=>{field(f,"lat").value="";field(f,"lng").value=""}));
   if(editing)$("#cancelEdit").onclick=()=>renderTake();
+  else $("#haveProfile").onclick=()=>showClaim(null);
   f.onsubmit=submitProvider;
 }
 
@@ -989,11 +1030,14 @@ async function submitProvider(e){
   const v=n=>field(f,n).value;
   const tipos=$$("input[name=tipos]:checked",f).map(i=>i.value);
   const country=v("country"),role=v("role");
+  const gest=field(f,"offers_gestiones").checked,advice=field(f,"offers_advice").checked;
+  if(!gest&&!advice)return toast("Elige al menos un servicio: gestiones o asesoría.",true);
   if(v("name").trim().length<2)return toast("Escribe tu nombre.",true);
   if(v("city").trim().length<2)return toast("Indica tu municipio base.",true);
   if(role==="abogado"&&!v("credential").trim())return toast("Falta tu número de tarjeta profesional.",true);
   if((role==="judicante"||role==="estudiante")&&!v("credential").trim())return toast("Indica tu universidad y semestre.",true);
-  if(!tipos.length)return toast("Elige al menos un tipo de gestión.",true);
+  if(advice&&!v("matter"))return toast("Elige tu materia principal.",true);
+  if(gest&&!tipos.length)return toast("Elige al menos un tipo de gestión.",true);
   if(!v("phone").trim()||!v("email").trim())return toast("Falta tu WhatsApp o tu correo.",true);
   if(!field(f,"consent").checked)return toast(ERRORS.consent,true);
 
@@ -1003,13 +1047,17 @@ async function submitProvider(e){
     const g=await forwardGeocode(v("city").trim(),v("dept").trim(),country);
     if(g){lat=g.lat;lng=g.lng}
   }
-  const res=await api("gx_register_provider",{
+  const payload={
     token:providerToken(),role,name:v("name").trim(),credential:v("credential").trim(),
-    country,city:v("city").trim(),dept:v("dept").trim(),lat,lng,radius_km:v("radius_km"),tipos,
+    country,city:v("city").trim(),dept:v("dept").trim(),lat,lng,
+    radius_km:gest?v("radius_km"):"",tipos:gest?tipos:[],
+    matter:advice?v("matter"):"",experience:v("experience").trim(),
     phone:toE164(country,v("phone")),email:v("email").trim(),bio:v("bio").trim(),
-    consent:true,website:v("website")
-  });
+    offers_gestiones:gest,offers_advice:advice,consent:true,website:v("website")
+  };
+  const res=await api("gx_register_provider",payload);
   setBusy(btn,false);
+  if(res.error==="claim_required")return showClaim(payload);
   if(!res.ok)return toast(errText(res.error),true);
 
   toast(lat
@@ -1017,6 +1065,51 @@ async function submitProvider(e){
     :"Perfil guardado. No pudimos ubicar tu municipio en el mapa; te mostraremos solicitudes de ese mismo nombre.");
   S.takeSub="near";
   renderTake();
+}
+
+/* Recuperar un perfil que ya existe (registro anterior o cambio de dispositivo):
+   se comprueba que el correo es tuyo con un código de 6 dígitos. */
+function showClaim(payload){
+  clearInterval(S.timer);
+  S._refresh=null;
+  const known=!!(payload&&payload.email);
+  $("#view").innerHTML=`<div class="card">
+    <h2>Recupera tu perfil</h2>
+    <p class="muted">${known?`Ya existe un perfil con <b>${esc(payload.email)}</b>. `:""}Para vincularlo a este dispositivo confirma que el correo es tuyo: te enviamos un código de 6 dígitos.</p>
+    ${known?"":`<label for="claimEmail">Correo con el que te registraste</label>
+    <input id="claimEmail" type="email" maxlength="120" autocomplete="email">`}
+    <button class="primary" type="button" id="claimSend">ENVIAR CÓDIGO</button>
+    <div id="claimStep2" hidden>
+      <label for="claimCode">Código de 6 dígitos</label>
+      <input id="claimCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+      <button class="primary" type="button" id="claimGo">VINCULAR MI PERFIL</button>
+    </div>
+    <button class="link" type="button" id="claimBack">Volver</button>
+  </div>`;
+  const email=()=>known?payload.email:$("#claimEmail").value.trim();
+
+  $("#claimBack").onclick=()=>renderTake();
+  $("#claimSend").onclick=async()=>{
+    if(!email())return toast("Escribe tu correo.",true);
+    const b=$("#claimSend");setBusy(b,true,"ENVIANDO…");
+    const res=await api("gx_claim_start",{email:email()});
+    setBusy(b,false);
+    if(!res.ok)return toast(errText(res.error),true);
+    $("#claimStep2").hidden=false;$("#claimCode").focus();
+    toast("Si el correo está registrado, te enviamos un código. Revisa también el spam.");
+  };
+  $("#claimGo").onclick=async()=>{
+    const b=$("#claimGo");setBusy(b,true,"VERIFICANDO…");
+    const res=await api("gx_claim_finish",{email:email(),code:$("#claimCode").value.trim(),token:providerToken()});
+    setBusy(b,false);
+    if(!res.ok)return toast(res.error==="rate_limited"?"Demasiados intentos. Pide un código nuevo.":"Código incorrecto o vencido.",true);
+    if(known){
+      const r2=await api("gx_register_provider",payload);
+      toast(r2.ok?"Perfil vinculado y actualizado.":errText(r2.error),!r2.ok);
+    }else toast("Perfil vinculado a este dispositivo.");
+    S.takeSub="near";
+    renderTake();
+  };
 }
 
 /* =========================================================
