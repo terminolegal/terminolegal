@@ -15,18 +15,20 @@
   --btn-text:#fff; --shadow:rgba(16,36,62,.07); --ok:#1f7a4d; --ok-bg:#e8f4ee; --warn:#8a5a00;
   --warn-bg:#fbf1dc; --bad:#a12a2a; --bad-bg:#fbeaea;
 }
-@media (prefers-color-scheme:dark){
-  :root{
-    --navy:#c9d6e8; --gold:#d8b877; --ink:#eef1f5; --muted:#95a1b0; --line:#2a3546; --bg:#0b1220;
-    --surface:#111a2c; --surface-alt:#0e1626; --input-bg:#0e1626; --input-border:#2a3546;
-    --btn-text:#0b1220; --shadow:rgba(0,0,0,.35); --ok:#6fcf9b; --ok-bg:#12281d; --warn:#e6b85c;
-    --warn-bg:#2a2110; --bad:#e28b8b; --bad-bg:#2b1616;
-  }
+body.dark{
+  --navy:#c9d6e8; --gold:#d8b877; --ink:#eef1f5; --muted:#95a1b0; --line:#2a3546; --bg:#0b1220;
+  --surface:#111a2c; --surface-alt:#0e1626; --input-bg:#0e1626; --input-border:#2a3546;
+  --btn-text:#0b1220; --shadow:rgba(0,0,0,.35); --ok:#6fcf9b; --ok-bg:#12281d; --warn:#e6b85c;
+  --warn-bg:#2a2110; --bad:#e28b8b; --bad-bg:#2b1616;
+  color-scheme:dark;
 }
+
+html{font-size:100%}
 
 body{margin:0;background:var(--bg);color:var(--ink);
   font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5;
-  padding-bottom:env(safe-area-inset-bottom)}
+  padding-bottom:env(safe-area-inset-bottom);
+  transition:background .25s,color .25s;overflow-x:hidden}
 .app{width:min(760px,94%);margin:0 auto;padding:28px 0 60px}
 
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -130,11 +132,36 @@ button.primary,button.secondary,button.link{font:inherit;cursor:pointer}
   max-width:92vw;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50}
 #toast.show{opacity:1}
 #toast.err{background:#a12a2a;color:#fff}
+
+/* ACCESIBILIDAD (misma barra del calculador) */
+.a11y-bar{position:fixed;top:50%;right:0;transform:translateY(-50%);display:flex;flex-direction:column;
+  background:var(--navy);border-radius:10px 0 0 10px;box-shadow:0 8px 24px var(--shadow);overflow:hidden;z-index:1000}
+.a11y-btn{width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:transparent;
+  border:0;border-bottom:1px solid rgba(255,255,255,.18);color:var(--btn-text);cursor:pointer;padding:0;font:inherit}
+.a11y-btn:last-child{border-bottom:0}
+.a11y-btn svg{width:19px;height:19px}
+.a11y-btn:hover,.a11y-btn[aria-pressed="true"]{background:var(--gold)}
+.a11y-big{font-weight:700;font-size:1.05rem;line-height:1}
+.a11y-small{font-weight:700;font-size:.72rem;line-height:1}
+@media(max-width:480px){.a11y-btn{width:36px;height:36px}.a11y-btn svg{width:16px;height:16px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 
 <body>
+
+<!-- ACCESIBILIDAD -->
+<div class="a11y-bar" role="toolbar" aria-label="Accesibilidad">
+  <button type="button" id="contrastBtn" class="a11y-btn" aria-pressed="false" title="Contraste" aria-label="Contraste">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M12 3a9 9 0 000 18z" fill="currentColor" stroke="none"></path>
+    </svg>
+  </button>
+  <button type="button" id="increaseTextBtn" class="a11y-btn" title="Aumentar letra" aria-label="Aumentar letra"><span class="a11y-big">A</span></button>
+  <button type="button" id="decreaseTextBtn" class="a11y-btn" title="Reducir letra" aria-label="Reducir letra"><span class="a11y-small">A</span></button>
+</div>
+
 <div class="app">
 
   <div class="top">
@@ -991,6 +1018,28 @@ async function submitProvider(e){
   S.takeSub="near";
   renderTake();
 }
+
+/* =========================================================
+   ACCESIBILIDAD: modo oscuro y tamaño de letra (se recuerdan)
+   ========================================================= */
+(function(){
+  const contrastBtn=$("#contrastBtn"),inc=$("#increaseTextBtn"),dec=$("#decreaseTextBtn");
+  const MIN=-2,MAX=3;
+  let step=Math.max(MIN,Math.min(MAX,parseInt(store.get("tl_textstep")||"0",10)||0));
+  const applyScale=()=>{document.documentElement.style.fontSize=(100+step*8)+"%"};
+  const applyDark=on=>{
+    document.body.classList.toggle("dark",on);
+    contrastBtn.setAttribute("aria-pressed",String(on));
+  };
+  applyDark(store.get("tl_dark")==="1");
+  applyScale();
+  contrastBtn.onclick=()=>{
+    const on=!document.body.classList.contains("dark");
+    applyDark(on);store.set("tl_dark",on?"1":"0");
+  };
+  inc.onclick=()=>{step=Math.min(MAX,step+1);applyScale();store.set("tl_textstep",String(step))};
+  dec.onclick=()=>{step=Math.max(MIN,step-1);applyScale();store.set("tl_textstep",String(step))};
+})();
 
 /* =========================================================
    INICIO
