@@ -1697,22 +1697,6 @@ body.dark .form-status.is-error{color:#e28b8b}
   box-shadow:0 8px 24px var(--shadow)
 }
 
-.certification-toolbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding:10px 14px;
-  border-bottom:1px solid var(--line);
-  background:var(--surface-alt)
-}
-
-.certification-toolbar strong{
-  font-size:.72rem;
-  letter-spacing:.05em;
-  color:var(--navy)
-}
-
 .certification-document{
   max-width:780px;
   margin:0 auto;
@@ -1720,25 +1704,6 @@ body.dark .form-status.is-error{color:#e28b8b}
   background:#fff;
   color:#17202b;
   font-family:Arial,Helvetica,sans-serif
-}
-
-.certification-brand{
-  text-align:center;
-  margin-bottom:26px
-}
-
-.certification-brand-name{
-  color:#10243e;
-  font-weight:700;
-  letter-spacing:.16em;
-  font-size:14px;
-  margin:0 0 5px
-}
-
-.certification-brand-sub{
-  color:#687383;
-  font-size:9px;
-  margin:0
 }
 
 .certification-title{
@@ -2016,9 +1981,6 @@ body.dark .form-status.is-error{color:#e28b8b}
 
   /* PDF compacto: evita bloques con espacio excesivo y permite que
      la secuencia continúe naturalmente en la página siguiente. */
-  #printArea .certification-brand{margin-bottom:12px}
-  #printArea .certification-brand-name{font-size:12px;margin-bottom:3px}
-  #printArea .certification-brand-sub{font-size:8px}
   #printArea .certification-title{font-size:18px;margin-bottom:5px}
   #printArea .certification-subtitle{font-size:8.5px;line-height:1.35;margin-bottom:12px}
   #printArea .certification-section{margin-top:12px}
@@ -2169,6 +2131,86 @@ body.dark .form-status.is-error{color:#e28b8b}
 
   .segmented-3 span{
     height:40px
+  }
+}
+
+/* =========================================================
+   AJUSTES CERTIFICACIÓN — v11.2
+   ========================================================= */
+
+/* Rejilla: bordes que funcionan con 4 o 5 elementos */
+.certification-grid .certification-item:nth-last-child(-n+2){border-bottom:1px solid #e4e8ed}
+.certification-grid .certification-item:last-child{border-bottom:0}
+.certification-grid .certification-item:nth-last-child(2):nth-child(odd){border-bottom:0}
+.certification-grid .certification-item.full{grid-column:1 / -1;border-right:0}
+
+/* Tipografía más legible */
+.certification-title{font-size:26px;margin-top:0}
+.certification-subtitle{font-size:12px}
+.certification-section h3{font-size:13px}
+.certification-item{padding:11px 14px}
+.certification-item span{font-size:10px}
+.certification-item strong{font-size:13.5px}
+.certification-result-label{font-size:10px}
+.certification-result-date{font-size:28px}
+.certification-method,
+.certification-legal{font-size:12px;line-height:1.7}
+.certification-sequence-row{font-size:11px;grid-template-columns:40px 86px 1fr}
+.certification-trace-label{font-size:10px}
+.certification-trace-code{font-size:13px}
+.certification-trace-note{font-size:9px}
+.certification-scope{font-size:10.5px}
+.certification-footer{font-size:9.5px}
+
+/* Glosario */
+.certification-glossary-title{
+  margin:16px 0 8px;
+  color:#10243e;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.04em
+}
+.certification-glossary-item{
+  margin:0 0 6px;
+  color:#3a4453;
+  font-size:12px;
+  line-height:1.6
+}
+.certification-glossary-item strong{color:#10243e}
+
+@media(max-width:600px){
+  .certification-grid .certification-item:nth-last-child(2):nth-child(odd){
+    border-bottom:1px solid #e4e8ed
+  }
+  .certification-grid .certification-item:last-child{border-bottom:0}
+  .certification-sequence-row{grid-template-columns:34px 82px 1fr}
+}
+
+@media print{
+  #printArea .certification-document{font-size:10px}
+  #printArea .certification-title{font-size:20px}
+  #printArea .certification-subtitle{font-size:9.5px}
+  #printArea .certification-section h3{font-size:11px}
+  #printArea .certification-item span{font-size:8px}
+  #printArea .certification-item strong{font-size:10.5px}
+  #printArea .certification-result-label{font-size:8px}
+  #printArea .certification-result-date{font-size:22px}
+  #printArea .certification-method,
+  #printArea .certification-legal{font-size:10px;line-height:1.5}
+  #printArea .certification-sequence-row{
+    font-size:8.8px;
+    grid-template-columns:36px 82px 1fr
+  }
+  #printArea .certification-trace-label{font-size:7.5px}
+  #printArea .certification-trace-code{font-size:10px}
+  #printArea .certification-trace-note{font-size:7.5px}
+  #printArea .certification-scope{font-size:8.5px}
+  #printArea .certification-footer{font-size:8px}
+  #printArea .certification-glossary-title{font-size:10px;margin-top:10px}
+  #printArea .certification-glossary-item{
+    font-size:9.5px;
+    break-inside:avoid;
+    page-break-inside:avoid
   }
 }
 </style>
@@ -2536,10 +2578,6 @@ body.dark .form-status.is-error{color:#e28b8b}
      class="certification-view"
      hidden>
 
-  <div class="certification-toolbar">
-    <strong data-i18n="certToolbar">CERTIFICACIÓN DE CÓMPUTO</strong>
-  </div>
-
   <div id="certificationDocument"
        class="certification-document"></div>
 
@@ -2551,7 +2589,7 @@ body.dark .form-status.is-error{color:#e28b8b}
      hidden>
 
   <p class="notice" id="versionNotice">
-    Versión <span id="appVersionLabel">11.1</span> — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.
+    Versión <span id="appVersionLabel">11.2</span> — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.
   </p>
 
   <div class="export-row">
@@ -2877,7 +2915,6 @@ const I18N={
     lblType:"Tipo de días",
     btnPdf:"GUARDAR PDF",
     btnShare:"COMPARTIR",
-    certToolbar:"CERTIFICACIÓN DE CÓMPUTO",
     notice:"Versión {version} — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.",
     postNote:"El cálculo se realiza según el tipo de término seleccionado y la jurisdicción de referencia. Los días hábiles excluyen los días de descanso semanal y los festivos disponibles para esa jurisdicción. Las reglas especiales pueden variar según la materia, autoridad o territorio aplicable.",
     feedbackLabel:"¿Te sirvió?",
@@ -2901,23 +2938,29 @@ const I18N={
 
     legalBase:"BASE DEL CÓMPUTO: El resultado se obtiene aplicando la regla de conteo seleccionada sobre la fecha de inicio y el calendario de referencia de {name}. En días hábiles se excluyen los días de descanso semanal y los festivos incorporados al calendario disponible; en días calendario se cuentan consecutivamente todos los días. Referencia territorial: {note} Pueden existir reglas especiales por materia, órgano, nivel territorial, convenio, contrato o procedimiento que modifiquen el cómputo. Este documento es una herramienta de referencia y no sustituye la verificación de la norma específica aplicable al término.",
 
-    certBrandSub:"Herramienta de cómputo y trazabilidad de términos",
     certTitle:"CERTIFICACIÓN DE CÓMPUTO DE TÉRMINO",
     certSubtitle:"Constancia técnica del cálculo realizado por el sistema. Este documento identifica los parámetros utilizados y la secuencia del cómputo.",
     certSec1:"1. IDENTIFICACIÓN DEL CÓMPUTO",
-    certLblEnd:"Fecha de resultado",
+    certSec2:"2. TRAZABILIDAD DEL CONTEO",
+    certSec3:"3. SECUENCIA DEL CONTEO",
+    certSec4:"4. MÉTODO UTILIZADO",
+    certSec5:"5. BASE DEL CÓMPUTO",
+    certGlossaryTitle:"Glosario de términos y conceptos",
+    glossary:[
+      ["Término","Último momento de la duración o existencia de algo. Proc.: límite del plazo en que tiene que realizarse un acto procesal."],
+      ["Día hábil","Día en el que es posible llevar a cabo las actuaciones procesales."],
+      ["Día calendario","Día natural."],
+      ["Día feriado","Día festivo, especialmente el que no cae en domingo."],
+      ["Fin de semana","Parte de la semana que comprende el sábado y el domingo."]
+    ],
     certLblAmount:"Número de días / unidad",
     certLblMode:"Modalidad",
     certLblJurisdiction:"Jurisdicción de referencia",
     certLblLegalTerm:"Término jurídico seleccionado",
     certLblResult:"Fecha resultante",
-    certSec2:"2. MÉTODO UTILIZADO",
     methodMonths:"La fecha de inicio es {start}. El sistema suma {amountLabel} mediante la regla de meses calendario definida por el motor y obtiene como fecha resultante {end}.",
     methodDays:"La fecha de inicio {start} no se contabiliza. El conteo comienza al día siguiente y continúa hasta completar {amountLabel}. En días hábiles se excluyen los días de descanso semanal y los festivos incorporados al calendario de referencia.",
-    certSec3:"3. TRAZABILIDAD DEL CONTEO",
     certCalAlt:"Calendario de trazabilidad del término legal",
-    certSec4:"4. SECUENCIA DEL CONTEO",
-    certSec5:"5. BASE DEL CÓMPUTO",
     certTraceLabel:"Trazabilidad del cálculo",
     certTraceNote:"Código de trazabilidad: país · fecha de inicio · correlativo de uso en esta instalación. El registro analítico conserva además una huella técnica de los parámetros del cálculo.",
     certScope1:"El código anterior se genera a partir de los parámetros del cálculo y permite cotejar la consistencia de esta representación con dichos parámetros. No constituye firma electrónica, certificación de autoridad pública ni garantía de la procedencia jurídica del término.",
@@ -2933,7 +2976,6 @@ const I18N={
     lblType:"Tipo de dias",
     btnPdf:"SALVAR PDF",
     btnShare:"COMPARTILHAR",
-    certToolbar:"CERTIFICAÇÃO DE CÁLCULO",
     notice:"Versão {version} — motor de cálculo com calendário de referência por jurisdição, validação de datas e limites de intervalo. Os feriados afetam apenas a contagem de dias úteis.",
     postNote:"O cálculo é feito conforme o tipo de prazo selecionado e a jurisdição de referência. Os dias úteis excluem os dias de descanso semanal e os feriados disponíveis para essa jurisdição. As regras especiais podem variar conforme a matéria, a autoridade ou o território aplicável.",
     feedbackLabel:"Foi útil?",
@@ -2957,23 +2999,29 @@ const I18N={
 
     legalBase:"BASE DA CONTAGEM: O resultado é obtido aplicando a regra de contagem selecionada sobre a data de início e o calendário de referência de {name}. Em dias úteis, excluem-se os dias de descanso semanal e os feriados incorporados ao calendário disponível; em dias corridos, contam-se consecutivamente todos os dias. Referência territorial: {note} Podem existir regras especiais por matéria, órgão, nível territorial, convênio, contrato ou procedimento que modifiquem a contagem. Este documento é uma ferramenta de referência e não substitui a verificação da norma específica aplicável ao prazo.",
 
-    certBrandSub:"Ferramenta de cálculo e rastreabilidade de prazos",
     certTitle:"CERTIFICAÇÃO DE CÁLCULO DE PRAZO",
     certSubtitle:"Comprovante técnico do cálculo realizado pelo sistema. Este documento identifica os parâmetros utilizados e a sequência da contagem.",
     certSec1:"1. IDENTIFICAÇÃO DO CÁLCULO",
-    certLblEnd:"Data do resultado",
+    certSec2:"2. RASTREABILIDADE DA CONTAGEM",
+    certSec3:"3. SEQUÊNCIA DA CONTAGEM",
+    certSec4:"4. MÉTODO UTILIZADO",
+    certSec5:"5. BASE DA CONTAGEM",
+    certGlossaryTitle:"Glossário de termos e conceitos",
+    glossary:[
+      ["Prazo","Último momento da duração ou existência de algo. Proc.: limite do prazo dentro do qual deve ser praticado um ato processual."],
+      ["Dia útil","Dia em que é possível praticar atos processuais."],
+      ["Dia corrido","Dia natural, contado de forma contínua."],
+      ["Feriado","Dia festivo, especialmente o que não cai em domingo."],
+      ["Fim de semana","Parte da semana que compreende o sábado e o domingo."]
+    ],
     certLblAmount:"Número de dias / unidade",
     certLblMode:"Modalidade",
     certLblJurisdiction:"Jurisdição de referência",
     certLblLegalTerm:"Prazo jurídico selecionado",
     certLblResult:"Data resultante",
-    certSec2:"2. MÉTODO UTILIZADO",
     methodMonths:"A data de início é {start}. O sistema soma {amountLabel} pela regra de meses de calendário definida pelo motor e obtém como data resultante {end}.",
     methodDays:"A data de início {start} não é contabilizada. A contagem começa no dia seguinte e continua até completar {amountLabel}. Em dias úteis, excluem-se os dias de descanso semanal e os feriados incorporados ao calendário de referência.",
-    certSec3:"3. RASTREABILIDADE DA CONTAGEM",
     certCalAlt:"Calendário de rastreabilidade do prazo",
-    certSec4:"4. SEQUÊNCIA DA CONTAGEM",
-    certSec5:"5. BASE DA CONTAGEM",
     certTraceLabel:"Rastreabilidade do cálculo",
     certTraceNote:"Código de rastreabilidade: país · data de início · sequencial de uso nesta instalação. O registro analítico conserva também uma impressão técnica dos parâmetros do cálculo.",
     certScope1:"O código acima é gerado a partir dos parâmetros do cálculo e permite conferir a consistência desta representação com esses parâmetros. Não constitui assinatura eletrônica, certificação de autoridade pública nem garantia da procedência jurídica do prazo.",
@@ -7395,6 +7443,28 @@ function buildCertificationSequence(termData){
 }
 
 
+/* Glosario ordenado alfabéticamente según el idioma de salida */
+function buildGlossaryHTML(lang){
+
+  const items=
+    (tr(lang,"glossary")||[])
+      .slice()
+      .sort((a,b)=>
+        a[0].localeCompare(
+          b[0],
+          LOCALES[lang]||LOCALES.es
+        )
+      );
+
+  return items.map(
+    ([term,def])=>`
+      <p class="certification-glossary-item">
+        <strong>${escapeHtml(term)}:</strong> ${escapeHtml(def)}
+      </p>`
+  ).join("");
+}
+
+
 function buildCertificationHTML(termData,includeCalendar=true){
 
   const{
@@ -7465,11 +7535,6 @@ function buildCertificationHTML(termData,includeCalendar=true){
       :"";
 
   return`
-    <div class="certification-brand">
-      <p class="certification-brand-name">TÉRMINO LEGAL</p>
-      <p class="certification-brand-sub">${escapeHtml(tr(lang,"certBrandSub"))}</p>
-    </div>
-
     <h1 class="certification-title">${escapeHtml(tr(lang,"certTitle"))}</h1>
 
     <p class="certification-subtitle">
@@ -7484,11 +7549,6 @@ function buildCertificationHTML(termData,includeCalendar=true){
         <div class="certification-item">
           <span>${escapeHtml(tr(lang,"lblStart"))}</span>
           <strong>${escapeHtml(startText)}</strong>
-        </div>
-
-        <div class="certification-item">
-          <span>${escapeHtml(tr(lang,"certLblEnd"))}</span>
-          <strong>${escapeHtml(endText)}</strong>
         </div>
 
         <div class="certification-item">
@@ -7507,7 +7567,7 @@ function buildCertificationHTML(termData,includeCalendar=true){
         </div>
 
         ${type==="legal" && legalTerm ? `
-        <div class="certification-item">
+        <div class="certification-item full">
           <span>${escapeHtml(tr(lang,"certLblLegalTerm"))}</span>
           <strong>${escapeHtml(legalTerm)}</strong>
         </div>` : ""}
@@ -7520,21 +7580,24 @@ function buildCertificationHTML(termData,includeCalendar=true){
       </div>
     </section>
 
-    <section class="certification-section">
-      <h3>${escapeHtml(tr(lang,"certSec2"))}</h3>
-      <p class="certification-method">${escapeHtml(methodText)}</p>
-    </section>
-
     <section class="certification-section certification-calendar-block">
-      <h3>${escapeHtml(tr(lang,"certSec3"))}</h3>
+      <h3>${escapeHtml(tr(lang,"certSec2"))}</h3>
       ${calendarHtml}
     </section>
 
     <section class="certification-section certification-sequence-section">
-      <h3>${escapeHtml(tr(lang,"certSec4"))}</h3>
+      <h3>${escapeHtml(tr(lang,"certSec3"))}</h3>
       <div class="certification-sequence" style="margin-top:0">
         ${buildCertificationSequence(termData)}
       </div>
+    </section>
+
+    <section class="certification-section">
+      <h3>${escapeHtml(tr(lang,"certSec4"))}</h3>
+      <p class="certification-method">${escapeHtml(methodText)}</p>
+
+      <h4 class="certification-glossary-title">${escapeHtml(tr(lang,"certGlossaryTitle"))}</h4>
+      ${buildGlossaryHTML(lang)}
     </section>
 
     <section class="certification-section">
@@ -7682,7 +7745,7 @@ const SHARE_URL=
 const CALCULATION_SHEET_ENDPOINT=
   "https://script.google.com/macros/s/AKfycbxx6oWsJMDZvQVtf9arU2dBhk62v5TwWjsx1oAmXdVy1R4EZHGy2d3x_C6wwY2rtNwL/exec";
 
-const APP_VERSION="11.1";
+const APP_VERSION="11.2";
 
 /* Mantiene el número de versión mostrado en el resultado
    sincronizado con APP_VERSION. */
