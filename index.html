@@ -654,9 +654,9 @@ body.dark .error{
   flex:1 1 150px;
   height:46px;
   border-radius:10px;
-  background:transparent;
-  border:1.5px solid var(--gold);
-  color:var(--gold);
+  background:var(--navy);
+  border:0;
+  color:var(--btn-text);
   font-weight:700;
   font-size:.72rem;
   letter-spacing:.06em;
@@ -664,9 +664,10 @@ body.dark .error{
 }
 
 .export-btn:hover{
-  background:var(--gold);
+  background:var(--navy);
   color:var(--btn-text);
-  transform:none
+  filter:brightness(1.08);
+  transform:translateY(-1px)
 }
 
 .export-btn svg{
@@ -674,6 +675,59 @@ body.dark .error{
   height:14px;
   vertical-align:-3px;
   margin-right:5px
+}
+
+/* BOTÓN SUTIL DE ASESORÍA (debajo de Guardar PDF / Compartir) */
+.advice-cta{
+  margin-top:14px;
+  padding-top:12px;
+  border-top:1px solid var(--line);
+  text-align:center
+}
+
+.advice-link{
+  width:auto;
+  height:34px;
+  padding:0 14px;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  background:transparent;
+  border:1px solid var(--line);
+  border-radius:999px;
+  color:var(--navy);
+  font-size:.66rem;
+  font-weight:600;
+  letter-spacing:.04em
+}
+
+.advice-link:hover{
+  background:var(--surface-alt);
+  border-color:var(--gold);
+  filter:none;
+  transform:none
+}
+
+.advice-link svg{
+  width:14px;
+  height:14px;
+  color:var(--gold);
+  flex:0 0 auto
+}
+
+/* NOTA INFERIOR (aviso de cálculo + versión), debajo de todas las cajas */
+.result-footnote{
+  margin:16px auto 0;
+  max-width:640px;
+  padding:0 8px;
+  text-align:center
+}
+
+.result-footnote p{
+  margin:0 0 6px;
+  color:var(--muted);
+  font-size:.62rem;
+  line-height:1.6
 }
 
 footer{
@@ -2588,10 +2642,6 @@ body.dark .form-status.is-error{color:#e28b8b}
      class="card result-actions"
      hidden>
 
-  <p class="notice" id="versionNotice">
-    Versión <span id="appVersionLabel">11.2</span> — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.
-  </p>
-
   <div class="export-row">
 
     <button type="button"
@@ -2640,18 +2690,20 @@ body.dark .form-status.is-error{color:#e28b8b}
 
   </div>
 
+  <!-- ASESORÍA (sutil, debajo de Guardar PDF / Compartir) -->
+  <div class="advice-cta">
+    <button type="button" id="findAdviceBtn" class="advice-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="9" cy="8" r="3.5"></circle>
+        <path d="M2.5 20c0-3.6 2.9-6 6.5-6"></path>
+        <circle cx="17" cy="16" r="3"></circle>
+        <path d="M19.2 18.2 22 21"></path>
+      </svg>
+      <span data-i18n="btnAdvice">Encontrar asesoría</span>
+    </button>
+  </div>
+
 </div>
-
-<p class="intro"
-   id="postResultNote"
-   style="margin-top:16px"
-   hidden>
-
-  El cálculo se realiza según el tipo de término seleccionado y la jurisdicción de referencia.
-  Los días hábiles excluyen los días de descanso semanal y los festivos disponibles para esa jurisdicción.
-  Las reglas especiales pueden variar según la materia, autoridad o territorio aplicable.
-
-</p>
 
 <!-- FEEDBACK / PQRS (compacto, todo en una línea) -->
 <div class="feedback-card card" id="feedbackCard" hidden>
@@ -2833,6 +2885,18 @@ body.dark .form-status.is-error{color:#e28b8b}
   </div>
 </div>
 
+<!-- NOTA INFERIOR: aviso de cálculo + versión (debajo de todas las cajas) -->
+<div class="result-footnote" id="postResultNote" hidden>
+  <p id="postNoteText">
+    El cálculo se realiza según el tipo de término seleccionado y la jurisdicción de referencia.
+    Los días hábiles excluyen los días de descanso semanal y los festivos disponibles para esa jurisdicción.
+    Las reglas especiales pueden variar según la materia, autoridad o territorio aplicable.
+  </p>
+  <p id="versionNotice">
+    Versión <span id="appVersionLabel">11.2</span> — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.
+  </p>
+</div>
+
 <footer>
   <span>© 2026 TÉRMINO LEGAL</span>
   <span>Calculador jurídico — versión experimental</span>
@@ -2915,6 +2979,7 @@ const I18N={
     lblType:"Tipo de días",
     btnPdf:"GUARDAR PDF",
     btnShare:"COMPARTIR",
+    btnAdvice:"Encontrar asesoría",
     notice:"Versión {version} — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.",
     postNote:"El cálculo se realiza según el tipo de término seleccionado y la jurisdicción de referencia. Los días hábiles excluyen los días de descanso semanal y los festivos disponibles para esa jurisdicción. Las reglas especiales pueden variar según la materia, autoridad o territorio aplicable.",
     feedbackLabel:"¿Te sirvió?",
@@ -2976,6 +3041,7 @@ const I18N={
     lblType:"Tipo de dias",
     btnPdf:"SALVAR PDF",
     btnShare:"COMPARTILHAR",
+    btnAdvice:"Encontrar assessoria",
     notice:"Versão {version} — motor de cálculo com calendário de referência por jurisdição, validação de datas e limites de intervalo. Os feriados afetam apenas a contagem de dias úteis.",
     postNote:"O cálculo é feito conforme o tipo de prazo selecionado e a jurisdição de referência. Os dias úteis excluem os dias de descanso semanal e os feriados disponíveis para essa jurisdição. As regras especiais podem variar conforme a matéria, a autoridade ou o território aplicável.",
     feedbackLabel:"Foi útil?",
@@ -3102,7 +3168,7 @@ function applyOutputLanguage(lang){
       tr(lang,"notice",{version:APP_VERSION});
 
   const post=
-    document.getElementById("postResultNote");
+    document.getElementById("postNoteText");
 
   if(post)
     post.textContent=
@@ -6295,6 +6361,33 @@ openProfessionalsBtn?.addEventListener("click",()=>{
     {origen:"icono"}
   );
   openProfessionalsDirectory();
+});
+
+/* Botón sutil "Encontrar asesoría" (debajo de Guardar PDF / Compartir).
+   Si el cálculo fue con un término frecuente, abre el directorio ya
+   filtrado por la materia de ese término. */
+document.getElementById("findAdviceBtn")?.addEventListener("click",()=>{
+
+  const info=
+    (lastTermData?.type==="legal" && selectedLegalTerm)
+      ?flattenLegalTerms().find(x=>x.term===selectedLegalTerm)
+      :null;
+
+  trackEvent(
+    "profesionales_abrir",
+    {
+      origen:"resultado",
+      termino:info?selectedLegalTerm:"",
+      materia:categoryToMarket(info?.categoryName)
+    },
+    lastTermData
+  );
+
+  openProfessionalsDirectory(
+    categoryToMarket(info?.categoryName),
+    info?.categoryName||""
+  );
+
 });
 
 closeProfessionalsBtn?.addEventListener(
