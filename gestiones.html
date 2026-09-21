@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Gestiones en Término Legal</title>
+
+<style>
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+
+:root{
+  --navy:#10243e; --gold:#b9964f; --ink:#17202b; --muted:#687383; --line:#e4e8ed;
+  --bg:#f7f8fa; --surface:#fff; --surface-alt:#f3f5f8; --input-bg:#fff; --input-border:#ccd3dc;
+  --btn-text:#fff; --shadow:rgba(16,36,62,.07); --ok:#1f7a4d; --ok-bg:#e8f4ee; --warn:#8a5a00;
+  --warn-bg:#fbf1dc; --bad:#a12a2a; --bad-bg:#fbeaea;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --navy:#c9d6e8; --gold:#d8b877; --ink:#eef1f5; --muted:#95a1b0; --line:#2a3546; --bg:#0b1220;
+    --surface:#111a2c; --surface-alt:#0e1626; --input-bg:#0e1626; --input-border:#2a3546;
+    --btn-text:#0b1220; --shadow:rgba(0,0,0,.35); --ok:#6fcf9b; --ok-bg:#12281d; --warn:#e6b85c;
+    --warn-bg:#2a2110; --bad:#e28b8b; --bad-bg:#2b1616;
+  }
+}
+
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5;
+  padding-bottom:env(safe-area-inset-bottom)}
+.app{width:min(760px,94%);margin:0 auto;padding:28px 0 60px}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-name{font-weight:700;letter-spacing:.14em;font-size:1.05rem;color:var(--navy);margin:0}
+.brand-name span{color:var(--gold)}
+.back{font-size:.78rem;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--navy);text-decoration:underline}
+
+h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.7rem,6vw,2.3rem);line-height:1.15;
+  color:var(--navy);margin:26px 0 8px}
+.intro{color:var(--muted);font-size:.95rem;margin:0 0 18px;max-width:560px}
+h2{font-family:Georgia,"Times New Roman",serif;font-size:1.25rem;color:var(--navy);margin:0 0 4px}
+h3{font-family:Georgia,"Times New Roman",serif;font-size:1.08rem;color:var(--navy);margin:0 0 3px}
+.muted{color:var(--muted);font-size:.84rem;margin:0}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;
+  box-shadow:0 10px 30px var(--shadow);padding:20px;margin-bottom:14px}
+
+/* Comunidad de la zona */
+.zone{background:var(--surface-alt);border:1px solid var(--line);border-left:3px solid var(--gold);
+  border-radius:12px;padding:14px 16px;margin-bottom:16px}
+.zone-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.zone strong{display:block;color:var(--navy);font-size:.92rem}
+.zone-stats{display:flex;gap:6px 14px;flex-wrap:wrap;margin-top:6px;font-size:.82rem;color:var(--ink)}
+.zone-stats b{color:var(--navy)}
+
+/* Tabs */
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--input-border);border-radius:12px;
+  overflow:hidden;margin-bottom:14px;background:var(--surface)}
+.seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:.88rem;font-weight:600;
+  min-height:48px;cursor:pointer;padding:0 8px}
+.seg button[aria-pressed="true"]{background:var(--navy);color:var(--btn-text)}
+.sub{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.chipbtn{border:1px solid var(--input-border);background:var(--surface);color:var(--muted);border-radius:999px;
+  font:inherit;font-size:.8rem;font-weight:600;padding:8px 14px;cursor:pointer;min-height:38px}
+.chipbtn[aria-pressed="true"]{border-color:var(--gold);color:var(--navy);background:var(--surface-alt)}
+
+/* Formularios */
+label{display:block;font-size:.84rem;font-weight:600;color:var(--navy);margin:14px 0 6px}
+input[type=text],input[type=email],input[type=tel],input[type=number],input[type=datetime-local],select,textarea{
+  width:100%;min-height:46px;border:1px solid var(--input-border);border-radius:10px;padding:0 12px;
+  font:inherit;font-size:1rem;color:var(--ink);background:var(--input-bg)}
+textarea{padding:10px 12px;min-height:84px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid rgba(185,150,79,.3);border-color:var(--gold)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.grid2{grid-template-columns:1fr}}
+.hint{font-size:.72rem;color:var(--muted);margin:5px 0 0}
+.check{display:flex;gap:9px;align-items:flex-start;font-weight:500;font-size:.75rem;color:var(--muted);margin-top:14px}
+.check input{margin-top:3px;flex:0 0 auto}
+.tipos{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}
+@media(max-width:520px){.tipos{grid-template-columns:1fr}}
+.tipos label{display:flex;gap:8px;align-items:center;font-weight:500;font-size:.8rem;margin:0;color:var(--ink)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+button.primary,button.secondary,button.link{font:inherit;cursor:pointer}
+.primary{width:100%;min-height:50px;border:0;border-radius:12px;background:var(--navy);color:var(--btn-text);
+  font-weight:700;letter-spacing:.05em;font-size:.88rem;margin-top:18px}
+.primary:hover{filter:brightness(1.08)}
+.primary:disabled{opacity:.55;cursor:wait}
+.secondary{min-height:40px;border:1px solid var(--input-border);border-radius:10px;background:transparent;
+  color:var(--navy);font-weight:600;font-size:.8rem;padding:0 14px}
+.secondary:hover{border-color:var(--gold)}
+.btn-sm{min-height:38px;border:0;border-radius:9px;background:var(--navy);color:var(--btn-text);font-weight:700;
+  font-size:.75rem;padding:0 14px;cursor:pointer;letter-spacing:.03em}
+.btn-sm:disabled{opacity:.55;cursor:wait}
+.link{background:none;border:0;color:var(--navy);text-decoration:underline;font-size:.8rem;padding:6px 0;
+  margin-top:6px;cursor:pointer}
+
+/* Tarjeta de gestión: mismo lenguaje visual que el calculador */
+.gx{display:grid;grid-template-columns:62px 1fr;gap:14px;background:var(--surface);border:1px solid var(--line);
+  border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 6px 18px var(--shadow)}
+.tile{background:var(--navy);color:var(--btn-text);border-radius:10px;text-align:center;padding:9px 0 8px;
+  align-self:start}
+.tile .d{display:block;font-family:Georgia,serif;font-size:1.7rem;line-height:1;font-weight:700}
+.tile .m{display:block;font-size:.72rem;margin-top:3px;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+.meta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.88rem;font-weight:600;margin:7px 0;color:var(--ink)}
+.price{color:var(--navy);font-family:Georgia,serif;font-size:1.05rem}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.chip{font-size:.72rem;font-weight:600;background:var(--surface-alt);border:1px solid var(--line);
+  border-radius:999px;padding:2px 10px;color:var(--muted)}
+.chip.ok{background:var(--ok-bg);color:var(--ok);border-color:transparent}
+.chip.warn{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+.chip.bad{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+.counter{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px;padding:12px;background:var(--surface-alt);
+  border-radius:10px}
+.offer{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:10px 0;
+  border-top:1px solid var(--line)}
+.offer strong{color:var(--navy);font-size:.88rem}
+.msg{font-size:.78rem;font-style:italic;color:var(--muted);margin:3px 0 0}
+.contact{background:var(--ok-bg);color:var(--ok);border-radius:10px;padding:11px 13px;margin-top:10px;font-size:.85rem}
+.contact a{color:inherit;font-weight:700}
+.empty{border:1px dashed var(--input-border);border-radius:14px;padding:22px 16px;text-align:center;
+  color:var(--muted);font-size:.86rem}
+.notice{font-size:.8rem;border-radius:10px;padding:10px 12px;margin:0 0 14px}
+.notice.warn{background:var(--warn-bg);color:var(--warn)}
+.notice.bad{background:var(--bad-bg);color:var(--bad)}
+.foot{font-size:.68rem;color:var(--muted);margin-top:26px;line-height:1.6}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);
+  background:var(--navy);color:var(--btn-text);padding:11px 18px;border-radius:12px;font-size:.85rem;
+  max-width:92vw;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50}
+#toast.show{opacity:1}
+#toast.err{background:#a12a2a;color:#fff}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <div class="top">
+    <div class="brand-name">TÉRMINO <span>LEGAL</span></div>
+    <a class="back" href="index.html">Volver al calculador</a>
+  </div>
+
+  <h1>Gestiones cerca de ti</h1>
+  <p class="intro">Publica la diligencia que necesitas con tu oferta de pago. Abogados, judicantes y estudiantes de derecho de la zona la ven y aceptan, o proponen otro valor.</p>
+
+  <div class="zone" id="zone" aria-live="polite"></div>
+
+  <div class="seg" role="group" aria-label="Qué quieres hacer">
+    <button type="button" id="roleNeed">Necesito una gestión</button>
+    <button type="button" id="roleTake">Quiero tomar gestiones</button>
+  </div>
+
+  <main id="view"></main>
+
+  <p class="foot">
+    Término Legal conecta personas; no presta asesoría jurídica ni garantiza el resultado de las gestiones.
+    Quien contrata es responsable de otorgar el poder o la sustitución que la diligencia exija y de verificar
+    que quien la atienda pueda actuar en ella. Los datos de contacto solo se comparten entre las dos partes
+    cuando una oferta es aceptada.
+  </p>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =========================================================
+   CONFIGURACIÓN
+   ========================================================= */
+const ENDPOINT="https://script.google.com/macros/s/AKfycbxx6oWsJMDZvQVtf9arU2dBhk62v5TwWjsx1oAmXdVy1R4EZHGy2d3x_C6wwY2rtNwL/exec";
+
+/* Países activos. Mantener igual que GX_ENABLED en gestiones_backend.gs */
+const ENABLED=["CO"];
+
+const COUNTRIES={
+  CO:{name:"Colombia",cur:"COP",dial:"57",locale:"es-CO"},
+  MX:{name:"México",cur:"MXN",dial:"52",locale:"es-MX"},
+  AR:{name:"Argentina",cur:"ARS",dial:"54",locale:"es-AR"},
+  CL:{name:"Chile",cur:"CLP",dial:"56",locale:"es-CL"},
+  PE:{name:"Perú",cur:"PEN",dial:"51",locale:"es-PE"},
+  EC:{name:"Ecuador",cur:"USD",dial:"593",locale:"es-EC"},
+  BO:{name:"Bolivia",cur:"BOB",dial:"591",locale:"es-BO"},
+  PY:{name:"Paraguay",cur:"PYG",dial:"595",locale:"es-PY"},
+  UY:{name:"Uruguay",cur:"UYU",dial:"598",locale:"es-UY"},
+  CR:{name:"Costa Rica",cur:"CRC",dial:"506",locale:"es-CR"},
+  GT:{name:"Guatemala",cur:"GTQ",dial:"502",locale:"es-GT"},
+  HN:{name:"Honduras",cur:"HNL",dial:"504",locale:"es-HN"},
+  SV:{name:"El Salvador",cur:"USD",dial:"503",locale:"es-SV"},
+  NI:{name:"Nicaragua",cur:"NIO",dial:"505",locale:"es-NI"},
+  PA:{name:"Panamá",cur:"USD",dial:"507",locale:"es-PA"},
+  DO:{name:"República Dominicana",cur:"DOP",dial:"1",locale:"es-DO"},
+  VE:{name:"Venezuela",cur:"USD",dial:"58",locale:"es-VE"},
+  BR:{name:"Brasil",cur:"BRL",dial:"55",locale:"pt-BR"}
+};
+
+const TIPOS={
+  secuestro:"Diligencia de secuestro",
+  radicacion:"Radicación de documentos",
+  entrega:"Diligencia de entrega",
+  audiencia:"Audiencia",
+  revision_expediente:"Revisión de expediente",
+  tramite_entidad:"Trámite ante entidad",
+  accidente_transito:"Asistencia en accidente de tránsito",
+  avaluo_catastral:"Avalúo catastral",
+  asistencia_dia:"Colaborador por el día",
+  otro:"Otra gestión"
+};
+const ROLES={
+  abogado:"Abogado(a)",
+  judicante:"Judicante",
+  estudiante:"Estudiante de derecho",
+  dependiente:"Dependiente / tramitador"
+};
+const PAY={
+  cuenta_cobro:"Cuenta de cobro",
+  efectivo:"Efectivo",
+  transferencia:"Transferencia",
+  a_convenir:"Forma de pago a convenir"
+};
+const STATUS={abierta:"Buscando",asignada:"Asignada",cumplida:"Cumplida",cancelada:"Cancelada",vencida:"Vencida"};
+const OFFER_STATUS={pendiente:"Pendiente",aceptada:"Aceptada",rechazada:"No elegida"};
+const MONTHS=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+
+const ERRORS={
+  invalid:"Revisa los datos: hay campos incompletos o no válidos.",
+  consent:"Debes autorizar el tratamiento de tus datos para continuar.",
+  duplicate:"Ese correo ya está registrado desde otro dispositivo.",
+  unauthorized:"No reconocemos tu perfil en este dispositivo.",
+  not_found:"Esa gestión u oferta ya no está disponible.",
+  not_verified:"Tu perfil aún está en verificación. Cuando lo aprobemos podrás ver solicitudes.",
+  rate_limited:"Demasiadas solicitudes seguidas. Espera un momento.",
+  country:"Todavía no operamos en ese país.",
+  limit:"Ya tienes 10 solicitudes abiertas. Cierra alguna antes de publicar otra.",
+  network:"No pudimos conectar. Revisa tu conexión e intenta de nuevo.",
+  server:"Algo falló de nuestro lado. Intenta de nuevo en un momento."
+};
+
+/* =========================================================
+   UTILIDADES
+   ========================================================= */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const r2=n=>Math.round(n*100)/100;
+const field=(f,n)=>f.elements[n];   /* evita choques con propiedades del form (name, role) */
+
+const store={
+  get(k){try{return localStorage.getItem(k)}catch{return null}},
+  set(k,v){try{localStorage.setItem(k,v)}catch{}}
+};
+
+function randomToken(){
+  const a=new Uint8Array(24);
+  if(window.crypto&&crypto.getRandomValues)crypto.getRandomValues(a);
+  else a.forEach((_,i)=>a[i]=Math.floor(Math.random()*256));
+  return [...a].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+function persistentToken(key){
+  let t=store.get(key);
+  if(!t||t.length<24){t=randomToken();store.set(key,t)}
+  return t;
+}
+const requesterToken=()=>persistentToken("tl_gx_rtok");
+const providerToken=()=>persistentToken("tl_gx_ptok");
+
+function visitorId(){
+  let v=store.get("TL_ANON_VISITOR_ID");
+  if(!v){v=randomToken().slice(0,32);store.set("TL_ANON_VISITOR_ID",v)}
+  return v;
+}
+
+let toastTimer;
+function toast(msg,err){
+  const t=$("#toast");
+  t.textContent=msg;
+  t.className="show"+(err?" err":"");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{t.className=""},4500);
+}
+const errText=code=>ERRORS[code]||ERRORS.server;
+
+async function api(action,data={}){
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),25000);
+  try{
+    const res=await fetch(ENDPOINT,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({action,visitor_id:visitorId(),...data}),
+      signal:ctrl.signal
+    });
+    const json=await res.json();
+    return json&&typeof json==="object"?json:{ok:false,error:"server"};
+  }catch{
+    return {ok:false,error:"network"};
+  }finally{clearTimeout(timer)}
+}
+
+function money(n,cur,country){
+  const c=COUNTRIES[country||ENABLED[0]]||COUNTRIES.CO;
+  try{
+    return new Intl.NumberFormat(c.locale,{style:"currency",currency:cur||c.cur,maximumFractionDigits:0}).format(n);
+  }catch{return `${cur||""} ${Number(n).toLocaleString()}`}
+}
+
+function tile(iso){
+  const d=new Date(iso);
+  return `<div class="tile" aria-hidden="true"><span class="d">${d.getDate()}</span><span class="m">${MONTHS[d.getMonth()]}</span></div>`;
+}
+function whenText(iso){
+  const d=new Date(iso);
+  return d.toLocaleDateString("es-CO",{weekday:"long",day:"numeric",month:"long"})+
+         ", "+d.toLocaleTimeString("es-CO",{hour:"numeric",minute:"2-digit"});
+}
+function timeText(iso){
+  return new Date(iso).toLocaleTimeString("es-CO",{hour:"numeric",minute:"2-digit"});
+}
+function localNow(){
+  const d=new Date(),p=n=>String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+/* Deja el número listo para WhatsApp (con indicativo del país). */
+function toE164(country,input){
+  const dial=(COUNTRIES[country]||COUNTRIES.CO).dial;
+  let d=String(input||"").replace(/\D/g,"");
+  if(d.startsWith("00"))d=d.slice(2);
+  if(d.length<=10)d=dial+d;
+  return d;
+}
+function waLink(phone,text){
+  return `https://wa.me/${encodeURIComponent(phone)}${text?`?text=${encodeURIComponent(text)}`:""}`;
+}
+
+function setBusy(btn,busy,label){
+  if(!btn)return;
+  if(busy){btn.dataset.label=btn.textContent;btn.textContent=label||"ENVIANDO…";btn.disabled=true}
+  else{btn.textContent=btn.dataset.label||btn.textContent;btn.disabled=false}
+}
+
+/* =========================================================
+   UBICACIÓN
+   La ubicación se redondea a ~1 km antes de salir del dispositivo.
+   ========================================================= */
+function getPosition(){
+  return new Promise((resolve,reject)=>{
+    if(!navigator.geolocation)return reject(new Error("unsupported"));
+    navigator.geolocation.getCurrentPosition(
+      p=>resolve(p.coords),
+      err=>reject(err),
+      {enableHighAccuracy:false,timeout:12000,maximumAge:600000}
+    );
+  });
+}
+
+async function reverseGeocode(lat,lng){
+  try{
+    const r=await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=es`);
+    const j=await r.json();
+    return {city:j.city||j.locality||"",dept:j.principalSubdivision||"",country:j.countryCode||""};
+  }catch{return null}
+}
+
+async function forwardGeocode(city,dept,cc){
+  const q=[city,dept,(COUNTRIES[cc]||{}).name].filter(Boolean).join(", ");
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&accept-language=es&countrycodes=${cc.toLowerCase()}&q=${encodeURIComponent(q)}`);
+    const j=await r.json();
+    if(j&&j[0])return {lat:r2(parseFloat(j[0].lat)),lng:r2(parseFloat(j[0].lon))};
+  }catch{}
+  return null;
+}
+
+/* Detecta dónde está la persona y devuelve {lat,lng,city,dept,country} */
+async function detectPlace(){
+  let c;
+  try{c=await getPosition()}
+  catch(e){
+    toast(e&&e.code===1?"Sin permiso de ubicación. Puedes escribir el municipio a mano.":"No pudimos obtener tu ubicación. Escribe el municipio a mano.",true);
+    return null;
+  }
+  const lat=r2(c.latitude),lng=r2(c.longitude);
+  const rev=await reverseGeocode(lat,lng);
+  const place={lat,lng,city:(rev&&rev.city)||"",dept:(rev&&rev.dept)||"",country:((rev&&rev.country)||"").toUpperCase()};
+  if(place.country&&!ENABLED.includes(place.country)){
+    toast(`Aún no operamos en ${(COUNTRIES[place.country]||{}).name||place.country}.`,true);
+    return null;
+  }
+  if(!place.country)place.country=ENABLED[0];
+  return place;
+}
+
+/* =========================================================
+   ESTADO Y ARRANQUE
+   ========================================================= */
+const S={
+  role:store.get("tl_gx_role")==="take"?"take":"need",
+  needSub:"new",
+  takeSub:"near",
+  loc:null,
+  provider:null,
+  offers:[],
+  timer:null,
+  _refresh:null
+};
+try{S.loc=JSON.parse(store.get("tl_gx_loc")||"null")}catch{}
+
+function saveLoc(place){
+  S.loc=place;
+  store.set("tl_gx_loc",JSON.stringify(place));
+}
+
+function render(){
+  clearInterval(S.timer);
+  $("#roleNeed").setAttribute("aria-pressed",String(S.role==="need"));
+  $("#roleTake").setAttribute("aria-pressed",String(S.role==="take"));
+  renderZone();
+  S.role==="need"?renderNeed():renderTake();
+}
+
+$("#roleNeed").onclick=()=>{S.role="need";store.set("tl_gx_role","need");render()};
+$("#roleTake").onclick=()=>{S.role="take";store.set("tl_gx_role","take");render()};
+
+/* Sondeo periódico (solo con la pestaña visible) para que se sienta en vivo */
+function poll(fn,ms){
+  clearInterval(S.timer);
+  S.timer=setInterval(()=>{if(!document.hidden)fn()},ms);
+}
+document.addEventListener("visibilitychange",()=>{
+  if(!document.hidden&&S._refresh)S._refresh();
+});
+
+/* =========================================================
+   COMUNIDAD DE LA ZONA
+   ========================================================= */
+async function renderZone(){
+  const el=$("#zone");
+  if(!S.loc){
+    el.innerHTML=`<div class="zone-row">
+      <div><strong>Comunidad de tu zona</strong>
+      <span class="muted">Detecta tu ubicación para ver cuántos profesionales y gestiones hay cerca.</span></div>
+      <button type="button" class="btn-sm" id="detectZone">DETECTAR MI ZONA</button></div>`;
+    $("#detectZone").onclick=onDetectZone;
+    return;
+  }
+  el.innerHTML=`<span class="muted">Consultando tu zona…</span>`;
+  const res=await api("gx_zone_stats",{country:S.loc.country,city:S.loc.city,lat:S.loc.lat,lng:S.loc.lng});
+  if(!res.ok){
+    el.innerHTML=`<div class="zone-row"><div><strong>Comunidad de ${esc(S.loc.city||"tu zona")}</strong>
+      <span class="muted">No pudimos cargar los datos de la zona.</span></div>
+      <button type="button" class="btn-sm" id="detectZone">ACTUALIZAR</button></div>`;
+    $("#detectZone").onclick=onDetectZone;
+    return;
+  }
+  const roles=Object.entries(res.providers.by_role||{})
+    .map(([k,v])=>`${v} ${esc((ROLES[k]||k).toLowerCase())}`).join(", ");
+  el.innerHTML=`<div class="zone-row">
+    <div>
+      <strong>Comunidad de ${esc(S.loc.city||"tu zona")}${S.loc.dept?`, ${esc(S.loc.dept)}`:""}</strong>
+      <div class="zone-stats">
+        <span><b>${res.providers.total}</b> ${res.providers.total===1?"profesional cubre":"profesionales cubren"} tu zona${res.providers.verified?` (${res.providers.verified} verificados)`:""}</span>
+        <span><b>${res.open_gestiones}</b> ${res.open_gestiones===1?"gestión abierta":"gestiones abiertas"} a menos de 50 km</span>
+      </div>
+      ${roles?`<p class="muted" style="margin-top:4px">${roles}</p>`:""}
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      ${res.group_url?`<a class="btn-sm" style="display:inline-flex;align-items:center;text-decoration:none" href="${esc(res.group_url)}" target="_blank" rel="noopener noreferrer">UNIRME AL GRUPO</a>`:""}
+      <button type="button" class="secondary" id="detectZone">Cambiar zona</button>
+    </div>
+  </div>`;
+  $("#detectZone").onclick=onDetectZone;
+}
+
+async function onDetectZone(){
+  const btn=$("#detectZone");
+  setBusy(btn,true,"BUSCANDO…");
+  const place=await detectPlace();
+  setBusy(btn,false);
+  if(place){saveLoc(place);renderZone()}
+}
+
+/* =========================================================
+   NECESITO UNA GESTIÓN
+   ========================================================= */
+function renderNeed(){
+  clearInterval(S.timer);
+  const v=$("#view");
+  v.innerHTML=`
+    <div class="sub">
+      <button type="button" class="chipbtn" id="subNew">Nueva solicitud</button>
+      <button type="button" class="chipbtn" id="subMine">Mis solicitudes</button>
+    </div>
+    <div id="needBody"></div>`;
+  $("#subNew").setAttribute("aria-pressed",String(S.needSub==="new"));
+  $("#subMine").setAttribute("aria-pressed",String(S.needSub==="mine"));
+  $("#subNew").onclick=()=>{S.needSub="new";renderNeed()};
+  $("#subMine").onclick=()=>{S.needSub="mine";renderNeed()};
+  S.needSub==="new"?renderNeedForm():renderMine();
+}
+
+function renderNeedForm(){
+  S._refresh=null;
+  const country=(S.loc&&ENABLED.includes(S.loc.country))?S.loc.country:ENABLED[0];
+  const cur=COUNTRIES[country].cur;
+  $("#needBody").innerHTML=`
+  <form id="needForm" class="card" novalidate>
+    <h2>¿Qué gestión necesitas?</h2>
+    <p class="muted">Cuéntanos qué, dónde y cuánto ofreces. La ven quienes cubren ese municipio.</p>
+
+    <label for="tipo">Tipo de gestión</label>
+    <select id="tipo" name="tipo">${Object.entries(TIPOS).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select>
+
+    <label for="entidad">Despacho o entidad <span class="muted">(opcional)</span></label>
+    <input id="entidad" name="entidad" type="text" maxlength="120" placeholder="Ej.: Inspección de Policía de Cota">
+
+    ${ENABLED.length>1?`<label for="country">País</label>
+    <select id="country" name="country">${ENABLED.map(c=>`<option value="${c}" ${c===country?"selected":""}>${COUNTRIES[c].name}</option>`).join("")}</select>`
+    :`<input type="hidden" name="country" value="${country}">`}
+
+    <div class="grid2">
+      <div><label for="city">Municipio donde se hace</label>
+        <input id="city" name="city" type="text" maxlength="80" required autocomplete="off" placeholder="Ej.: Samacá" value="${esc((S.loc&&S.loc.city)||"")}"></div>
+      <div><label for="dept">Departamento</label>
+        <input id="dept" name="dept" type="text" maxlength="80" autocomplete="off" placeholder="Ej.: Boyacá" value="${esc((S.loc&&S.loc.dept)||"")}"></div>
+    </div>
+    <input type="hidden" name="lat" value="${S.loc&&S.loc.city?S.loc.lat:""}">
+    <input type="hidden" name="lng" value="${S.loc&&S.loc.city?S.loc.lng:""}">
+    <button type="button" class="link" id="useHere">Estoy en el lugar: usar mi ubicación</button>
+    <p class="hint" id="geoHint"></p>
+
+    <div class="grid2">
+      <div><label for="when">Fecha y hora</label>
+        <input id="when" name="when" type="datetime-local" required min="${localNow()}"></div>
+      <div><label for="price">Tu oferta en ${cur}</label>
+        <input id="price" name="price" type="number" inputmode="numeric" min="1" step="1000" required placeholder="130000"></div>
+    </div>
+
+    <div class="grid2">
+      <div><label for="pay">Forma de pago</label>
+        <select id="pay" name="pay_method">${Object.entries(PAY).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select></div>
+      <div><label for="requires">Quién puede atenderla</label>
+        <select id="requires" name="requires">
+          <option value="cualquiera">Abogado, judicante o estudiante</option>
+          <option value="abogado">Solo abogado(a)</option>
+        </select></div>
+    </div>
+
+    <label for="details">Detalles <span class="muted">(opcional)</span></label>
+    <textarea id="details" name="details" maxlength="500" placeholder="Qué hay que llevar o hacer. Sin números de proceso ni datos sensibles."></textarea>
+
+    <div class="grid2">
+      <div><label for="name">Tu nombre</label>
+        <input id="name" name="name" type="text" maxlength="100" required autocomplete="name" value="${esc(store.get("tl_gx_name")||"")}"></div>
+      <div><label for="contact">Tu WhatsApp</label>
+        <input id="contact" name="contact" type="tel" inputmode="tel" required autocomplete="tel" placeholder="3001234567" value="${esc(store.get("tl_gx_contact")||"")}"></div>
+    </div>
+    <p class="hint">Tu contacto solo se comparte con la persona cuyo ofrecimiento aceptes.</p>
+
+    <div class="hp" aria-hidden="true"><label>Sitio web<input name="website" tabindex="-1" autocomplete="off"></label></div>
+
+    <label class="check"><input type="checkbox" name="consent" required>
+      <span>Autorizo el tratamiento de mis datos personales para conectar esta solicitud con profesionales de la zona, conforme a la política de tratamiento de datos.</span></label>
+
+    <button class="primary" type="submit">PUBLICAR SOLICITUD</button>
+  </form>`;
+
+  const f=$("#needForm");
+  $("#useHere").onclick=async()=>{
+    const b=$("#useHere");
+    b.disabled=true;b.textContent="Buscando tu ubicación…";
+    const p=await detectPlace();
+    b.disabled=false;b.textContent="Estoy en el lugar: usar mi ubicación";
+    if(!p)return;
+    field(f,"city").value=p.city;field(f,"dept").value=p.dept;
+    field(f,"lat").value=p.lat;field(f,"lng").value=p.lng;
+    saveLoc(p);renderZone();
+    $("#geoHint").textContent="Ubicación aproximada aplicada. Corrige el municipio si no coincide.";
+  };
+  /* Si el usuario edita el municipio a mano, las coordenadas viejas ya no sirven */
+  ["city","dept"].forEach(n=>field(f,n).addEventListener("input",()=>{
+    field(f,"lat").value="";field(f,"lng").value="";
+  }));
+  f.onsubmit=submitNeed;
+}
+
+async function submitNeed(e){
+  e.preventDefault();
+  const f=e.target,btn=f.querySelector("button[type=submit]");
+  const v=n=>field(f,n).value;
+  const country=v("country");
+  const city=v("city").trim(),dept=v("dept").trim();
+  if(city.length<2)return toast("Escribe el municipio donde se hace la gestión.",true);
+  if(!v("when"))return toast("Indica la fecha y la hora.",true);
+  const when=new Date(v("when"));
+  if(isNaN(when)||when<=new Date())return toast("La fecha y la hora deben ser futuras.",true);
+  if(!(Number(v("price"))>0))return toast("Indica cuánto ofreces.",true);
+  if(!v("name").trim()||!v("contact").trim())return toast("Falta tu nombre o tu WhatsApp.",true);
+  if(!field(f,"consent").checked)return toast(ERRORS.consent,true);
+
+  setBusy(btn,true,"PUBLICANDO…");
+  let lat=v("lat"),lng=v("lng");
+  if(!lat||!lng){
+    const g=await forwardGeocode(city,dept,country);
+    if(g){lat=g.lat;lng=g.lng}
+  }
+  const res=await api("gx_create_gestion",{
+    token:requesterToken(),country,city,dept,lat,lng,
+    tipo:v("tipo"),entidad:v("entidad").trim(),when:when.toISOString(),
+    price:Number(v("price")),pay_method:v("pay_method"),requires:v("requires"),
+    details:v("details").trim(),name:v("name").trim(),
+    contact:toE164(country,v("contact")),consent:true,website:v("website")
+  });
+  setBusy(btn,false);
+  if(!res.ok)return toast(errText(res.error),true);
+
+  store.set("tl_gx_name",v("name").trim());
+  store.set("tl_gx_contact",v("contact").trim());
+  toast(lat
+    ?"Solicitud publicada. Aquí verás las ofertas en cuanto lleguen."
+    :"Solicitud publicada. No pudimos ubicar el municipio en el mapa; la verán quienes lo tengan en su zona por nombre.");
+  S.needSub="mine";
+  renderNeed();
+}
+
+async function renderMine(){
+  const body=$("#needBody");
+  body.innerHTML=`<div class="empty">Cargando tus solicitudes…</div>`;
+  const load=async silent=>{
+    const res=await api("gx_my_gestiones",{token:requesterToken()});
+    if(S.role!=="need"||S.needSub!=="mine")return;
+    const box=$("#needBody");
+    if(!box)return;
+    if(!res.ok){if(!silent)box.innerHTML=`<div class="notice bad">${esc(errText(res.error))}</div>`;return}
+    box.innerHTML=res.items.length
+      ?res.items.map(mineCard).join("")
+      :`<div class="empty">Todavía no has publicado solicitudes.<br>Cuando lo hagas, aquí verás las ofertas en vivo.</div>`;
+  };
+  S._refresh=()=>load(true);
+  await load(false);
+  poll(()=>load(true),20000);
+}
+
+function statusChip(s){
+  const cls=s==="asignada"||s==="cumplida"?"ok":(s==="cancelada"||s==="vencida"?"bad":"warn");
+  return `<span class="chip ${cls}">${STATUS[s]||s}</span>`;
+}
+
+function mineCard(g){
+  const pending=g.offers.filter(o=>o.status==="pendiente");
+  let inner="";
+
+  if(g.status==="abierta"){
+    inner+=pending.length
+      ?`<p class="muted" style="margin-top:10px"><b>${pending.length}</b> ${pending.length===1?"oferta":"ofertas"} para tu solicitud</p>`+
+        pending.slice().sort((a,b)=>a.price-b.price).map(o=>`
+        <div class="offer">
+          <div>
+            <strong>${esc(o.provider.name||"Profesional")}</strong>
+            <span class="chip">${esc(ROLES[o.provider.role]||o.provider.role||"")}</span>
+            ${o.provider.verified?`<span class="chip ok">Verificado</span>`:""}
+            <div class="muted">${o.provider.distance_km!=null?`A ${o.provider.distance_km} km del lugar. `:""}<b class="price" style="font-size:.95rem">${money(o.price,g.currency)}</b></div>
+            ${o.message?`<p class="msg">${esc(o.message)}</p>`:""}
+          </div>
+          <button type="button" class="btn-sm" data-act="accept" data-g="${g.id}" data-o="${o.id}">ACEPTAR</button>
+        </div>`).join("")
+      :`<p class="muted" style="margin-top:10px">Esperando ofertas de profesionales de la zona…</p>`;
+    inner+=`<div class="actions"><button type="button" class="secondary" data-act="cancel" data-g="${g.id}">Cancelar solicitud</button></div>`;
+  }
+
+  if((g.status==="asignada"||g.status==="cumplida")&&g.accepted){
+    const a=g.accepted;
+    const msg=`Hola ${a.name}, te escribo por la gestión de ${TIPOS[g.tipo].toLowerCase()} en ${g.city} el ${whenText(g.when)}, coordinada por Término Legal.`;
+    inner+=`<div class="contact">
+      <b>${esc(a.name)}</b> (${esc(ROLES[a.role]||a.role)}) aceptó por ${money(g.agreed_price!=null?g.agreed_price:g.price,g.currency)}.<br>
+      <a href="${waLink(a.phone,msg)}" target="_blank" rel="noopener noreferrer">Escribir por WhatsApp</a>
+      ${a.email?` &nbsp;${esc(a.email)}`:""}</div>`;
+    if(g.status==="asignada")inner+=`<div class="actions">
+      <button type="button" class="btn-sm" data-act="done" data-g="${g.id}">MARCAR COMO CUMPLIDA</button>
+      <button type="button" class="secondary" data-act="cancel" data-g="${g.id}">Cancelar</button></div>`;
+  }
+
+  return `<article class="gx">${tile(g.when)}<div>
+    <h3>${esc(TIPOS[g.tipo])}</h3>
+    <p class="muted">${esc(g.entidad||"Entidad por definir")}<br>${esc(g.city)}${g.dept?`, ${esc(g.dept)}`:""}</p>
+    <p class="meta"><span>${esc(timeText(g.when))}</span><span class="price">${money(g.price,g.currency)}</span></p>
+    <div class="chips">${statusChip(g.status)}${g.requires==="abogado"?`<span class="chip">Solo abogado(a)</span>`:""}</div>
+    ${inner}</div></article>`;
+}
+
+/* =========================================================
+   ACCIONES (delegación de eventos para ambas vistas)
+   ========================================================= */
+$("#view").addEventListener("click",async e=>{
+  const b=e.target.closest("[data-act]");
+  if(!b)return;
+  const act=b.dataset.act;
+
+  if(act==="accept"){
+    if(!confirm("¿Aceptar esta oferta? Se compartirá tu contacto con esta persona."))return;
+    b.disabled=true;
+    const res=await api("gx_accept_offer",{token:requesterToken(),gestion_id:b.dataset.g,offer_id:b.dataset.o});
+    if(!res.ok){b.disabled=false;return toast(errText(res.error),true)}
+    toast("Oferta aceptada. Ya puedes escribirle por WhatsApp.");
+    return renderMine();
+  }
+
+  if(act==="cancel"||act==="done"){
+    if(!confirm(act==="done"?"¿Marcar esta gestión como cumplida?":"¿Cancelar esta solicitud?"))return;
+    b.disabled=true;
+    const res=await api("gx_set_status",{token:requesterToken(),gestion_id:b.dataset.g,status:act==="done"?"cumplida":"cancelada"});
+    if(!res.ok){b.disabled=false;return toast(errText(res.error),true)}
+    toast(act==="done"?"Gestión cumplida.":"Solicitud cancelada.");
+    return renderMine();
+  }
+
+  if(act==="counterToggle"){
+    const box=b.closest("article").querySelector(".counter");
+    box.hidden=!box.hidden;
+    if(!box.hidden)box.querySelector("input").focus();
+    return;
+  }
+
+  if(act==="offer"||act==="counterSend"){
+    const art=b.closest("article");
+    let price=Number(b.dataset.price),message="";
+    if(act==="counterSend"){
+      price=Number(art.querySelector("[name=cprice]").value);
+      message=art.querySelector("[name=cmsg]").value.trim();
+    }
+    if(!(price>0))return toast("Indica el valor de tu oferta.",true);
+    b.disabled=true;
+    const res=await api("gx_make_offer",{token:providerToken(),gestion_id:b.dataset.g,price,message});
+    b.disabled=false;
+    if(!res.ok){
+      if(res.error==="unauthorized"){toast(errText(res.error),true);return renderTake()}
+      return toast(errText(res.error),true);
+    }
+    toast("Oferta enviada. Si te eligen, verás aquí el contacto.");
+    return loadTake(true,true);
+  }
+});
+
+/* =========================================================
+   QUIERO TOMAR GESTIONES
+   ========================================================= */
+async function renderTake(){
+  clearInterval(S.timer);
+  S._refresh=null;
+  const v=$("#view");
+  v.innerHTML=`<div class="empty">Cargando…</div>`;
+  if(!store.get("tl_gx_ptok"))return renderProviderForm(null);
+
+  const res=await api("gx_provider_me",{token:providerToken()});
+  if(S.role!=="take")return;
+  if(!res.ok){
+    if(res.error==="unauthorized")return renderProviderForm(null);
+    v.innerHTML=`<div class="notice bad">${esc(errText(res.error))}</div>`;
+    return;
+  }
+  S.provider=res.provider;
+  S.offers=res.offers;
+  renderTakeShell();
+  await loadTake(false);
+  poll(()=>loadTake(true),30000);
+}
+
+function renderTakeShell(){
+  const p=S.provider;
+  $("#view").innerHTML=`
+    <div class="card" style="padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
+        <div>
+          <strong style="color:var(--navy)">${esc(p.name)}</strong>
+          <span class="chip">${esc(ROLES[p.role]||p.role)}</span>
+          ${p.verified?`<span class="chip ok">Verificado</span>`:`<span class="chip warn">En verificación</span>`}
+          <p class="muted">Cubres ${p.radius_km} km alrededor de ${esc(p.city)}${p.dept?`, ${esc(p.dept)}`:""}</p>
+        </div>
+        <button type="button" class="secondary" id="editProfile">Editar perfil</button>
+      </div>
+    </div>
+    <div class="sub">
+      <button type="button" class="chipbtn" id="subNear">Cerca de ti</button>
+      <button type="button" class="chipbtn" id="subOffers">Mis ofertas</button>
+    </div>
+    <div id="takeBody"></div>`;
+  $("#subNear").setAttribute("aria-pressed",String(S.takeSub==="near"));
+  $("#subOffers").setAttribute("aria-pressed",String(S.takeSub==="offers"));
+  $("#subNear").onclick=()=>{S.takeSub="near";renderTakeShell();loadTake(false)};
+  $("#subOffers").onclick=()=>{S.takeSub="offers";renderTakeShell();loadTake(false)};
+  $("#editProfile").onclick=()=>renderProviderForm(S.provider);
+}
+
+async function loadTake(silent,force){
+  if(S.role!=="take"||!S.provider||!$("#takeBody"))return;
+  S._refresh=()=>loadTake(true);
+  if(!silent)$("#takeBody").innerHTML=`<div class="empty">Buscando gestiones en tu zona…</div>`;
+
+  const [near,me]=await Promise.all([
+    api("gx_list_nearby",{token:providerToken()}),
+    api("gx_provider_me",{token:providerToken()})
+  ]);
+  const body=$("#takeBody");
+  if(S.role!=="take"||!body)return;
+  if(me.ok){S.provider=me.provider;S.offers=me.offers}
+
+  if(S.takeSub==="offers"){
+    body.innerHTML=S.offers&&S.offers.length
+      ?S.offers.map(offerCard).join("")
+      :`<div class="empty">Todavía no has hecho ofertas.<br>Mira la pestaña “Cerca de ti”.</div>`;
+    return;
+  }
+  if(!near.ok){
+    body.innerHTML=`<div class="notice ${near.error==="not_verified"?"warn":"bad"}">${esc(errText(near.error))}</div>`;
+    return;
+  }
+  /* No pisar un formulario de contraoferta que el usuario está llenando */
+  if(silent&&!force&&body.querySelector(".counter:not([hidden])"))return;
+  body.innerHTML=near.items.length
+    ?near.items.map(nearCard).join("")
+    :`<div class="empty">No hay gestiones abiertas en tu zona en este momento.<br>Esta pantalla se actualiza sola.</div>`;
+}
+
+function nearCard(g){
+  const mine=g.my_offer;
+  const actions=mine
+    ?`<p class="muted" style="margin-top:10px">Tu oferta: <b>${money(mine.price,g.currency)}</b> (${OFFER_STATUS[mine.status]||mine.status})</p>
+       ${mine.status==="pendiente"?`<div class="actions"><button type="button" class="secondary" data-act="counterToggle">Cambiar oferta</button></div>`:""}`
+    :`<div class="actions">
+        <button type="button" class="btn-sm" data-act="offer" data-g="${g.id}" data-price="${g.price}">ACEPTO POR ${esc(money(g.price,g.currency))}</button>
+        <button type="button" class="secondary" data-act="counterToggle">Contraoferta</button>
+      </div>`;
+  return `<article class="gx">${tile(g.when)}<div>
+    <h3>${esc(TIPOS[g.tipo])}</h3>
+    <p class="muted">${esc(g.entidad||"Entidad por definir")}<br>${esc(g.city)}${g.dept?`, ${esc(g.dept)}`:""}${g.distance_km!=null?`. A ${g.distance_km} km de tu zona`:""}</p>
+    <p class="meta"><span>${esc(timeText(g.when))}</span><span class="price">${money(g.price,g.currency)}</span><span>${esc(PAY[g.pay_method]||"")}</span></p>
+    <div class="chips">
+      ${g.requires==="abogado"?`<span class="chip">Solo abogado(a)</span>`:""}
+      ${g.offers_count?`<span class="chip">${g.offers_count} ${g.offers_count===1?"oferta":"ofertas"} ya</span>`:`<span class="chip ok">Sin ofertas aún</span>`}
+    </div>
+    ${g.details?`<p class="muted">${esc(g.details)}</p>`:""}
+    ${actions}
+    <div class="counter" hidden>
+      <div><label style="margin-top:0">Tu valor (${esc(g.currency)})</label>
+        <input name="cprice" type="number" inputmode="numeric" min="1" step="1000" value="${mine?mine.price:g.price}"></div>
+      <div><label style="margin-top:0">Mensaje <span class="muted">(opcional)</span></label>
+        <input name="cmsg" type="text" maxlength="200" placeholder="Ej.: Estoy a 10 minutos del despacho"></div>
+      <button type="button" class="btn-sm" data-act="counterSend" data-g="${g.id}">ENVIAR OFERTA</button>
+    </div>
+  </div></article>`;
+}
+
+function offerCard(o){
+  const g=o.gestion;
+  const cls=o.status==="aceptada"?"ok":(o.status==="rechazada"?"bad":"warn");
+  let contact="";
+  if(o.status==="aceptada"&&o.requester){
+    const msg=`Hola ${o.requester.name}, soy quien aceptó tu solicitud de ${TIPOS[g.tipo].toLowerCase()} en ${g.city} en Término Legal.`;
+    contact=`<div class="contact"><b>${esc(o.requester.name)}</b> te eligió por ${money(o.price,g.currency)}.<br>
+      <a href="${waLink(o.requester.phone,msg)}" target="_blank" rel="noopener noreferrer">Escribir por WhatsApp</a></div>`;
+  }
+  return `<article class="gx">${tile(g.when)}<div>
+    <h3>${esc(TIPOS[g.tipo])}</h3>
+    <p class="muted">${esc(g.entidad||"Entidad por definir")}<br>${esc(g.city)}${g.dept?`, ${esc(g.dept)}`:""}</p>
+    <p class="meta"><span>${esc(whenText(g.when))}</span><span class="price">${money(o.price,g.currency)}</span></p>
+    <div class="chips"><span class="chip ${cls}">${OFFER_STATUS[o.status]||o.status}</span><span class="chip">${STATUS[g.status]||g.status}</span></div>
+    ${contact}</div></article>`;
+}
+
+/* ───────── Registro / edición de prestador ───────── */
+function renderProviderForm(p){
+  clearInterval(S.timer);
+  S._refresh=null;
+  const editing=!!p;
+  const country=(p&&p.country)||(S.loc&&ENABLED.includes(S.loc.country)?S.loc.country:ENABLED[0]);
+  const chosen=new Set(p?p.tipos:["radicacion","entrega","secuestro"]);
+  const role=p?p.role:"abogado";
+
+  $("#view").innerHTML=`
+  <form id="provForm" class="card" novalidate>
+    <h2>${editing?"Editar mi perfil":"Regístrate para tomar gestiones"}</h2>
+    <p class="muted">Cuéntanos quién eres y qué zona cubres. Revisamos cada perfil antes de marcarlo como verificado.</p>
+
+    <label for="prole">Soy</label>
+    <select id="prole" name="role">${Object.entries(ROLES).map(([k,v])=>`<option value="${k}" ${k===role?"selected":""}>${v}</option>`).join("")}</select>
+
+    <label for="pname">Nombre completo</label>
+    <input id="pname" name="name" type="text" maxlength="100" required autocomplete="name" value="${esc(p?p.name:"")}">
+
+    <label for="cred" id="credLabel">Número de tarjeta profesional</label>
+    <input id="cred" name="credential" type="text" maxlength="80" value="${esc(p?p.credential:"")}">
+    <p class="hint" id="credHint"></p>
+
+    ${ENABLED.length>1?`<label for="pcountry">País</label>
+    <select id="pcountry" name="country">${ENABLED.map(c=>`<option value="${c}" ${c===country?"selected":""}>${COUNTRIES[c].name}</option>`).join("")}</select>`
+    :`<input type="hidden" name="country" value="${country}">`}
+
+    <div class="grid2">
+      <div><label for="pcity">Municipio base</label>
+        <input id="pcity" name="city" type="text" maxlength="80" required autocomplete="off" value="${esc(p?p.city:((S.loc&&S.loc.city)||""))}"></div>
+      <div><label for="pdept">Departamento</label>
+        <input id="pdept" name="dept" type="text" maxlength="80" autocomplete="off" value="${esc(p?p.dept:((S.loc&&S.loc.dept)||""))}"></div>
+    </div>
+    <input type="hidden" name="lat" value="${S.loc&&!p?S.loc.lat:""}">
+    <input type="hidden" name="lng" value="${S.loc&&!p?S.loc.lng:""}">
+    <button type="button" class="link" id="useHereP">Usar mi ubicación actual</button>
+    <p class="hint">Guardamos solo una ubicación aproximada (a ~1 km) y nunca la mostramos a otros.</p>
+
+    <label for="radius">Hasta dónde te desplazas</label>
+    <select id="radius" name="radius_km">${[10,25,50,100,200].map(k=>`<option value="${k}" ${k===(p?p.radius_km:50)?"selected":""}>${k} km a la redonda</option>`).join("")}</select>
+
+    <label>Gestiones que aceptas</label>
+    <div class="tipos">${Object.entries(TIPOS).map(([k,v])=>`<label><input type="checkbox" name="tipos" value="${k}" ${chosen.has(k)?"checked":""}> ${v}</label>`).join("")}</div>
+
+    <div class="grid2">
+      <div><label for="pphone">WhatsApp</label>
+        <input id="pphone" name="phone" type="tel" inputmode="tel" required autocomplete="tel" placeholder="3001234567"></div>
+      <div><label for="pemail">Correo</label>
+        <input id="pemail" name="email" type="email" maxlength="120" required autocomplete="email"></div>
+    </div>
+    <p class="hint">Tu teléfono y tu correo solo se comparten con quien acepte tu oferta.${editing?" Vuelve a escribirlos para guardar cambios.":""}</p>
+
+    <label for="bio">Presentación <span class="muted">(opcional)</span></label>
+    <textarea id="bio" name="bio" maxlength="400" placeholder="Experiencia, despachos que conoces, disponibilidad.">${esc(p?p.bio:"")}</textarea>
+
+    <div class="hp" aria-hidden="true"><label>Sitio web<input name="website" tabindex="-1" autocomplete="off"></label></div>
+
+    <label class="check"><input type="checkbox" name="consent" required>
+      <span>Autorizo el tratamiento de mis datos personales para gestionar mi registro y conectarme con solicitudes de mi zona, conforme a la política de tratamiento de datos.</span></label>
+
+    <button class="primary" type="submit">${editing?"GUARDAR CAMBIOS":"REGISTRARME"}</button>
+    ${editing?`<button class="link" type="button" id="cancelEdit">Cancelar</button>`:""}
+  </form>`;
+
+  const f=$("#provForm");
+  const syncRole=()=>{
+    const r=field(f,"role").value;
+    $("#credLabel").textContent=r==="abogado"?"Número de tarjeta profesional":
+      (r==="dependiente"?"Experiencia (opcional)":"Universidad y semestre o año de grado");
+    $("#credHint").textContent=r==="abogado"?"Lo usamos para verificar tu registro. No se muestra públicamente.":
+      (r==="dependiente"?"Por ejemplo: años de experiencia en trámites y despachos.":"Ej.: Universidad Nacional, 9.º semestre.");
+  };
+  field(f,"role").onchange=syncRole;syncRole();
+
+  $("#useHereP").onclick=async()=>{
+    const b=$("#useHereP");b.disabled=true;b.textContent="Buscando tu ubicación…";
+    const pl=await detectPlace();
+    b.disabled=false;b.textContent="Usar mi ubicación actual";
+    if(!pl)return;
+    field(f,"city").value=pl.city;field(f,"dept").value=pl.dept;
+    field(f,"lat").value=pl.lat;field(f,"lng").value=pl.lng;
+    saveLoc(pl);renderZone();
+  };
+  ["city","dept"].forEach(n=>field(f,n).addEventListener("input",()=>{field(f,"lat").value="";field(f,"lng").value=""}));
+  if(editing)$("#cancelEdit").onclick=()=>renderTake();
+  f.onsubmit=submitProvider;
+}
+
+async function submitProvider(e){
+  e.preventDefault();
+  const f=e.target,btn=f.querySelector("button[type=submit]");
+  const v=n=>field(f,n).value;
+  const tipos=$$("input[name=tipos]:checked",f).map(i=>i.value);
+  const country=v("country"),role=v("role");
+  if(v("name").trim().length<2)return toast("Escribe tu nombre.",true);
+  if(v("city").trim().length<2)return toast("Indica tu municipio base.",true);
+  if(role==="abogado"&&!v("credential").trim())return toast("Falta tu número de tarjeta profesional.",true);
+  if((role==="judicante"||role==="estudiante")&&!v("credential").trim())return toast("Indica tu universidad y semestre.",true);
+  if(!tipos.length)return toast("Elige al menos un tipo de gestión.",true);
+  if(!v("phone").trim()||!v("email").trim())return toast("Falta tu WhatsApp o tu correo.",true);
+  if(!field(f,"consent").checked)return toast(ERRORS.consent,true);
+
+  setBusy(btn,true,"GUARDANDO…");
+  let lat=v("lat"),lng=v("lng");
+  if(!lat||!lng){
+    const g=await forwardGeocode(v("city").trim(),v("dept").trim(),country);
+    if(g){lat=g.lat;lng=g.lng}
+  }
+  const res=await api("gx_register_provider",{
+    token:providerToken(),role,name:v("name").trim(),credential:v("credential").trim(),
+    country,city:v("city").trim(),dept:v("dept").trim(),lat,lng,radius_km:v("radius_km"),tipos,
+    phone:toE164(country,v("phone")),email:v("email").trim(),bio:v("bio").trim(),
+    consent:true,website:v("website")
+  });
+  setBusy(btn,false);
+  if(!res.ok)return toast(errText(res.error),true);
+
+  toast(lat
+    ?"Perfil guardado."
+    :"Perfil guardado. No pudimos ubicar tu municipio en el mapa; te mostraremos solicitudes de ese mismo nombre.");
+  S.takeSub="near";
+  renderTake();
+}
+
+/* =========================================================
+   INICIO
+   ========================================================= */
+render();
+</script>
+</body>
+</html>
