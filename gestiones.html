@@ -15,20 +15,18 @@
   --btn-text:#fff; --shadow:rgba(16,36,62,.07); --ok:#1f7a4d; --ok-bg:#e8f4ee; --warn:#8a5a00;
   --warn-bg:#fbf1dc; --bad:#a12a2a; --bad-bg:#fbeaea;
 }
-body.dark{
-  --navy:#c9d6e8; --gold:#d8b877; --ink:#eef1f5; --muted:#95a1b0; --line:#2a3546; --bg:#0b1220;
-  --surface:#111a2c; --surface-alt:#0e1626; --input-bg:#0e1626; --input-border:#2a3546;
-  --btn-text:#0b1220; --shadow:rgba(0,0,0,.35); --ok:#6fcf9b; --ok-bg:#12281d; --warn:#e6b85c;
-  --warn-bg:#2a2110; --bad:#e28b8b; --bad-bg:#2b1616;
-  color-scheme:dark;
+@media (prefers-color-scheme:dark){
+  :root{
+    --navy:#c9d6e8; --gold:#d8b877; --ink:#eef1f5; --muted:#95a1b0; --line:#2a3546; --bg:#0b1220;
+    --surface:#111a2c; --surface-alt:#0e1626; --input-bg:#0e1626; --input-border:#2a3546;
+    --btn-text:#0b1220; --shadow:rgba(0,0,0,.35); --ok:#6fcf9b; --ok-bg:#12281d; --warn:#e6b85c;
+    --warn-bg:#2a2110; --bad:#e28b8b; --bad-bg:#2b1616;
+  }
 }
-
-html{font-size:100%}
 
 body{margin:0;background:var(--bg);color:var(--ink);
   font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5;
-  padding-bottom:env(safe-area-inset-bottom);
-  transition:background .25s,color .25s;overflow-x:hidden}
+  padding-bottom:env(safe-area-inset-bottom)}
 .app{width:min(760px,94%);margin:0 auto;padding:28px 0 60px}
 
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -81,7 +79,6 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(185,150,79,.3);bo
 .tipos{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}
 @media(max-width:520px){.tipos{grid-template-columns:1fr}}
 .tipos label{display:flex;gap:8px;align-items:center;font-weight:500;font-size:.8rem;margin:0;color:var(--ink)}
-.svc{font-size:.84rem;color:var(--ink);line-height:1.4}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 
 button.primary,button.secondary,button.link{font:inherit;cursor:pointer}
@@ -133,36 +130,11 @@ button.primary,button.secondary,button.link{font:inherit;cursor:pointer}
   max-width:92vw;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50}
 #toast.show{opacity:1}
 #toast.err{background:#a12a2a;color:#fff}
-
-/* ACCESIBILIDAD (misma barra del calculador) */
-.a11y-bar{position:fixed;top:50%;right:0;transform:translateY(-50%);display:flex;flex-direction:column;
-  background:var(--navy);border-radius:10px 0 0 10px;box-shadow:0 8px 24px var(--shadow);overflow:hidden;z-index:1000}
-.a11y-btn{width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:transparent;
-  border:0;border-bottom:1px solid rgba(255,255,255,.18);color:var(--btn-text);cursor:pointer;padding:0;font:inherit}
-.a11y-btn:last-child{border-bottom:0}
-.a11y-btn svg{width:19px;height:19px}
-.a11y-btn:hover,.a11y-btn[aria-pressed="true"]{background:var(--gold)}
-.a11y-big{font-weight:700;font-size:1.05rem;line-height:1}
-.a11y-small{font-weight:700;font-size:.72rem;line-height:1}
-@media(max-width:480px){.a11y-btn{width:36px;height:36px}.a11y-btn svg{width:16px;height:16px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 
 <body>
-
-<!-- ACCESIBILIDAD -->
-<div class="a11y-bar" role="toolbar" aria-label="Accesibilidad">
-  <button type="button" id="contrastBtn" class="a11y-btn" aria-pressed="false" title="Contraste" aria-label="Contraste">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="12" cy="12" r="9"></circle>
-      <path d="M12 3a9 9 0 000 18z" fill="currentColor" stroke="none"></path>
-    </svg>
-  </button>
-  <button type="button" id="increaseTextBtn" class="a11y-btn" title="Aumentar letra" aria-label="Aumentar letra"><span class="a11y-big">A</span></button>
-  <button type="button" id="decreaseTextBtn" class="a11y-btn" title="Reducir letra" aria-label="Reducir letra"><span class="a11y-small">A</span></button>
-</div>
-
 <div class="app">
 
   <div class="top">
@@ -228,29 +200,12 @@ const TIPOS={
   entrega:"Diligencia de entrega",
   audiencia:"Audiencia",
   revision_expediente:"Revisión de expediente",
-  revision_caso:"Revisión de caso",
   tramite_entidad:"Trámite ante entidad",
   accidente_transito:"Asistencia en accidente de tránsito",
   avaluo_catastral:"Avalúo catastral",
   asistencia_dia:"Colaborador por el día",
   otro:"Otra gestión"
 };
-
-/* Tarifa sugerida por tipo de gestión (COP). Ajusta según tu mercado. */
-const TARIFA_SUGERIDA={
-  secuestro:100000,
-  radicacion:80000,
-  entrega:90000,
-  audiencia:150000,
-  revision_expediente:70000,
-  revision_caso:90000,
-  tramite_entidad:90000,
-  accidente_transito:120000,
-  avaluo_catastral:110000,
-  asistencia_dia:150000,
-  otro:100000
-};
-
 const ROLES={
   abogado:"Abogado(a)",
   judicante:"Judicante",
@@ -263,22 +218,9 @@ const PAY={
   transferencia:"Transferencia",
   a_convenir:"Forma de pago a convenir"
 };
-const REQUIRES={
-  cualquiera:"Abogado, judicante o estudiante",
-  abogado:"Solo abogado(a)",
-  otros:"Otro perfil (mensajero, gestor, etc.)"
-};
-const MATTERS={
-  "constitucional-administrativo":"Constitucional / administrativo",
-  laboral:"Laboral", civil:"Civil", familia:"Familia", penal:"Penal",
-  "corporativo-comercial":"Corporativo / comercial",
-  "empresas-entidades":"Empresas / entidades públicas"
-};
 const STATUS={abierta:"Buscando",asignada:"Asignada",cumplida:"Cumplida",cancelada:"Cancelada",vencida:"Vencida"};
 const OFFER_STATUS={pendiente:"Pendiente",aceptada:"Aceptada",rechazada:"No elegida"};
 const MONTHS=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
-const MONTHS_LONG=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-const WEEKDAYS_SHORT=["Do","Lu","Ma","Mi","Ju","Vi","Sa"];
 
 const ERRORS={
   invalid:"Revisa los datos: hay campos incompletos o no válidos.",
@@ -290,7 +232,6 @@ const ERRORS={
   rate_limited:"Demasiadas solicitudes seguidas. Espera un momento.",
   country:"Todavía no operamos en ese país.",
   limit:"Ya tienes 10 solicitudes abiertas. Cierra alguna antes de publicar otra.",
-  claim_required:"Ese correo ya tiene un perfil. Vincúlalo con un código.",
   network:"No pudimos conectar. Revisa tu conexión e intenta de nuevo.",
   server:"Algo falló de nuestro lado. Intenta de nuevo en un momento."
 };
@@ -451,205 +392,6 @@ async function detectPlace(){
 }
 
 /* =========================================================
-   CAMPO ÚNICO "MUNICIPIO" (municipio + departamento fusionados)
-   Un solo input visible; el departamento se resuelve solo por
-   geolocalización o por geocodificación al escribir, y viaja oculto.
-   ========================================================= */
-function attachPlaceField(form,{cityName,deptName,latName,lngName,onResolved}){
-  const cityInput=field(form,cityName);
-  const deptInput=field(form,deptName);
-  const hint=document.createElement("p");
-  hint.className="hint";
-  hint.dataset.placeHint="1";
-  cityInput.insertAdjacentElement("afterend",hint);
-
-  function paint(){
-    if(deptInput.value)hint.textContent=`Departamento detectado: ${deptInput.value}. Si no es correcto, corrige el municipio.`;
-    else hint.textContent="Escribe el municipio; detectamos el departamento automáticamente.";
-  }
-  paint();
-
-  let debounceTimer;
-  cityInput.addEventListener("input",()=>{
-    field(form,latName).value="";field(form,lngName).value="";deptInput.value="";
-    paint();
-    clearTimeout(debounceTimer);
-    const city=cityInput.value.trim();
-    if(city.length<3)return;
-    debounceTimer=setTimeout(async()=>{
-      const country=(field(form,"country")&&field(form,"country").value)||ENABLED[0];
-      const g=await forwardGeocode(city,"",country);
-      if(g&&cityInput.value.trim()===city){
-        field(form,latName).value=g.lat;field(form,lngName).value=g.lng;
-        const rev=await reverseGeocode(g.lat,g.lng);
-        if(rev&&rev.dept)deptInput.value=rev.dept;
-        paint();
-        if(onResolved)onResolved();
-      }
-    },700);
-  });
-
-  return {
-    async useHere(btn){
-      const label=btn?btn.textContent:"";
-      if(btn){btn.disabled=true;btn.textContent="Buscando tu ubicación…"}
-      const p=await detectPlace();
-      if(btn){btn.disabled=false;btn.textContent=label}
-      if(!p)return null;
-      cityInput.value=p.city;deptInput.value=p.dept;
-      field(form,latName).value=p.lat;field(form,lngName).value=p.lng;
-      paint();
-      if(onResolved)onResolved();
-      return p;
-    }
-  };
-}
-
-/* =========================================================
-   SELECTOR DE FECHA Y HORA (mismo calendario de Término Legal,
-   con franjas de media hora: 12:00, 12:30, 1:00…)
-   ========================================================= */
-const DateTimePicker=(()=>{
-
-  function pad(n){return String(n).padStart(2,"0")}
-  function dateKey(d){return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
-  function halfHourSlots(){
-    const out=[];
-    for(let h=0;h<24;h++)for(const m of[0,30])out.push({h,m,label:`${pad(h)}:${pad(m)}`});
-    return out;
-  }
-  const SLOTS=halfHourSlots();
-
-  function build(input,{minDate}={}){
-    input.readOnly=true;
-    input.autocomplete="off";
-    input.placeholder="dd/mm/aaaa, hh:mm";
-
-    const badge=document.createElement("span");
-    badge.setAttribute("aria-hidden","true");
-    badge.style.cssText="position:absolute;left:7px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:9px;background:var(--gold);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2";
-    badge.innerHTML=`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#12100a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><text x="8" y="16.3" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="7.5" fill="#12100a">t</text></svg>`;
-
-    const wrap=document.createElement("div");
-    wrap.style.cssText="position:relative";
-    input.parentNode.insertBefore(wrap,input);
-    wrap.appendChild(badge);
-    wrap.appendChild(input);
-    input.style.paddingLeft="46px";
-
-    const picker=document.createElement("div");
-    picker.hidden=true;
-    picker.style.cssText="position:absolute;z-index:900;width:300px;margin-top:6px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--input-border);border-radius:14px;box-shadow:0 12px 30px var(--shadow);padding:12px";
-    wrap.appendChild(picker);
-
-    let cursor=new Date();
-    let selected=null;
-    let selHour=null,selMin=null;
-
-    function monthName(i){return MONTHS_LONG[i].charAt(0).toUpperCase()+MONTHS_LONG[i].slice(1)}
-
-    function renderDays(){
-      const year=cursor.getFullYear(),month=cursor.getMonth();
-      const first=new Date(year,month,1),offset=first.getDay();
-      const total=new Date(year,month+1,0).getDate();
-      const todayKey=dateKey(new Date());
-      const selKey=selected?dateKey(selected):"";
-      const min=minDate?new Date(minDate.getFullYear(),minDate.getMonth(),minDate.getDate()):null;
-
-      let html=`
-        <div style="display:grid;grid-template-columns:36px 1fr 36px;align-items:center;gap:4px;margin-bottom:8px">
-          <button type="button" data-nav="-1" style="all:unset;cursor:pointer;width:36px;height:32px;text-align:center;color:var(--navy);font-size:1.25rem;border-radius:8px">‹</button>
-          <strong style="text-align:center;color:var(--navy);font-size:.85rem">${monthName(month)} ${year}</strong>
-          <button type="button" data-nav="1" style="all:unset;cursor:pointer;width:36px;height:32px;text-align:center;color:var(--navy);font-size:1.25rem;border-radius:8px">›</button>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">
-          ${WEEKDAYS_SHORT.map(w=>`<span style="text-align:center;font-size:.65rem;font-weight:700;color:var(--muted);padding:5px 0">${w}</span>`).join("")}
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">`;
-
-      for(let i=0;i<offset;i++)html+=`<span></span>`;
-      for(let day=1;day<=total;day++){
-        const d=new Date(year,month,day);
-        const key=dateKey(d);
-        const disabled=min&&d<min;
-        const isSel=key===selKey;
-        const isToday=key===todayKey;
-        html+=`<button type="button" data-day="${key}" ${disabled?"disabled":""}
-          style="width:100%;aspect-ratio:1;border:0;border-radius:7px;font-size:.76rem;font-weight:500;cursor:${disabled?"not-allowed":"pointer"};
-          background:${isSel?"var(--gold)":"transparent"};color:${isSel?"#fff":disabled?"var(--muted)":"var(--ink)"};
-          ${isToday&&!isSel?"box-shadow:inset 0 0 0 1px var(--gold)":""};opacity:${disabled?.4:1}">${day}</button>`;
-      }
-      html+=`</div>`;
-
-      html+=`<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line)">
-        <label style="display:block;font-size:.7rem;font-weight:700;color:var(--navy);margin-bottom:6px">Hora</label>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;max-height:150px;overflow-y:auto">
-          ${SLOTS.map(s=>{
-            const isSel=selHour===s.h&&selMin===s.m;
-            return `<button type="button" data-time="${s.h}:${s.m}" style="min-height:30px;border:1px solid var(--input-border);border-radius:7px;font-size:.68rem;cursor:pointer;
-              background:${isSel?"var(--navy)":"transparent"};color:${isSel?"#fff":"var(--ink)"}">${s.label}</button>`;
-          }).join("")}
-        </div>
-      </div>
-      <button type="button" data-confirm="1" style="width:100%;min-height:38px;margin-top:10px;border:0;border-radius:9px;background:var(--gold);color:#12100a;font-weight:700;font-size:.75rem;cursor:pointer" ${(!selected||selHour===null)?"disabled":""}>USAR ESTA FECHA Y HORA</button>`;
-
-      picker.innerHTML=html;
-    }
-
-    function paintInput(){
-      if(!selected||selHour===null)return;
-      const d=new Date(selected);
-      d.setHours(selHour,selMin,0,0);
-      input.value=`${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}, ${pad(selHour)}:${pad(selMin)}`;
-      input.dataset.iso=d.toISOString();
-      input.dispatchEvent(new Event("change",{bubbles:true}));
-    }
-
-    picker.addEventListener("click",e=>{
-      const nav=e.target.closest("[data-nav]");
-      if(nav){cursor.setMonth(cursor.getMonth()+Number(nav.dataset.nav));renderDays();return}
-      const day=e.target.closest("[data-day]");
-      if(day&&!day.disabled){
-        const[y,m,dd]=day.dataset.day.split("-").map(Number);
-        selected=new Date(y,m-1,dd);
-        renderDays();
-        return;
-      }
-      const time=e.target.closest("[data-time]");
-      if(time){
-        const[h,m]=time.dataset.time.split(":").map(Number);
-        selHour=h;selMin=m;
-        renderDays();
-        return;
-      }
-      const confirm=e.target.closest("[data-confirm]");
-      if(confirm&&selected&&selHour!==null){
-        paintInput();
-        picker.hidden=true;
-      }
-    });
-
-    function open(){
-      cursor=selected?new Date(selected):new Date();
-      renderDays();
-      picker.hidden=false;
-    }
-    badge.addEventListener("click",open);
-    document.addEventListener("click",e=>{
-      if(picker.hidden)return;
-      if(!wrap.contains(e.target))picker.hidden=true;
-    });
-
-    return {
-      getISO:()=>input.dataset.iso||"",
-      reset(){selected=null;selHour=null;selMin=null;input.value="";input.dataset.iso=""}
-    };
-  }
-
-  return {build};
-})();
-
-/* =========================================================
    ESTADO Y ARRANQUE
    ========================================================= */
 const S={
@@ -690,34 +432,15 @@ document.addEventListener("visibilitychange",()=>{
 });
 
 /* =========================================================
-   COMUNIDAD DE LA ZONA + CONTADOR GENERAL
+   COMUNIDAD DE LA ZONA
    ========================================================= */
-let globalStatsCache=null;
-
-async function loadGlobalStats(){
-  if(globalStatsCache)return globalStatsCache;
-  const res=await api("gx_stats_global",{});
-  if(res.ok)globalStatsCache=res;
-  return res.ok?res:null;
-}
-
 async function renderZone(){
   const el=$("#zone");
-
-  const gStats=await loadGlobalStats();
-  const counterHtml=gStats
-    ?`<div class="zone-stats" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--line)">
-        <span>🧑‍⚖️ <b>${gStats.providers}</b> profesionales activos</span>
-        <span>✅ <b>${gStats.completed}</b> gestiones cumplidas</span>
-      </div>`
-    :"";
-
   if(!S.loc){
     el.innerHTML=`<div class="zone-row">
       <div><strong>Comunidad de tu zona</strong>
       <span class="muted">Detecta tu ubicación para ver cuántos profesionales y gestiones hay cerca.</span></div>
-      <button type="button" class="btn-sm" id="detectZone">DETECTAR MI ZONA</button></div>
-      ${counterHtml}`;
+      <button type="button" class="btn-sm" id="detectZone">DETECTAR MI ZONA</button></div>`;
     $("#detectZone").onclick=onDetectZone;
     return;
   }
@@ -726,8 +449,7 @@ async function renderZone(){
   if(!res.ok){
     el.innerHTML=`<div class="zone-row"><div><strong>Comunidad de ${esc(S.loc.city||"tu zona")}</strong>
       <span class="muted">No pudimos cargar los datos de la zona.</span></div>
-      <button type="button" class="btn-sm" id="detectZone">ACTUALIZAR</button></div>
-      ${counterHtml}`;
+      <button type="button" class="btn-sm" id="detectZone">ACTUALIZAR</button></div>`;
     $("#detectZone").onclick=onDetectZone;
     return;
   }
@@ -746,7 +468,6 @@ async function renderZone(){
       ${res.group_url?`<a class="btn-sm" style="display:inline-flex;align-items:center;text-decoration:none" href="${esc(res.group_url)}" target="_blank" rel="noopener noreferrer">UNIRME AL GRUPO</a>`:""}
       <button type="button" class="secondary" id="detectZone">Cambiar zona</button>
     </div>
-    ${counterHtml}
   </div>`;
   $("#detectZone").onclick=onDetectZone;
 }
@@ -778,20 +499,10 @@ function renderNeed(){
   S.needSub==="new"?renderNeedForm():renderMine();
 }
 
-/* Perfil guardado del solicitante: nombre + WhatsApp. Si ya existen,
-   se muestran como resumen en vez de pedir escribirlos de nuevo. */
-function savedRequester(){
-  const name=store.get("tl_gx_name")||"";
-  const contact=store.get("tl_gx_contact")||"";
-  return name&&contact?{name,contact}:null;
-}
-
 function renderNeedForm(){
   S._refresh=null;
   const country=(S.loc&&ENABLED.includes(S.loc.country))?S.loc.country:ENABLED[0];
   const cur=COUNTRIES[country].cur;
-  const saved=savedRequester();
-
   $("#needBody").innerHTML=`
   <form id="needForm" class="card" novalidate>
     <h2>¿Qué gestión necesitas?</h2>
@@ -807,50 +518,44 @@ function renderNeedForm(){
     <select id="country" name="country">${ENABLED.map(c=>`<option value="${c}" ${c===country?"selected":""}>${COUNTRIES[c].name}</option>`).join("")}</select>`
     :`<input type="hidden" name="country" value="${country}">`}
 
-    <label for="city">Municipio donde se hace</label>
-    <input id="city" name="city" type="text" maxlength="80" required autocomplete="off" placeholder="Ej.: Samacá" value="${esc((S.loc&&S.loc.city)||"")}">
-    <input type="hidden" name="dept" value="${esc((S.loc&&S.loc.dept)||"")}">
+    <div class="grid2">
+      <div><label for="city">Municipio donde se hace</label>
+        <input id="city" name="city" type="text" maxlength="80" required autocomplete="off" placeholder="Ej.: Samacá" value="${esc((S.loc&&S.loc.city)||"")}"></div>
+      <div><label for="dept">Departamento</label>
+        <input id="dept" name="dept" type="text" maxlength="80" autocomplete="off" placeholder="Ej.: Boyacá" value="${esc((S.loc&&S.loc.dept)||"")}"></div>
+    </div>
     <input type="hidden" name="lat" value="${S.loc&&S.loc.city?S.loc.lat:""}">
     <input type="hidden" name="lng" value="${S.loc&&S.loc.city?S.loc.lng:""}">
     <button type="button" class="link" id="useHere">Estoy en el lugar: usar mi ubicación</button>
+    <p class="hint" id="geoHint"></p>
 
-    <label for="when">Fecha y hora</label>
-    <input id="when" name="when" type="text" required>
-
-    <label for="price">Tu oferta en ${cur}</label>
-    <input id="price" name="price" type="number" inputmode="numeric" min="1" step="1000" required placeholder="100000">
-    <p class="hint" id="tarifaHint">Tarifa recomendada: ${money(TARIFA_SUGERIDA.secuestro,cur,country)}. Puedes ajustarla.</p>
+    <div class="grid2">
+      <div><label for="when">Fecha y hora</label>
+        <input id="when" name="when" type="datetime-local" required min="${localNow()}"></div>
+      <div><label for="price">Tu oferta en ${cur}</label>
+        <input id="price" name="price" type="number" inputmode="numeric" min="1" step="1000" required placeholder="130000"></div>
+    </div>
 
     <div class="grid2">
       <div><label for="pay">Forma de pago</label>
         <select id="pay" name="pay_method">${Object.entries(PAY).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select></div>
       <div><label for="requires">Quién puede atenderla</label>
-        <select id="requires" name="requires">${Object.entries(REQUIRES).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select></div>
+        <select id="requires" name="requires">
+          <option value="cualquiera">Abogado, judicante o estudiante</option>
+          <option value="abogado">Solo abogado(a)</option>
+        </select></div>
     </div>
 
     <label for="details">Detalles <span class="muted">(opcional)</span></label>
     <textarea id="details" name="details" maxlength="500" placeholder="Qué hay que llevar o hacer. Sin números de proceso ni datos sensibles."></textarea>
 
-    <div id="requesterBlock">
-      ${saved?`
-        <div class="zone" style="margin-top:14px">
-          <div class="zone-row">
-            <div><strong>Publicando como ${esc(saved.name)}</strong><span class="muted">WhatsApp ${esc(saved.contact)}</span></div>
-            <button type="button" class="secondary" id="editRequester">Cambiar</button>
-          </div>
-        </div>
-        <input type="hidden" name="name" value="${esc(saved.name)}">
-        <input type="hidden" name="contact" value="${esc(saved.contact)}">
-      `:`
-        <div class="grid2">
-          <div><label for="name">Tu nombre</label>
-            <input id="name" name="name" type="text" maxlength="100" required autocomplete="name"></div>
-          <div><label for="contact">Tu WhatsApp</label>
-            <input id="contact" name="contact" type="tel" inputmode="tel" required autocomplete="tel" placeholder="3001234567"></div>
-        </div>
-        <p class="hint">Guardamos estos datos en este dispositivo para que la próxima vez solo tengas que confirmarlos.</p>
-      `}
+    <div class="grid2">
+      <div><label for="name">Tu nombre</label>
+        <input id="name" name="name" type="text" maxlength="100" required autocomplete="name" value="${esc(store.get("tl_gx_name")||"")}"></div>
+      <div><label for="contact">Tu WhatsApp</label>
+        <input id="contact" name="contact" type="tel" inputmode="tel" required autocomplete="tel" placeholder="3001234567" value="${esc(store.get("tl_gx_contact")||"")}"></div>
     </div>
+    <p class="hint">Tu contacto solo se comparte con la persona cuyo ofrecimiento aceptes.</p>
 
     <div class="hp" aria-hidden="true"><label>Sitio web<input name="website" tabindex="-1" autocomplete="off"></label></div>
 
@@ -861,46 +566,33 @@ function renderNeedForm(){
   </form>`;
 
   const f=$("#needForm");
-
-  const place=attachPlaceField(f,{cityName:"city",deptName:"dept",latName:"lat",lngName:"lng"});
-  $("#useHere").onclick=()=>place.useHere($("#useHere")).then(p=>{if(p){saveLoc(p);renderZone()}});
-
-  const dtp=DateTimePicker.build($("#when"),{minDate:new Date()});
-
-  field(f,"tipo").addEventListener("change",()=>{
-    const sugerida=TARIFA_SUGERIDA[field(f,"tipo").value]||100000;
-    $("#tarifaHint").textContent=`Tarifa recomendada: ${money(sugerida,cur,country)}. Puedes ajustarla.`;
-    const priceInput=field(f,"price");
-    if(!priceInput.value||priceInput.dataset.auto==="1"){
-      priceInput.value=sugerida;
-      priceInput.dataset.auto="1";
-    }
-  });
-  field(f,"price").addEventListener("input",()=>{field(f,"price").dataset.auto="0"});
-  /* Aplica la tarifa sugerida del primer tipo desde el arranque */
-  field(f,"price").value=TARIFA_SUGERIDA[field(f,"tipo").value]||100000;
-  field(f,"price").dataset.auto="1";
-
-  if(saved){
-    $("#editRequester").onclick=()=>{
-      store.set("tl_gx_name","");store.set("tl_gx_contact","");
-      renderNeedForm();
-    };
-  }
-
-  f.onsubmit=e=>submitNeed(e,dtp);
+  $("#useHere").onclick=async()=>{
+    const b=$("#useHere");
+    b.disabled=true;b.textContent="Buscando tu ubicación…";
+    const p=await detectPlace();
+    b.disabled=false;b.textContent="Estoy en el lugar: usar mi ubicación";
+    if(!p)return;
+    field(f,"city").value=p.city;field(f,"dept").value=p.dept;
+    field(f,"lat").value=p.lat;field(f,"lng").value=p.lng;
+    saveLoc(p);renderZone();
+    $("#geoHint").textContent="Ubicación aproximada aplicada. Corrige el municipio si no coincide.";
+  };
+  /* Si el usuario edita el municipio a mano, las coordenadas viejas ya no sirven */
+  ["city","dept"].forEach(n=>field(f,n).addEventListener("input",()=>{
+    field(f,"lat").value="";field(f,"lng").value="";
+  }));
+  f.onsubmit=submitNeed;
 }
 
-async function submitNeed(e,dtp){
+async function submitNeed(e){
   e.preventDefault();
   const f=e.target,btn=f.querySelector("button[type=submit]");
   const v=n=>field(f,n).value;
   const country=v("country");
   const city=v("city").trim(),dept=v("dept").trim();
   if(city.length<2)return toast("Escribe el municipio donde se hace la gestión.",true);
-  const iso=dtp.getISO();
-  if(!iso)return toast("Indica la fecha y la hora.",true);
-  const when=new Date(iso);
+  if(!v("when"))return toast("Indica la fecha y la hora.",true);
+  const when=new Date(v("when"));
   if(isNaN(when)||when<=new Date())return toast("La fecha y la hora deben ser futuras.",true);
   if(!(Number(v("price"))>0))return toast("Indica cuánto ofreces.",true);
   if(!v("name").trim()||!v("contact").trim())return toast("Falta tu nombre o tu WhatsApp.",true);
@@ -925,7 +617,7 @@ async function submitNeed(e,dtp){
   store.set("tl_gx_name",v("name").trim());
   store.set("tl_gx_contact",v("contact").trim());
   toast(lat
-    ?"Solicitud publicada. Guardamos tus datos para la próxima vez y aquí verás las ofertas en cuanto lleguen."
+    ?"Solicitud publicada. Aquí verás las ofertas en cuanto lleguen."
     :"Solicitud publicada. No pudimos ubicar el municipio en el mapa; la verán quienes lo tengan en su zona por nombre.");
   S.needSub="mine";
   renderNeed();
@@ -992,7 +684,7 @@ function mineCard(g){
     <h3>${esc(TIPOS[g.tipo])}</h3>
     <p class="muted">${esc(g.entidad||"Entidad por definir")}<br>${esc(g.city)}${g.dept?`, ${esc(g.dept)}`:""}</p>
     <p class="meta"><span>${esc(timeText(g.when))}</span><span class="price">${money(g.price,g.currency)}</span></p>
-    <div class="chips">${statusChip(g.status)}${g.requires!=="cualquiera"?`<span class="chip">${esc(REQUIRES[g.requires]||g.requires)}</span>`:""}</div>
+    <div class="chips">${statusChip(g.status)}${g.requires==="abogado"?`<span class="chip">Solo abogado(a)</span>`:""}</div>
     ${inner}</div></article>`;
 }
 
@@ -1143,7 +835,7 @@ function nearCard(g){
     <p class="muted">${esc(g.entidad||"Entidad por definir")}<br>${esc(g.city)}${g.dept?`, ${esc(g.dept)}`:""}${g.distance_km!=null?`. A ${g.distance_km} km de tu zona`:""}</p>
     <p class="meta"><span>${esc(timeText(g.when))}</span><span class="price">${money(g.price,g.currency)}</span><span>${esc(PAY[g.pay_method]||"")}</span></p>
     <div class="chips">
-      ${g.requires!=="cualquiera"?`<span class="chip">${esc(REQUIRES[g.requires]||g.requires)}</span>`:""}
+      ${g.requires==="abogado"?`<span class="chip">Solo abogado(a)</span>`:""}
       ${g.offers_count?`<span class="chip">${g.offers_count} ${g.offers_count===1?"oferta":"ofertas"} ya</span>`:`<span class="chip ok">Sin ofertas aún</span>`}
     </div>
     ${g.details?`<p class="muted">${esc(g.details)}</p>`:""}
@@ -1175,20 +867,19 @@ function offerCard(o){
     ${contact}</div></article>`;
 }
 
-/* ───────── Registro / edición de prestador (perfil único, solo gestiones) ───────── */
+/* ───────── Registro / edición de prestador ───────── */
 function renderProviderForm(p){
   clearInterval(S.timer);
   S._refresh=null;
   const editing=!!p;
   const country=(p&&p.country)||(S.loc&&ENABLED.includes(S.loc.country)?S.loc.country:ENABLED[0]);
-  const chosen=new Set(p&&p.tipos&&p.tipos.length?p.tipos:["radicacion","entrega","secuestro"]);
+  const chosen=new Set(p?p.tipos:["radicacion","entrega","secuestro"]);
   const role=p?p.role:"abogado";
 
   $("#view").innerHTML=`
   <form id="provForm" class="card" novalidate>
-    <h2>${editing?"Editar mi perfil":"Crea tu perfil de gestiones"}</h2>
-    <p class="muted">Un solo registro: recibe solicitudes de tu zona y ofrece por las que te sirvan. Revisamos cada perfil antes de marcarlo como verificado.</p>
-    ${editing?"":`<button type="button" class="link" id="haveProfile">¿Ya te registraste antes? Recupera tu perfil con tu correo</button>`}
+    <h2>${editing?"Editar mi perfil":"Regístrate para tomar gestiones"}</h2>
+    <p class="muted">Cuéntanos quién eres y qué zona cubres. Revisamos cada perfil antes de marcarlo como verificado.</p>
 
     <label for="prole">Soy</label>
     <select id="prole" name="role">${Object.entries(ROLES).map(([k,v])=>`<option value="${k}" ${k===role?"selected":""}>${v}</option>`).join("")}</select>
@@ -1204,25 +895,28 @@ function renderProviderForm(p){
     <select id="pcountry" name="country">${ENABLED.map(c=>`<option value="${c}" ${c===country?"selected":""}>${COUNTRIES[c].name}</option>`).join("")}</select>`
     :`<input type="hidden" name="country" value="${country}">`}
 
-    <label for="pcity">Municipio base</label>
-    <input id="pcity" name="city" type="text" maxlength="80" required autocomplete="off" value="${esc(p?p.city:((S.loc&&S.loc.city)||""))}">
-    <input type="hidden" name="dept" value="${esc(p?p.dept:((S.loc&&S.loc.dept)||""))}">
+    <div class="grid2">
+      <div><label for="pcity">Municipio base</label>
+        <input id="pcity" name="city" type="text" maxlength="80" required autocomplete="off" value="${esc(p?p.city:((S.loc&&S.loc.city)||""))}"></div>
+      <div><label for="pdept">Departamento</label>
+        <input id="pdept" name="dept" type="text" maxlength="80" autocomplete="off" value="${esc(p?p.dept:((S.loc&&S.loc.dept)||""))}"></div>
+    </div>
     <input type="hidden" name="lat" value="${S.loc&&!p?S.loc.lat:""}">
     <input type="hidden" name="lng" value="${S.loc&&!p?S.loc.lng:""}">
     <button type="button" class="link" id="useHereP">Usar mi ubicación actual</button>
     <p class="hint">Guardamos solo una ubicación aproximada (a ~1 km) y nunca la mostramos a otros.</p>
 
     <label for="radius">Hasta dónde te desplazas</label>
-    <select id="radius" name="radius_km">${[10,25,50,100,200].map(k=>`<option value="${k}" ${k===((p&&p.radius_km)||50)?"selected":""}>${k} km a la redonda</option>`).join("")}</select>
+    <select id="radius" name="radius_km">${[10,25,50,100,200].map(k=>`<option value="${k}" ${k===(p?p.radius_km:50)?"selected":""}>${k} km a la redonda</option>`).join("")}</select>
 
     <label>Gestiones que aceptas</label>
     <div class="tipos">${Object.entries(TIPOS).map(([k,v])=>`<label><input type="checkbox" name="tipos" value="${k}" ${chosen.has(k)?"checked":""}> ${v}</label>`).join("")}</div>
 
     <div class="grid2">
       <div><label for="pphone">WhatsApp</label>
-        <input id="pphone" name="phone" type="tel" inputmode="tel" required autocomplete="tel" placeholder="3001234567" value="${esc(p?p.phone:"")}"></div>
+        <input id="pphone" name="phone" type="tel" inputmode="tel" required autocomplete="tel" placeholder="3001234567"></div>
       <div><label for="pemail">Correo</label>
-        <input id="pemail" name="email" type="email" maxlength="120" required autocomplete="email" value="${esc(p?p.email:"")}"></div>
+        <input id="pemail" name="email" type="email" maxlength="120" required autocomplete="email"></div>
     </div>
     <p class="hint">Tu teléfono y tu correo solo se comparten con quien acepte tu oferta.${editing?" Vuelve a escribirlos para guardar cambios.":""}</p>
 
@@ -1234,26 +928,31 @@ function renderProviderForm(p){
     <label class="check"><input type="checkbox" name="consent" required>
       <span>Autorizo el tratamiento de mis datos personales para gestionar mi registro y conectarme con solicitudes de mi zona, conforme a la política de tratamiento de datos.</span></label>
 
-    <button class="primary" type="submit">${editing?"GUARDAR CAMBIOS":"CREAR MI PERFIL"}</button>
+    <button class="primary" type="submit">${editing?"GUARDAR CAMBIOS":"REGISTRARME"}</button>
     ${editing?`<button class="link" type="button" id="cancelEdit">Cancelar</button>`:""}
   </form>`;
 
   const f=$("#provForm");
-  const sync=()=>{
-    const r=field(f,"role").value, lawyer=r==="abogado";
-    $("#credLabel").textContent=lawyer?"Número de tarjeta profesional":
+  const syncRole=()=>{
+    const r=field(f,"role").value;
+    $("#credLabel").textContent=r==="abogado"?"Número de tarjeta profesional":
       (r==="dependiente"?"Experiencia (opcional)":"Universidad y semestre o año de grado");
-    $("#credHint").textContent=lawyer?"Lo usamos para verificar tu registro. No se muestra públicamente.":
+    $("#credHint").textContent=r==="abogado"?"Lo usamos para verificar tu registro. No se muestra públicamente.":
       (r==="dependiente"?"Por ejemplo: años de experiencia en trámites y despachos.":"Ej.: Universidad Nacional, 9.º semestre.");
   };
-  field(f,"role").addEventListener("change",sync);
-  sync();
+  field(f,"role").onchange=syncRole;syncRole();
 
-  const place=attachPlaceField(f,{cityName:"city",deptName:"dept",latName:"lat",lngName:"lng"});
-  $("#useHereP").onclick=()=>place.useHere($("#useHereP")).then(pl=>{if(pl){saveLoc(pl);renderZone()}});
-
+  $("#useHereP").onclick=async()=>{
+    const b=$("#useHereP");b.disabled=true;b.textContent="Buscando tu ubicación…";
+    const pl=await detectPlace();
+    b.disabled=false;b.textContent="Usar mi ubicación actual";
+    if(!pl)return;
+    field(f,"city").value=pl.city;field(f,"dept").value=pl.dept;
+    field(f,"lat").value=pl.lat;field(f,"lng").value=pl.lng;
+    saveLoc(pl);renderZone();
+  };
+  ["city","dept"].forEach(n=>field(f,n).addEventListener("input",()=>{field(f,"lat").value="";field(f,"lng").value=""}));
   if(editing)$("#cancelEdit").onclick=()=>renderTake();
-  else $("#haveProfile").onclick=()=>showClaim(null);
   f.onsubmit=submitProvider;
 }
 
@@ -1277,17 +976,13 @@ async function submitProvider(e){
     const g=await forwardGeocode(v("city").trim(),v("dept").trim(),country);
     if(g){lat=g.lat;lng=g.lng}
   }
-  const payload={
+  const res=await api("gx_register_provider",{
     token:providerToken(),role,name:v("name").trim(),credential:v("credential").trim(),
-    country,city:v("city").trim(),dept:v("dept").trim(),lat,lng,
-    radius_km:v("radius_km"),tipos,
-    matter:"",experience:"",
+    country,city:v("city").trim(),dept:v("dept").trim(),lat,lng,radius_km:v("radius_km"),tipos,
     phone:toE164(country,v("phone")),email:v("email").trim(),bio:v("bio").trim(),
-    offers_gestiones:true,offers_advice:false,consent:true,website:v("website")
-  };
-  const res=await api("gx_register_provider",payload);
+    consent:true,website:v("website")
+  });
   setBusy(btn,false);
-  if(res.error==="claim_required")return showClaim(payload);
   if(!res.ok)return toast(errText(res.error),true);
 
   toast(lat
@@ -1296,73 +991,6 @@ async function submitProvider(e){
   S.takeSub="near";
   renderTake();
 }
-
-/* Recuperar un perfil que ya existe (registro anterior o cambio de dispositivo):
-   se comprueba que el correo es tuyo con un código de 6 dígitos. */
-function showClaim(payload){
-  clearInterval(S.timer);
-  S._refresh=null;
-  const known=!!(payload&&payload.email);
-  $("#view").innerHTML=`<div class="card">
-    <h2>Recupera tu perfil</h2>
-    <p class="muted">${known?`Ya existe un perfil con <b>${esc(payload.email)}</b>. `:""}Para vincularlo a este dispositivo confirma que el correo es tuyo: te enviamos un código de 6 dígitos.</p>
-    ${known?"":`<label for="claimEmail">Correo con el que te registraste</label>
-    <input id="claimEmail" type="email" maxlength="120" autocomplete="email">`}
-    <button class="primary" type="button" id="claimSend">ENVIAR CÓDIGO</button>
-    <div id="claimStep2" hidden>
-      <label for="claimCode">Código de 6 dígitos</label>
-      <input id="claimCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
-      <button class="primary" type="button" id="claimGo">VINCULAR MI PERFIL</button>
-    </div>
-    <button class="link" type="button" id="claimBack">Volver</button>
-  </div>`;
-  const email=()=>known?payload.email:$("#claimEmail").value.trim();
-
-  $("#claimBack").onclick=()=>renderTake();
-  $("#claimSend").onclick=async()=>{
-    if(!email())return toast("Escribe tu correo.",true);
-    const b=$("#claimSend");setBusy(b,true,"ENVIANDO…");
-    const res=await api("gx_claim_start",{email:email()});
-    setBusy(b,false);
-    if(!res.ok)return toast(errText(res.error),true);
-    $("#claimStep2").hidden=false;$("#claimCode").focus();
-    toast("Si el correo está registrado, te enviamos un código. Revisa también el spam.");
-  };
-  $("#claimGo").onclick=async()=>{
-    const b=$("#claimGo");setBusy(b,true,"VERIFICANDO…");
-    const res=await api("gx_claim_finish",{email:email(),code:$("#claimCode").value.trim(),token:providerToken()});
-    setBusy(b,false);
-    if(!res.ok)return toast(res.error==="rate_limited"?"Demasiados intentos. Pide un código nuevo.":"Código incorrecto o vencido.",true);
-    if(known){
-      const r2=await api("gx_register_provider",payload);
-      toast(r2.ok?"Perfil vinculado y actualizado.":errText(r2.error),!r2.ok);
-    }else toast("Perfil vinculado a este dispositivo.");
-    S.takeSub="near";
-    renderTake();
-  };
-}
-
-/* =========================================================
-   ACCESIBILIDAD: modo oscuro y tamaño de letra (se recuerdan)
-   ========================================================= */
-(function(){
-  const contrastBtn=$("#contrastBtn"),inc=$("#increaseTextBtn"),dec=$("#decreaseTextBtn");
-  const MIN=-2,MAX=3;
-  let step=Math.max(MIN,Math.min(MAX,parseInt(store.get("tl_textstep")||"0",10)||0));
-  const applyScale=()=>{document.documentElement.style.fontSize=(100+step*8)+"%"};
-  const applyDark=on=>{
-    document.body.classList.toggle("dark",on);
-    contrastBtn.setAttribute("aria-pressed",String(on));
-  };
-  applyDark(store.get("tl_dark")==="1");
-  applyScale();
-  contrastBtn.onclick=()=>{
-    const on=!document.body.classList.contains("dark");
-    applyDark(on);store.set("tl_dark",on?"1":"0");
-  };
-  inc.onclick=()=>{step=Math.min(MAX,step+1);applyScale();store.set("tl_textstep",String(step))};
-  dec.onclick=()=>{step=Math.max(MIN,step-1);applyScale();store.set("tl_textstep",String(step))};
-})();
 
 /* =========================================================
    INICIO
