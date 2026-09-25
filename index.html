@@ -875,25 +875,116 @@ footer{
   }
 
   .feedback-btn,
-  .footer-social-btn,
-  .footer-professionals-link{
+  .footer-social-btn{
     width:28px;
     height:28px;
     flex-basis:28px;
   }
 
-  .footer-social-btn svg,
-  .footer-professionals-link svg{
+  .footer-social-btn svg{
     width:14px;
     height:14px;
   }
 
+  .footer-gestiones-btn{
+    height:28px;
+    min-width:28px;
+    padding:0 7px;
+    font-size:.58rem;
+  }
+
   .site-footer-actions{
-    gap:4px;
+    gap:5px;
   }
 
 }
 
+
+/* REDES SOCIALES — ALINEACIÓN UNIFORME */
+.site-footer-actions{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  flex:0 0 auto;
+}
+
+.footer-social-btn{
+  width:30px;
+  height:30px;
+  flex:0 0 30px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  border:1px solid var(--input-border);
+  border-radius:50%;
+  background:transparent;
+  color:var(--navy);
+  text-decoration:none;
+  line-height:0;
+  vertical-align:middle;
+  cursor:pointer;
+  transition:background .18s ease,border-color .18s ease,transform .18s ease;
+}
+
+.footer-social-btn:hover{
+  background:var(--surface-alt);
+  border-color:var(--gold);
+  transform:translateY(-1px);
+}
+
+.footer-social-btn:focus-visible{
+  outline:2px solid var(--gold);
+  outline-offset:2px;
+}
+
+.footer-social-btn svg{
+  display:block;
+  width:15px;
+  height:15px;
+  margin:0;
+  padding:0;
+  flex:0 0 15px;
+  color:var(--gold);
+}
+
+.footer-gestiones-btn{
+  width:auto;
+  min-width:30px;
+  height:30px;
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  box-sizing:border-box;
+  margin:0;
+  padding:0 8px;
+  border:1px solid var(--input-border);
+  border-radius:999px;
+  background:transparent;
+  color:var(--navy);
+  text-decoration:none;
+  font-size:.62rem;
+  font-weight:600;
+  line-height:1;
+  white-space:nowrap;
+  cursor:pointer;
+  transition:background .18s ease,border-color .18s ease,transform .18s ease;
+}
+
+.footer-gestiones-btn:hover{
+  background:var(--surface-alt);
+  border-color:var(--gold);
+  transform:translateY(-1px);
+}
+
+.footer-gestiones-btn:focus-visible{
+  outline:2px solid var(--gold);
+  outline-offset:2px;
+}
 
 /* =========================================================
    TÉRMINOS FRECUENTES — GUÍA INTERACTIVA
@@ -2270,7 +2361,7 @@ footer{
       <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.61 0 4.28 2.38 4.28 5.47v6.27zM5.34 7.43a2.07 2.07 0 110-4.13 2.07 2.07 0 010 4.13zM7.12 20.45H3.56V9h3.56v11.45z"/>
     </svg>
   </a>
-<a href="gestiones.html" class="footer-social-btn" style="color:inherit;text-decoration:none;font-size:12px;display:inline-flex;align-items:center;padding:0 6px" title="Gestiones">Gestiones</a>
+<a href="gestiones.html" class="footer-gestiones-btn" aria-label="Gestiones" title="Gestiones">Gestiones</a>
 </div>
 
 </div><!-- /feedbackCard -->
