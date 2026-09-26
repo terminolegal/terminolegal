@@ -15,14 +15,18 @@
   --btn-text:#fff; --shadow:rgba(16,36,62,.07); --ok:#1f7a4d; --ok-bg:#e8f4ee; --warn:#8a5a00;
   --warn-bg:#fbf1dc; --bad:#a12a2a; --bad-bg:#fbeaea;
 }
-@media (prefers-color-scheme:dark){
-  :root{
-    --navy:#c9d6e8; --gold:#d8b877; --ink:#eef1f5; --muted:#95a1b0; --line:#2a3546; --bg:#0b1220;
-    --surface:#111a2c; --surface-alt:#0e1626; --input-bg:#0e1626; --input-border:#2a3546;
-    --btn-text:#0b1220; --shadow:rgba(0,0,0,.35); --ok:#6fcf9b; --ok-bg:#12281d; --warn:#e6b85c;
-    --warn-bg:#2a2110; --bad:#e28b8b; --bad-bg:#2b1616;
-  }
+body.dark{
+  --navy:#c9d6e8; --gold:#d8b877; --ink:#eef1f5; --muted:#95a1b0; --line:#2a3546; --bg:#0b1220;
+  --surface:#111a2c; --surface-alt:#0e1626; --input-bg:#0e1626; --input-border:#2a3546;
+  --btn-text:#0b1220; --shadow:rgba(0,0,0,.35); --ok:#6fcf9b; --ok-bg:#12281d; --warn:#e6b85c;
+  --warn-bg:#2a2110; --bad:#e28b8b; --bad-bg:#2b1616;
 }
+
+/* ACCESIBILIDAD — igual que Término Legal */
+.a11y-bar{position:fixed;top:50%;right:0;transform:translateY(-50%);display:flex;flex-direction:column;background:var(--navy);border-radius:10px 0 0 10px;box-shadow:0 8px 24px var(--shadow);overflow:hidden;z-index:1000;padding:0 3px;font-size:.64rem;line-height:1.15}
+.a11y-btn{width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,.18);color:var(--btn-text);cursor:pointer;padding:0}
+.a11y-btn:last-child{border-bottom:0}.a11y-btn svg{width:19px;height:19px}.a11y-btn:hover,.a11y-btn[aria-pressed="true"]{background:var(--gold)}
+.a11y-big{font-weight:700;font-size:1.05rem;line-height:1}.a11y-small{font-weight:700;font-size:.72rem;line-height:1}
 
 body{margin:0;background:var(--bg);color:var(--ink);
   font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5;
@@ -217,6 +221,14 @@ button.primary,button.secondary,button.link{font:inherit;cursor:pointer}
 </head>
 
 <body>
+
+<div class="a11y-bar" role="toolbar" aria-label="Accesibilidad">
+  <button type="button" id="contrastBtn" class="a11y-btn" aria-pressed="false" title="Contraste" aria-label="Cambiar contraste">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 3a9 9 0 000 18z" fill="currentColor" stroke="none"></path></svg>
+  </button>
+  <button type="button" id="increaseTextBtn" class="a11y-btn" title="Aumentar letra" aria-label="Aumentar letra"><span class="a11y-big">A</span></button>
+  <button type="button" id="decreaseTextBtn" class="a11y-btn" title="Reducir letra" aria-label="Reducir letra"><span class="a11y-small">A</span></button>
+</div>
 <div class="app">
 
   <div class="top">
@@ -865,7 +877,7 @@ async function initBasicMap(id,lat,lng,onPick,countryOverride){
   }catch(err){
     console.error(err);
     const note=document.getElementById(id+'Note');
-    if(note)note.textContent='Configura la API key de Google Maps para mostrar el mapa de gestiones.';
+    if(note)note.textContent=(GOOGLE_MAPS_API_KEY.includes('PON_AQUI')?'Falta configurar la API key de Google Maps.':'No se pudo cargar Google Maps. Revisa la API key, Maps JavaScript API y la facturación de Google Cloud.');
     return null;
   }
 }
@@ -910,7 +922,7 @@ async function renderZone(){
     </div>
   </div>`;
   $("#detectZone").onclick=onDetectZone;
-  initBasicMap("zoneMap",S.loc.lat,S.loc.lng,async(lat,lng)=>{
+  initBasicMap("gestionesMap",S.loc.lat,S.loc.lng,async(lat,lng)=>{
     const p=await reverseGeocode(lat,lng);
     if(p){
       p.lat=lat;p.lng=lng;
@@ -1573,6 +1585,24 @@ async function submitProvider(e){
    INICIO
    ========================================================= */
 render();
+
+
+/* =========================================================
+   ACCESIBILIDAD — contraste y tamaño de letra
+   ========================================================= */
+const contrastBtn=document.getElementById("contrastBtn");
+const increaseTextBtn=document.getElementById("increaseTextBtn");
+const decreaseTextBtn=document.getElementById("decreaseTextBtn");
+let textScaleStep=Number(localStorage.getItem("tl_text_scale")||0);
+const MIN_STEP=-2,MAX_STEP=3;
+function applyTextScale(){document.documentElement.style.fontSize=(100+textScaleStep*8)+"%";}
+function applyContrast(){contrastBtn?.setAttribute("aria-pressed",String(document.body.classList.contains("dark")));}
+contrastBtn?.addEventListener("click",()=>{const isDark=document.body.classList.toggle("dark");localStorage.setItem("tl_contrast",isDark?"dark":"light");applyContrast();});
+increaseTextBtn?.addEventListener("click",()=>{textScaleStep=Math.min(MAX_STEP,textScaleStep+1);localStorage.setItem("tl_text_scale",String(textScaleStep));applyTextScale();});
+decreaseTextBtn?.addEventListener("click",()=>{textScaleStep=Math.max(MIN_STEP,textScaleStep-1);localStorage.setItem("tl_text_scale",String(textScaleStep));applyTextScale();});
+if(localStorage.getItem("tl_contrast")==="dark")document.body.classList.add("dark");
+applyContrast();applyTextScale();
+
 </script>
 </body>
 </html>
