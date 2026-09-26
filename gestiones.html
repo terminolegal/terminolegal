@@ -71,6 +71,10 @@ input[type=text],input[type=email],input[type=tel],input[type=number],input[type
   font:inherit;font-size:1rem;color:var(--ink);background:var(--input-bg)}
 textarea{padding:10px 12px;min-height:84px;resize:vertical}
 input:focus,select:focus,textarea:focus{outline:2px solid rgba(185,150,79,.3);border-color:var(--gold)}
+.phone-row{display:flex;align-items:stretch;gap:6px}
+.phone-country{flex:0 0 92px;width:92px;min-width:92px;padding:0 7px!important;font-size:.88rem!important;border-radius:10px!important}
+.phone-number{flex:1;min-width:0}
+@media(max-width:520px){.phone-country{flex-basis:88px;width:88px;min-width:88px}}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:520px){.grid2{grid-template-columns:1fr}}
 .hint{font-size:.72rem;color:var(--muted);margin:5px 0 0}
@@ -132,6 +136,16 @@ button.primary,button.secondary,button.link{font:inherit;cursor:pointer}
 #toast.err{background:#a12a2a;color:#fff}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<style>
+.tl-map-wrap{margin:10px 0 4px;border:1px solid var(--input-border);border-radius:12px;overflow:hidden;background:var(--surface)}
+.tl-map-tools{display:flex;gap:6px;padding:8px;background:var(--surface-alt);border-bottom:1px solid var(--line)}
+.tl-map-tools input{min-width:0;flex:1;margin:0}
+.tl-map{height:230px;width:100%}
+.tl-map-note{padding:7px 9px;font-size:.78rem;color:var(--muted)}
+@media(max-width:520px){.tl-map{height:210px}.tl-map-tools{padding:7px}}
+</style>
 </head>
 
 <body>
@@ -143,7 +157,7 @@ button.primary,button.secondary,button.link{font:inherit;cursor:pointer}
   </div>
 
   <h1>Gestiones cerca de ti</h1>
-  <p class="intro">Publica la diligencia que necesitas con tu oferta de pago. Abogados, judicantes y estudiantes de derecho de la zona la ven y aceptan, o proponen otro valor.</p>
+  <p class="intro">Publica la diligencia que necesitas con tu oferta de pago. Profesionales y estudiantes de la zona la ven y aceptan, o proponen otro valor.</p>
 
   <div class="zone" id="zone" aria-live="polite"></div>
 
@@ -174,24 +188,200 @@ const ENDPOINT="https://script.google.com/macros/s/AKfycbxx6oWsJMDZvQVtf9arU2dBh
 const ENABLED=["CO"];
 
 const COUNTRIES={
-  CO:{name:"Colombia",cur:"COP",dial:"57",locale:"es-CO"},
-  MX:{name:"México",cur:"MXN",dial:"52",locale:"es-MX"},
-  AR:{name:"Argentina",cur:"ARS",dial:"54",locale:"es-AR"},
-  CL:{name:"Chile",cur:"CLP",dial:"56",locale:"es-CL"},
-  PE:{name:"Perú",cur:"PEN",dial:"51",locale:"es-PE"},
-  EC:{name:"Ecuador",cur:"USD",dial:"593",locale:"es-EC"},
-  BO:{name:"Bolivia",cur:"BOB",dial:"591",locale:"es-BO"},
-  PY:{name:"Paraguay",cur:"PYG",dial:"595",locale:"es-PY"},
-  UY:{name:"Uruguay",cur:"UYU",dial:"598",locale:"es-UY"},
-  CR:{name:"Costa Rica",cur:"CRC",dial:"506",locale:"es-CR"},
-  GT:{name:"Guatemala",cur:"GTQ",dial:"502",locale:"es-GT"},
-  HN:{name:"Honduras",cur:"HNL",dial:"504",locale:"es-HN"},
-  SV:{name:"El Salvador",cur:"USD",dial:"503",locale:"es-SV"},
-  NI:{name:"Nicaragua",cur:"NIO",dial:"505",locale:"es-NI"},
-  PA:{name:"Panamá",cur:"USD",dial:"507",locale:"es-PA"},
-  DO:{name:"República Dominicana",cur:"DOP",dial:"1",locale:"es-DO"},
-  VE:{name:"Venezuela",cur:"USD",dial:"58",locale:"es-VE"},
-  BR:{name:"Brasil",cur:"BRL",dial:"55",locale:"pt-BR"}
+  AF:{name:"Afganistán",flag:"🇦🇫",cur:"AFN",dial:"93",locale:"fa-AF"},
+  AL:{name:"Albania",flag:"🇦🇱",cur:"ALL",dial:"355",locale:"sq-AL"},
+  DZ:{name:"Argelia",flag:"🇩🇿",cur:"DZD",dial:"213",locale:"ar-DZ"},
+  AD:{name:"Andorra",flag:"🇦🇩",cur:"EUR",dial:"376",locale:"ca-AD"},
+  AO:{name:"Angola",flag:"🇦🇴",cur:"AOA",dial:"244",locale:"pt-AO"},
+  AG:{name:"Antigua y Barbuda",flag:"🇦🇬",cur:"XCD",dial:"1 268",locale:"en-AG"},
+  AR:{name:"Argentina",flag:"🇦🇷",cur:"ARS",dial:"54",locale:"es-AR"},
+  AM:{name:"Armenia",flag:"🇦🇲",cur:"AMD",dial:"374",locale:"hy-AM"},
+  AU:{name:"Australia",flag:"🇦🇺",cur:"AUD",dial:"61",locale:"en-AU"},
+  AT:{name:"Austria",flag:"🇦🇹",cur:"EUR",dial:"43",locale:"de-AT"},
+  AZ:{name:"Azerbaiyán",flag:"🇦🇿",cur:"AZN",dial:"994",locale:"az-AZ"},
+  BS:{name:"Bahamas",flag:"🇧🇸",cur:"BSD",dial:"1 242",locale:"en-BS"},
+  BH:{name:"Baréin",flag:"🇧🇭",cur:"BHD",dial:"973",locale:"ar-BH"},
+  BD:{name:"Bangladés",flag:"🇧🇩",cur:"BDT",dial:"880",locale:"bn-BD"},
+  BB:{name:"Barbados",flag:"🇧🇧",cur:"BBD",dial:"1 246",locale:"en-BB"},
+  BY:{name:"Bielorrusia",flag:"🇧🇾",cur:"BYN",dial:"375",locale:"be-BY"},
+  BE:{name:"Bélgica",flag:"🇧🇪",cur:"EUR",dial:"32",locale:"nl-BE"},
+  BZ:{name:"Belice",flag:"🇧🇿",cur:"BZD",dial:"501",locale:"en-BZ"},
+  BJ:{name:"Benín",flag:"🇧🇯",cur:"XOF",dial:"229",locale:"fr-BJ"},
+  BT:{name:"Bután",flag:"🇧🇹",cur:"BTN",dial:"975",locale:"dz-BT"},
+  BO:{name:"Bolivia",flag:"🇧🇴",cur:"BOB",dial:"591",locale:"es-BO"},
+  BA:{name:"Bosnia y Herzegovina",flag:"🇧🇦",cur:"BAM",dial:"387",locale:"bs-BA"},
+  BW:{name:"Botsuana",flag:"🇧🇼",cur:"BWP",dial:"267",locale:"en-BW"},
+  BR:{name:"Brasil",flag:"🇧🇷",cur:"BRL",dial:"55",locale:"pt-BR"},
+  BN:{name:"Brunéi",flag:"🇧🇳",cur:"BND",dial:"673",locale:"ms-BN"},
+  BG:{name:"Bulgaria",flag:"🇧🇬",cur:"BGN",dial:"359",locale:"bg-BG"},
+  BF:{name:"Burkina Faso",flag:"🇧🇫",cur:"XOF",dial:"226",locale:"fr-BF"},
+  BI:{name:"Burundi",flag:"🇧🇮",cur:"BIF",dial:"257",locale:"fr-BI"},
+  CV:{name:"Cabo Verde",flag:"🇨🇻",cur:"CVE",dial:"238",locale:"pt-CV"},
+  KH:{name:"Camboya",flag:"🇰🇭",cur:"KHR",dial:"855",locale:"km-KH"},
+  CM:{name:"Camerún",flag:"🇨🇲",cur:"XAF",dial:"237",locale:"fr-CM"},
+  CA:{name:"Canadá",flag:"🇨🇦",cur:"CAD",dial:"1",locale:"en-CA"},
+  CF:{name:"República Centroafricana",flag:"🇨🇫",cur:"XAF",dial:"236",locale:"fr-CF"},
+  TD:{name:"Chad",flag:"🇹🇩",cur:"XAF",dial:"235",locale:"fr-TD"},
+  CL:{name:"Chile",flag:"🇨🇱",cur:"CLP",dial:"56",locale:"es-CL"},
+  CN:{name:"China",flag:"🇨🇳",cur:"CNY",dial:"86",locale:"zh-CN"},
+  CO:{name:"Colombia",flag:"🇨🇴",cur:"COP",dial:"57",locale:"es-CO"},
+  KM:{name:"Comoras",flag:"🇰🇲",cur:"KMF",dial:"269",locale:"ar-KM"},
+  CG:{name:"República del Congo",flag:"🇨🇬",cur:"XAF",dial:"242",locale:"fr-CG"},
+  CD:{name:"República Democrática del Congo",flag:"🇨🇩",cur:"CDF",dial:"243",locale:"fr-CD"},
+  CR:{name:"Costa Rica",flag:"🇨🇷",cur:"CRC",dial:"506",locale:"es-CR"},
+  CI:{name:"Costa de Marfil",flag:"🇨🇮",cur:"XOF",dial:"225",locale:"fr-CI"},
+  HR:{name:"Croacia",flag:"🇭🇷",cur:"EUR",dial:"385",locale:"hr-HR"},
+  CU:{name:"Cuba",flag:"🇨🇺",cur:"CUP",dial:"53",locale:"es-CU"},
+  CY:{name:"Chipre",flag:"🇨🇾",cur:"EUR",dial:"357",locale:"el-CY"},
+  CZ:{name:"Chequia",flag:"🇨🇿",cur:"CZK",dial:"420",locale:"cs-CZ"},
+  DK:{name:"Dinamarca",flag:"🇩🇰",cur:"DKK",dial:"45",locale:"da-DK"},
+  DJ:{name:"Yibuti",flag:"🇩🇯",cur:"DJF",dial:"253",locale:"fr-DJ"},
+  DM:{name:"Dominica",flag:"🇩🇲",cur:"XCD",dial:"1 767",locale:"en-DM"},
+  DO:{name:"República Dominicana",flag:"🇩🇴",cur:"DOP",dial:"1 809",locale:"es-DO"},
+  EC:{name:"Ecuador",flag:"🇪🇨",cur:"USD",dial:"593",locale:"es-EC"},
+  EG:{name:"Egipto",flag:"🇪🇬",cur:"EGP",dial:"20",locale:"ar-EG"},
+  SV:{name:"El Salvador",flag:"🇸🇻",cur:"USD",dial:"503",locale:"es-SV"},
+  GQ:{name:"Guinea Ecuatorial",flag:"🇬🇶",cur:"XAF",dial:"240",locale:"es-GQ"},
+  ER:{name:"Eritrea",flag:"🇪🇷",cur:"ERN",dial:"291",locale:"ti-ER"},
+  EE:{name:"Estonia",flag:"🇪🇪",cur:"EUR",dial:"372",locale:"et-EE"},
+  SZ:{name:"Esuatini",flag:"🇸🇿",cur:"SZL",dial:"268",locale:"en-SZ"},
+  ET:{name:"Etiopía",flag:"🇪🇹",cur:"ETB",dial:"251",locale:"am-ET"},
+  FJ:{name:"Fiyi",flag:"🇫🇯",cur:"FJD",dial:"679",locale:"en-FJ"},
+  FI:{name:"Finlandia",flag:"🇫🇮",cur:"EUR",dial:"358",locale:"fi-FI"},
+  FR:{name:"Francia",flag:"🇫🇷",cur:"EUR",dial:"33",locale:"fr-FR"},
+  GA:{name:"Gabón",flag:"🇬🇦",cur:"XAF",dial:"241",locale:"fr-GA"},
+  GM:{name:"Gambia",flag:"🇬🇲",cur:"GMD",dial:"220",locale:"en-GM"},
+  GE:{name:"Georgia",flag:"🇬🇪",cur:"GEL",dial:"995",locale:"ka-GE"},
+  DE:{name:"Alemania",flag:"🇩🇪",cur:"EUR",dial:"49",locale:"de-DE"},
+  GH:{name:"Ghana",flag:"🇬🇭",cur:"GHS",dial:"233",locale:"en-GH"},
+  GR:{name:"Grecia",flag:"🇬🇷",cur:"EUR",dial:"30",locale:"el-GR"},
+  GD:{name:"Granada",flag:"🇬🇩",cur:"XCD",dial:"1 473",locale:"en-GD"},
+  GT:{name:"Guatemala",flag:"🇬🇹",cur:"GTQ",dial:"502",locale:"es-GT"},
+  GN:{name:"Guinea",flag:"🇬🇳",cur:"GNF",dial:"224",locale:"fr-GN"},
+  GW:{name:"Guinea-Bisáu",flag:"🇬🇼",cur:"XOF",dial:"245",locale:"pt-GW"},
+  GY:{name:"Guyana",flag:"🇬🇾",cur:"GYD",dial:"592",locale:"en-GY"},
+  HT:{name:"Haití",flag:"🇭🇹",cur:"HTG",dial:"509",locale:"fr-HT"},
+  HN:{name:"Honduras",flag:"🇭🇳",cur:"HNL",dial:"504",locale:"es-HN"},
+  HU:{name:"Hungría",flag:"🇭🇺",cur:"HUF",dial:"36",locale:"hu-HU"},
+  IS:{name:"Islandia",flag:"🇮🇸",cur:"ISK",dial:"354",locale:"is-IS"},
+  IN:{name:"India",flag:"🇮🇳",cur:"INR",dial:"91",locale:"hi-IN"},
+  ID:{name:"Indonesia",flag:"🇮🇩",cur:"IDR",dial:"62",locale:"id-ID"},
+  IR:{name:"Irán",flag:"🇮🇷",cur:"IRR",dial:"98",locale:"fa-IR"},
+  IQ:{name:"Irak",flag:"🇮🇶",cur:"IQD",dial:"964",locale:"ar-IQ"},
+  IE:{name:"Irlanda",flag:"🇮🇪",cur:"EUR",dial:"353",locale:"en-IE"},
+  IL:{name:"Israel",flag:"🇮🇱",cur:"ILS",dial:"972",locale:"he-IL"},
+  IT:{name:"Italia",flag:"🇮🇹",cur:"EUR",dial:"39",locale:"it-IT"},
+  JM:{name:"Jamaica",flag:"🇯🇲",cur:"JMD",dial:"1 876",locale:"en-JM"},
+  JP:{name:"Japón",flag:"🇯🇵",cur:"JPY",dial:"81",locale:"ja-JP"},
+  JO:{name:"Jordania",flag:"🇯🇴",cur:"JOD",dial:"962",locale:"ar-JO"},
+  KZ:{name:"Kazajistán",flag:"🇰🇿",cur:"KZT",dial:"7",locale:"kk-KZ"},
+  KE:{name:"Kenia",flag:"🇰🇪",cur:"KES",dial:"254",locale:"sw-KE"},
+  KI:{name:"Kiribati",flag:"🇰🇮",cur:"AUD",dial:"686",locale:"en-KI"},
+  KW:{name:"Kuwait",flag:"🇰🇼",cur:"KWD",dial:"965",locale:"ar-KW"},
+  KG:{name:"Kirguistán",flag:"🇰🇬",cur:"KGS",dial:"996",locale:"ky-KG"},
+  LA:{name:"Laos",flag:"🇱🇦",cur:"LAK",dial:"856",locale:"lo-LA"},
+  LV:{name:"Letonia",flag:"🇱🇻",cur:"EUR",dial:"371",locale:"lv-LV"},
+  LB:{name:"Líbano",flag:"🇱🇧",cur:"LBP",dial:"961",locale:"ar-LB"},
+  LS:{name:"Lesoto",flag:"🇱🇸",cur:"LSL",dial:"266",locale:"en-LS"},
+  LR:{name:"Liberia",flag:"🇱🇷",cur:"LRD",dial:"231",locale:"en-LR"},
+  LY:{name:"Libia",flag:"🇱🇾",cur:"LYD",dial:"218",locale:"ar-LY"},
+  LI:{name:"Liechtenstein",flag:"🇱🇮",cur:"CHF",dial:"423",locale:"de-LI"},
+  LT:{name:"Lituania",flag:"🇱🇹",cur:"EUR",dial:"370",locale:"lt-LT"},
+  LU:{name:"Luxemburgo",flag:"🇱🇺",cur:"EUR",dial:"352",locale:"lb-LU"},
+  MG:{name:"Madagascar",flag:"🇲🇬",cur:"MGA",dial:"261",locale:"mg-MG"},
+  MW:{name:"Malaui",flag:"🇲🇼",cur:"MWK",dial:"265",locale:"en-MW"},
+  MY:{name:"Malasia",flag:"🇲🇾",cur:"MYR",dial:"60",locale:"ms-MY"},
+  MV:{name:"Maldivas",flag:"🇲🇻",cur:"MVR",dial:"960",locale:"dv-MV"},
+  ML:{name:"Malí",flag:"🇲🇱",cur:"XOF",dial:"223",locale:"fr-ML"},
+  MT:{name:"Malta",flag:"🇲🇹",cur:"EUR",dial:"356",locale:"mt-MT"},
+  MH:{name:"Islas Marshall",flag:"🇲🇭",cur:"USD",dial:"692",locale:"en-MH"},
+  MR:{name:"Mauritania",flag:"🇲🇷",cur:"MRU",dial:"222",locale:"ar-MR"},
+  MU:{name:"Mauricio",flag:"🇲🇺",cur:"MUR",dial:"230",locale:"en-MU"},
+  MX:{name:"México",flag:"🇲🇽",cur:"MXN",dial:"52",locale:"es-MX"},
+  FM:{name:"Micronesia",flag:"🇫🇲",cur:"USD",dial:"691",locale:"en-FM"},
+  MD:{name:"Moldavia",flag:"🇲🇩",cur:"MDL",dial:"373",locale:"ro-MD"},
+  MC:{name:"Mónaco",flag:"🇲🇨",cur:"EUR",dial:"377",locale:"fr-MC"},
+  MN:{name:"Mongolia",flag:"🇲🇳",cur:"MNT",dial:"976",locale:"mn-MN"},
+  ME:{name:"Montenegro",flag:"🇲🇪",cur:"EUR",dial:"382",locale:"sr-ME"},
+  MA:{name:"Marruecos",flag:"🇲🇦",cur:"MAD",dial:"212",locale:"ar-MA"},
+  MZ:{name:"Mozambique",flag:"🇲🇿",cur:"MZN",dial:"258",locale:"pt-MZ"},
+  MM:{name:"Myanmar",flag:"🇲🇲",cur:"MMK",dial:"95",locale:"my-MM"},
+  NA:{name:"Namibia",flag:"🇳🇦",cur:"NAD",dial:"264",locale:"en-NA"},
+  NR:{name:"Nauru",flag:"🇳🇷",cur:"AUD",dial:"674",locale:"en-NR"},
+  NP:{name:"Nepal",flag:"🇳🇵",cur:"NPR",dial:"977",locale:"ne-NP"},
+  NL:{name:"Países Bajos",flag:"🇳🇱",cur:"EUR",dial:"31",locale:"nl-NL"},
+  NZ:{name:"Nueva Zelanda",flag:"🇳🇿",cur:"NZD",dial:"64",locale:"en-NZ"},
+  NI:{name:"Nicaragua",flag:"🇳🇮",cur:"NIO",dial:"505",locale:"es-NI"},
+  NE:{name:"Níger",flag:"🇳🇪",cur:"XOF",dial:"227",locale:"fr-NE"},
+  NG:{name:"Nigeria",flag:"🇳🇬",cur:"NGN",dial:"234",locale:"en-NG"},
+  KP:{name:"Corea del Norte",flag:"🇰🇵",cur:"KPW",dial:"850",locale:"ko-KP"},
+  MK:{name:"Macedonia del Norte",flag:"🇲🇰",cur:"MKD",dial:"389",locale:"mk-MK"},
+  NO:{name:"Noruega",flag:"🇳🇴",cur:"NOK",dial:"47",locale:"no-NO"},
+  OM:{name:"Omán",flag:"🇴🇲",cur:"OMR",dial:"968",locale:"ar-OM"},
+  PK:{name:"Pakistán",flag:"🇵🇰",cur:"PKR",dial:"92",locale:"ur-PK"},
+  PW:{name:"Palaos",flag:"🇵🇼",cur:"USD",dial:"680",locale:"en-PW"},
+  PA:{name:"Panamá",flag:"🇵🇦",cur:"USD",dial:"507",locale:"es-PA"},
+  PG:{name:"Papúa Nueva Guinea",flag:"🇵🇬",cur:"PGK",dial:"675",locale:"en-PG"},
+  PY:{name:"Paraguay",flag:"🇵🇾",cur:"PYG",dial:"595",locale:"es-PY"},
+  PE:{name:"Perú",flag:"🇵🇪",cur:"PEN",dial:"51",locale:"es-PE"},
+  PH:{name:"Filipinas",flag:"🇵🇭",cur:"PHP",dial:"63",locale:"en-PH"},
+  PL:{name:"Polonia",flag:"🇵🇱",cur:"PLN",dial:"48",locale:"pl-PL"},
+  PT:{name:"Portugal",flag:"🇵🇹",cur:"EUR",dial:"351",locale:"pt-PT"},
+  QA:{name:"Catar",flag:"🇶🇦",cur:"QAR",dial:"974",locale:"ar-QA"},
+  RO:{name:"Rumanía",flag:"🇷🇴",cur:"RON",dial:"40",locale:"ro-RO"},
+  RU:{name:"Rusia",flag:"🇷🇺",cur:"RUB",dial:"7",locale:"ru-RU"},
+  RW:{name:"Ruanda",flag:"🇷🇼",cur:"RWF",dial:"250",locale:"rw-RW"},
+  KN:{name:"San Cristóbal y Nieves",flag:"🇰🇳",cur:"XCD",dial:"1 869",locale:"en-KN"},
+  LC:{name:"Santa Lucía",flag:"🇱🇨",cur:"XCD",dial:"1 758",locale:"en-LC"},
+  VC:{name:"San Vicente y las Granadinas",flag:"🇻🇨",cur:"XCD",dial:"1 784",locale:"en-VC"},
+  WS:{name:"Samoa",flag:"🇼🇸",cur:"WST",dial:"685",locale:"sm-WS"},
+  SM:{name:"San Marino",flag:"🇸🇲",cur:"EUR",dial:"378",locale:"it-SM"},
+  ST:{name:"Santo Tomé y Príncipe",flag:"🇸🇹",cur:"STN",dial:"239",locale:"pt-ST"},
+  SA:{name:"Arabia Saudí",flag:"🇸🇦",cur:"SAR",dial:"966",locale:"ar-SA"},
+  SN:{name:"Senegal",flag:"🇸🇳",cur:"XOF",dial:"221",locale:"fr-SN"},
+  RS:{name:"Serbia",flag:"🇷🇸",cur:"RSD",dial:"381",locale:"sr-RS"},
+  SC:{name:"Seychelles",flag:"🇸🇨",cur:"SCR",dial:"248",locale:"en-SC"},
+  SL:{name:"Sierra Leona",flag:"🇸🇱",cur:"SLE",dial:"232",locale:"en-SL"},
+  SG:{name:"Singapur",flag:"🇸🇬",cur:"SGD",dial:"65",locale:"en-SG"},
+  SK:{name:"Eslovaquia",flag:"🇸🇰",cur:"EUR",dial:"421",locale:"sk-SK"},
+  SI:{name:"Eslovenia",flag:"🇸🇮",cur:"EUR",dial:"386",locale:"sl-SI"},
+  SB:{name:"Islas Salomón",flag:"🇸🇧",cur:"SBD",dial:"677",locale:"en-SB"},
+  SO:{name:"Somalia",flag:"🇸🇴",cur:"SOS",dial:"252",locale:"so-SO"},
+  ZA:{name:"Sudáfrica",flag:"🇿🇦",cur:"ZAR",dial:"27",locale:"en-ZA"},
+  KR:{name:"Corea del Sur",flag:"🇰🇷",cur:"KRW",dial:"82",locale:"ko-KR"},
+  SS:{name:"Sudán del Sur",flag:"🇸🇸",cur:"SSP",dial:"211",locale:"en-SS"},
+  ES:{name:"España",flag:"🇪🇸",cur:"EUR",dial:"34",locale:"es-ES"},
+  LK:{name:"Sri Lanka",flag:"🇱🇰",cur:"LKR",dial:"94",locale:"si-LK"},
+  SD:{name:"Sudán",flag:"🇸🇩",cur:"SDG",dial:"249",locale:"ar-SD"},
+  SR:{name:"Surinam",flag:"🇸🇷",cur:"SRD",dial:"597",locale:"nl-SR"},
+  SE:{name:"Suecia",flag:"🇸🇪",cur:"SEK",dial:"46",locale:"sv-SE"},
+  CH:{name:"Suiza",flag:"🇨🇭",cur:"CHF",dial:"41",locale:"de-CH"},
+  SY:{name:"Siria",flag:"🇸🇾",cur:"SYP",dial:"963",locale:"ar-SY"},
+  TJ:{name:"Tayikistán",flag:"🇹🇯",cur:"TJS",dial:"992",locale:"tg-TJ"},
+  TZ:{name:"Tanzania",flag:"🇹🇿",cur:"TZS",dial:"255",locale:"sw-TZ"},
+  TH:{name:"Tailandia",flag:"🇹🇭",cur:"THB",dial:"66",locale:"th-TH"},
+  TL:{name:"Timor Oriental",flag:"🇹🇱",cur:"USD",dial:"670",locale:"pt-TL"},
+  TG:{name:"Togo",flag:"🇹🇬",cur:"XOF",dial:"228",locale:"fr-TG"},
+  TO:{name:"Tonga",flag:"🇹🇴",cur:"TOP",dial:"676",locale:"to-TO"},
+  TT:{name:"Trinidad y Tobago",flag:"🇹🇹",cur:"TTD",dial:"1 868",locale:"en-TT"},
+  TN:{name:"Túnez",flag:"🇹🇳",cur:"TND",dial:"216",locale:"ar-TN"},
+  TR:{name:"Turquía",flag:"🇹🇷",cur:"TRY",dial:"90",locale:"tr-TR"},
+  TM:{name:"Turkmenistán",flag:"🇹🇲",cur:"TMT",dial:"993",locale:"tk-TM"},
+  TV:{name:"Tuvalu",flag:"🇹🇻",cur:"AUD",dial:"688",locale:"en-TV"},
+  UG:{name:"Uganda",flag:"🇺🇬",cur:"UGX",dial:"256",locale:"en-UG"},
+  UA:{name:"Ucrania",flag:"🇺🇦",cur:"UAH",dial:"380",locale:"uk-UA"},
+  AE:{name:"Emiratos Árabes Unidos",flag:"🇦🇪",cur:"AED",dial:"971",locale:"ar-AE"},
+  GB:{name:"Reino Unido",flag:"🇬🇧",cur:"GBP",dial:"44",locale:"en-GB"},
+  US:{name:"Estados Unidos",flag:"🇺🇸",cur:"USD",dial:"1",locale:"en-US"},
+  UY:{name:"Uruguay",flag:"🇺🇾",cur:"UYU",dial:"598",locale:"es-UY"},
+  UZ:{name:"Uzbekistán",flag:"🇺🇿",cur:"UZS",dial:"998",locale:"uz-UZ"},
+  VU:{name:"Vanuatu",flag:"🇻🇺",cur:"VUV",dial:"678",locale:"en-VU"},
+  VA:{name:"Ciudad del Vaticano",flag:"🇻🇦",cur:"EUR",dial:"39",locale:"it-VA"},
+  VE:{name:"Venezuela",flag:"🇻🇪",cur:"USD",dial:"58",locale:"es-VE"},
+  VN:{name:"Vietnam",flag:"🇻🇳",cur:"VND",dial:"84",locale:"vi-VN"},
+  YE:{name:"Yemen",flag:"🇾🇪",cur:"YER",dial:"967",locale:"ar-YE"},
+  ZM:{name:"Zambia",flag:"🇿🇲",cur:"ZMW",dial:"260",locale:"en-ZM"},
+  ZW:{name:"Zimbabue",flag:"🇿🇼",cur:"ZWG",dial:"263",locale:"en-ZW"}
 };
 
 const TIPOS={
@@ -207,10 +397,27 @@ const TIPOS={
   otro:"Otra gestión"
 };
 const ROLES={
+  profesional:"Profesional",
+  estudiante:"Estudiante",
+  otro:"Otro"
+};
+const PROFESSIONS={
   abogado:"Abogado(a)",
-  judicante:"Judicante",
-  estudiante:"Estudiante de derecho",
-  dependiente:"Dependiente / tramitador"
+  contador:"Contador(a)",
+  administrador:"Administrador(a)",
+  ingeniero:"Ingeniero(a)",
+  arquitecto:"Arquitecto(a)",
+  medico:"Médico(a)",
+  enfermero:"Enfermero(a)",
+  odontologo:"Odontólogo(a)",
+  psicologo:"Psicólogo(a)",
+  economista:"Economista",
+  comunicador:"Comunicador(a)",
+  trabajador_social:"Trabajador(a) social",
+  docente:"Docente",
+  notario:"Notario(a)",
+  tecnico:"Técnico(a)",
+  otro:"Otra profesión"
 };
 const PAY={
   cuenta_cobro:"Cuenta de cobro",
@@ -219,6 +426,7 @@ const PAY={
   a_convenir:"Forma de pago a convenir"
 };
 const STATUS={abierta:"Buscando",asignada:"Asignada",cumplida:"Cumplida",cancelada:"Cancelada",vencida:"Vencida"};
+const REQUIRES_LABEL={cualquiera:"Cualquiera",profesional:"Solo profesional",estudiante:"Solo estudiante",otro:"Solo otro",abogado:"Solo profesional"};
 const OFFER_STATUS={pendiente:"Pendiente",aceptada:"Aceptada",rechazada:"No elegida"};
 const MONTHS=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
 
@@ -323,11 +531,11 @@ function localNow(){
 
 /* Deja el número listo para WhatsApp (con indicativo del país). */
 function toE164(country,input){
-  const dial=(COUNTRIES[country]||COUNTRIES.CO).dial;
+  const dial=String((COUNTRIES[country]||COUNTRIES.CO).dial).replace(/\D/g,"");
   let d=String(input||"").replace(/\D/g,"");
   if(d.startsWith("00"))d=d.slice(2);
-  if(d.length<=10)d=dial+d;
-  return d;
+  if(d.startsWith(dial))return d;
+  return dial+d;
 }
 function waLink(phone,text){
   return `https://wa.me/${encodeURIComponent(phone)}${text?`?text=${encodeURIComponent(text)}`:""}`;
@@ -432,6 +640,60 @@ document.addEventListener("visibilitychange",()=>{
 });
 
 /* =========================================================
+   MAPA BÁSICO COMPARTIDO
+   Usa Leaflet + OpenStreetMap como visor y Nominatim como buscador.
+   ========================================================= */
+const TL_MAP={};
+function mapHtml(id,placeholder){
+  return `<div class="tl-map-wrap">
+    <div class="tl-map-tools">
+      <input id="${id}Search" type="search" placeholder="${esc(placeholder||"Buscar lugar")}" autocomplete="off">
+      <button type="button" class="btn-sm" id="${id}Go">BUSCAR</button>
+      <button type="button" class="secondary" id="${id}Here" title="Usar mi ubicación">⌖</button>
+    </div>
+    <div id="${id}" class="tl-map"></div>
+    <div class="tl-map-note" id="${id}Note">Mueve el punto para ajustar el lugar.</div>
+  </div>`;
+}
+function initBasicMap(id,lat,lng,onPick,countryOverride){
+  const el=document.getElementById(id); if(!el||!window.L)return null;
+  const has=Number.isFinite(Number(lat))&&Number.isFinite(Number(lng));
+  const center=has?[Number(lat),Number(lng)]:[4.65,-74.1];
+  const map=L.map(el,{zoomControl:true,scrollWheelZoom:false}).setView(center,has?13:5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+  let marker=has?L.marker(center,{draggable:true}).addTo(map):null;
+  const pick=(la,lo,zoom=true)=>{
+    la=Number(la);lo=Number(lo); if(!Number.isFinite(la)||!Number.isFinite(lo))return;
+    if(!marker)marker=L.marker([la,lo],{draggable:true}).addTo(map); else marker.setLatLng([la,lo]);
+    if(zoom)map.setView([la,lo],14);
+    onPick&&onPick(la,lo);
+  };
+  if(marker)marker.on('dragend',()=>{const q=marker.getLatLng();onPick&&onPick(r2(q.lat),r2(q.lng))});
+  const search=async()=>{
+    const input=document.getElementById(id+'Search'); const q=(input?.value||'').trim(); if(!q)return;
+    const country=countryOverride||((S.loc&&S.loc.country)||ENABLED[0]);
+    try{
+      const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&accept-language=es&countrycodes=${encodeURIComponent(country.toLowerCase())}&q=${encodeURIComponent(q)}`);
+      const rows=await r.json();
+      if(!rows.length){toast('No encontramos ese lugar.',true);return}
+      const x=rows[0]; pick(parseFloat(x.lat),parseFloat(x.lon));
+      const note=document.getElementById(id+'Note'); if(note)note.textContent=x.display_name||'Lugar seleccionado';
+      input.value=(x.display_name||q).split(',').slice(0,2).join(',');
+    }catch{toast('No pudimos buscar ese lugar.',true)}
+  };
+  document.getElementById(id+'Go')?.addEventListener('click',search);
+  document.getElementById(id+'Search')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();search()}});
+  document.getElementById(id+'Here')?.addEventListener('click',async()=>{
+    const p=await detectPlace(); if(!p)return;
+    pick(p.lat,p.lng); const input=document.getElementById(id+'Search'); if(input)input.value=[p.city,p.dept].filter(Boolean).join(', ');
+    const note=document.getElementById(id+'Note'); if(note)note.textContent='Ubicación aproximada aplicada.';
+  });
+  setTimeout(()=>map.invalidateSize(),80);
+  TL_MAP[id]={map,pick};
+  return TL_MAP[id];
+}
+
+/* =========================================================
    COMUNIDAD DE LA ZONA
    ========================================================= */
 async function renderZone(){
@@ -463,6 +725,7 @@ async function renderZone(){
         <span><b>${res.open_gestiones}</b> ${res.open_gestiones===1?"gestión abierta":"gestiones abiertas"} a menos de 50 km</span>
       </div>
       ${roles?`<p class="muted" style="margin-top:4px">${roles}</p>`:""}
+      ${mapHtml("zoneMap","Buscar otra zona") }
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       ${res.group_url?`<a class="btn-sm" style="display:inline-flex;align-items:center;text-decoration:none" href="${esc(res.group_url)}" target="_blank" rel="noopener noreferrer">UNIRME AL GRUPO</a>`:""}
@@ -470,6 +733,17 @@ async function renderZone(){
     </div>
   </div>`;
   $("#detectZone").onclick=onDetectZone;
+  initBasicMap("zoneMap",S.loc.lat,S.loc.lng,async(lat,lng)=>{
+    const p=await reverseGeocode(lat,lng);
+    if(p){
+      p.lat=lat;p.lng=lng;
+      saveLoc(p);
+      renderZone();
+    }else{
+      S.loc.lat=lat;S.loc.lng=lng;
+      saveLoc(S.loc);
+    }
+  },S.loc.country);
 }
 
 async function onDetectZone(){
@@ -528,6 +802,7 @@ function renderNeedForm(){
     <input type="hidden" name="lng" value="${S.loc&&S.loc.city?S.loc.lng:""}">
     <button type="button" class="link" id="useHere">Estoy en el lugar: usar mi ubicación</button>
     <p class="hint" id="geoHint"></p>
+    <div id="needMapBox">${mapHtml("needMap","Buscar municipio, dirección o lugar")}</div>
 
     <div class="grid2">
       <div><label for="when">Fecha y hora</label>
@@ -541,13 +816,28 @@ function renderNeedForm(){
         <select id="pay" name="pay_method">${Object.entries(PAY).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select></div>
       <div><label for="requires">Quién puede atenderla</label>
         <select id="requires" name="requires">
-          <option value="cualquiera">Abogado, judicante o estudiante</option>
-          <option value="abogado">Solo abogado(a)</option>
+          <option value="cualquiera">Cualquiera</option>
+          <option value="profesional">Solo profesional</option>
+          <option value="estudiante">Solo estudiante</option>
+          <option value="otro">Solo otro</option>
         </select></div>
     </div>
 
-    <label for="details">Detalles <span class="muted">(opcional)</span></label>
-    <textarea id="details" name="details" maxlength="500" placeholder="Qué hay que llevar o hacer. Sin números de proceso ni datos sensibles."></textarea>
+    <div class="grid2">
+      <div>
+        <label for="details">Detalles <span class="muted">(opcional)</span></label>
+        <textarea id="details" name="details" maxlength="500" placeholder="Qué hay que llevar o hacer. Sin números de proceso ni datos sensibles."></textarea>
+      </div>
+      <div>
+        <label for="preference_gender">Preferencia de quien atiende</label>
+        <select id="preference_gender" name="preference_gender">
+          <option value="indistinto">Indistinto</option>
+          <option value="mujer">Mujer</option>
+          <option value="hombre">Hombre</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+    </div>
 
     <div class="grid2">
       <div><label for="name">Tu nombre</label>
@@ -566,6 +856,15 @@ function renderNeedForm(){
   </form>`;
 
   const f=$("#needForm");
+  const needMap=initBasicMap("needMap",field(f,"lat").value,field(f,"lng").value,async(lat,lng)=>{
+    field(f,"lat").value=lat;field(f,"lng").value=lng;
+    const p=await reverseGeocode(lat,lng);
+    if(p){
+      field(f,"city").value=p.city||field(f,"city").value;
+      field(f,"dept").value=p.dept||field(f,"dept").value;
+      $("#geoHint").textContent="Lugar seleccionado en el mapa. Puedes corregir municipio o departamento.";
+    }
+  },field(f,"country").value);
   $("#useHere").onclick=async()=>{
     const b=$("#useHere");
     b.disabled=true;b.textContent="Buscando tu ubicación…";
@@ -574,6 +873,7 @@ function renderNeedForm(){
     if(!p)return;
     field(f,"city").value=p.city;field(f,"dept").value=p.dept;
     field(f,"lat").value=p.lat;field(f,"lng").value=p.lng;
+    needMap?.pick(p.lat,p.lng);
     saveLoc(p);renderZone();
     $("#geoHint").textContent="Ubicación aproximada aplicada. Corrige el municipio si no coincide.";
   };
@@ -608,6 +908,7 @@ async function submitNeed(e){
     token:requesterToken(),country,city,dept,lat,lng,
     tipo:v("tipo"),entidad:v("entidad").trim(),when:when.toISOString(),
     price:Number(v("price")),pay_method:v("pay_method"),requires:v("requires"),
+    preference_gender:v("preference_gender"),
     details:v("details").trim(),name:v("name").trim(),
     contact:toE164(country,v("contact")),consent:true,website:v("website")
   });
@@ -684,7 +985,7 @@ function mineCard(g){
     <h3>${esc(TIPOS[g.tipo])}</h3>
     <p class="muted">${esc(g.entidad||"Entidad por definir")}<br>${esc(g.city)}${g.dept?`, ${esc(g.dept)}`:""}</p>
     <p class="meta"><span>${esc(timeText(g.when))}</span><span class="price">${money(g.price,g.currency)}</span></p>
-    <div class="chips">${statusChip(g.status)}${g.requires==="abogado"?`<span class="chip">Solo abogado(a)</span>`:""}</div>
+    <div class="chips">${statusChip(g.status)}${g.requires&&g.requires!=="cualquiera"?`<span class="chip">${esc(REQUIRES_LABEL[g.requires]||g.requires)}</span>`:""}</div>
     ${inner}</div></article>`;
 }
 
@@ -773,6 +1074,7 @@ function renderTakeShell(){
         <div>
           <strong style="color:var(--navy)">${esc(p.name)}</strong>
           <span class="chip">${esc(ROLES[p.role]||p.role)}</span>
+          ${p.provider_gender?`<span class="chip">${p.provider_gender==="mujer"?"Mujer":p.provider_gender==="hombre"?"Hombre":"Otro"}</span>`:""}
           ${p.verified?`<span class="chip ok">Verificado</span>`:`<span class="chip warn">En verificación</span>`}
           <p class="muted">Cubres ${p.radius_km} km alrededor de ${esc(p.city)}${p.dept?`, ${esc(p.dept)}`:""}</p>
         </div>
@@ -835,7 +1137,8 @@ function nearCard(g){
     <p class="muted">${esc(g.entidad||"Entidad por definir")}<br>${esc(g.city)}${g.dept?`, ${esc(g.dept)}`:""}${g.distance_km!=null?`. A ${g.distance_km} km de tu zona`:""}</p>
     <p class="meta"><span>${esc(timeText(g.when))}</span><span class="price">${money(g.price,g.currency)}</span><span>${esc(PAY[g.pay_method]||"")}</span></p>
     <div class="chips">
-      ${g.requires==="abogado"?`<span class="chip">Solo abogado(a)</span>`:""}
+      ${g.requires&&g.requires!=="cualquiera"?`<span class="chip">${esc(REQUIRES_LABEL[g.requires]||g.requires)}</span>`:""}
+      ${g.preference_gender&&g.preference_gender!=="indistinto"?`<span class="chip">Prefiere ${g.preference_gender==="mujer"?"mujer":g.preference_gender==="hombre"?"hombre":"otro"}</span>`:""}
       ${g.offers_count?`<span class="chip">${g.offers_count} ${g.offers_count===1?"oferta":"ofertas"} ya</span>`:`<span class="chip ok">Sin ofertas aún</span>`}
     </div>
     ${g.details?`<p class="muted">${esc(g.details)}</p>`:""}
@@ -874,7 +1177,11 @@ function renderProviderForm(p){
   const editing=!!p;
   const country=(p&&p.country)||(S.loc&&ENABLED.includes(S.loc.country)?S.loc.country:ENABLED[0]);
   const chosen=new Set(p?p.tipos:["radicacion","entrega","secuestro"]);
-  const role=p?p.role:"abogado";
+  const legacyRole=p&&p.role;
+  const role=legacyRole==="abogado"?"profesional":(legacyRole==="judicante"?"estudiante":(legacyRole==="dependiente"?"otro":(legacyRole||"profesional")));
+  const roleOther=p&&p.role_other?p.role_other:"";
+  const profession=p&&p.profession?p.profession:"";
+  const phoneCountry=p&&p.phone_country?p.phone_country:country;
 
   $("#view").innerHTML=`
   <form id="provForm" class="card" novalidate>
@@ -884,8 +1191,25 @@ function renderProviderForm(p){
     <label for="prole">Soy</label>
     <select id="prole" name="role">${Object.entries(ROLES).map(([k,v])=>`<option value="${k}" ${k===role?"selected":""}>${v}</option>`).join("")}</select>
 
+    <div id="professionWrap" ${role==="profesional"?"":"hidden"}>
+      <label for="profession">Profesión</label>
+      <select id="profession" name="profession">
+        <option value="">Selecciona tu profesión</option>
+        ${Object.entries(PROFESSIONS).map(([k,v])=>`<option value="${k}" ${k===profession?"selected":""}>${v}</option>`).join("")}
+      </select>
+    </div>
+
+    <div id="roleOtherWrap" ${role==="otro"?"":"hidden"}>
+      <label for="role_other">¿Cuál?</label>
+      <input id="role_other" name="role_other" type="text" maxlength="100" value="${esc(roleOther)}" placeholder="Indica cuál es tu profesión o actividad">
+    </div>
+
     <label for="pname">Nombre completo</label>
     <input id="pname" name="name" type="text" maxlength="100" required autocomplete="name" value="${esc(p?p.name:"")}">
+
+    <label for="pid">Número de ID</label>
+    <input id="pid" name="id_number" type="text" maxlength="40" required autocomplete="off" value="${esc(p?p.id_number:"")}" placeholder="Número de documento de identidad">
+    <p class="hint">Se utiliza para identificar y verificar tu perfil. No se muestra públicamente.</p>
 
     <label for="cred" id="credLabel">Número de tarjeta profesional</label>
     <input id="cred" name="credential" type="text" maxlength="80" value="${esc(p?p.credential:"")}">
@@ -913,10 +1237,26 @@ function renderProviderForm(p){
     <div class="tipos">${Object.entries(TIPOS).map(([k,v])=>`<label><input type="checkbox" name="tipos" value="${k}" ${chosen.has(k)?"checked":""}> ${v}</label>`).join("")}</div>
 
     <div class="grid2">
-      <div><label for="pphone">WhatsApp</label>
-        <input id="pphone" name="phone" type="tel" inputmode="tel" required autocomplete="tel" placeholder="3001234567"></div>
+      <div>
+        <label for="provider_gender">Género</label>
+        <select id="provider_gender" name="provider_gender" required>
+          <option value="mujer" ${p&&p.provider_gender==="mujer"?"selected":""}>Mujer</option>
+          <option value="hombre" ${p&&p.provider_gender==="hombre"?"selected":""}>Hombre</option>
+          <option value="otro" ${p&&p.provider_gender==="otro"?"selected":""}>Otro</option>
+        </select>
+      </div>
+      <div>
+        <label for="phone_country">Celular</label>
+        <div class="phone-row">
+          <select id="phone_country" name="phone_country" class="phone-country" aria-label="Código de país del celular" title="Selecciona el país y su código">
+            ${Object.entries(COUNTRIES).map(([k,v])=>`<option value="${k}" ${k===phoneCountry?"selected":""}>${v.flag} +${v.dial}</option>`).join("")}
+          </select>
+          <input id="pphone" name="phone" class="phone-number" type="tel" inputmode="tel" required autocomplete="tel" placeholder="3001234567" aria-label="Número de celular o WhatsApp">
+        </div>
+        <p class="hint">Código de país + número.</p>
+      </div>
       <div><label for="pemail">Correo</label>
-        <input id="pemail" name="email" type="email" maxlength="120" required autocomplete="email"></div>
+        <input id="pemail" name="email" type="email" maxlength="120" required autocomplete="email" value="${esc(p?p.email||"":"")}"></div>
     </div>
     <p class="hint">Tu teléfono y tu correo solo se comparten con quien acepte tu oferta.${editing?" Vuelve a escribirlos para guardar cambios.":""}</p>
 
@@ -935,10 +1275,12 @@ function renderProviderForm(p){
   const f=$("#provForm");
   const syncRole=()=>{
     const r=field(f,"role").value;
-    $("#credLabel").textContent=r==="abogado"?"Número de tarjeta profesional":
-      (r==="dependiente"?"Experiencia (opcional)":"Universidad y semestre o año de grado");
-    $("#credHint").textContent=r==="abogado"?"Lo usamos para verificar tu registro. No se muestra públicamente.":
-      (r==="dependiente"?"Por ejemplo: años de experiencia en trámites y despachos.":"Ej.: Universidad Nacional, 9.º semestre.");
+    $("#professionWrap").hidden=r!=="profesional";
+    $("#roleOtherWrap").hidden=r!=="otro";
+    field(f,"profession").required=r==="profesional";
+    field(f,"role_other").required=r==="otro";
+    $("#credLabel").textContent="Acreditación o referencia (opcional)";
+    $("#credHint").textContent="Puedes indicar matrícula, tarjeta profesional, licencia o referencia si aplica.";
   };
   field(f,"role").onchange=syncRole;syncRole();
 
@@ -963,10 +1305,12 @@ async function submitProvider(e){
   const tipos=$$("input[name=tipos]:checked",f).map(i=>i.value);
   const country=v("country"),role=v("role");
   if(v("name").trim().length<2)return toast("Escribe tu nombre.",true);
+  if(!v("id_number").trim())return toast("Indica tu número de ID.",true);
+  if(role==="profesional"&&!v("profession"))return toast("Selecciona tu profesión.",true);
   if(v("city").trim().length<2)return toast("Indica tu municipio base.",true);
-  if(role==="abogado"&&!v("credential").trim())return toast("Falta tu número de tarjeta profesional.",true);
-  if((role==="judicante"||role==="estudiante")&&!v("credential").trim())return toast("Indica tu universidad y semestre.",true);
+  if(role==="otro"&&!v("role_other").trim())return toast("Indica cuál es tu profesión o actividad.",true);
   if(!tipos.length)return toast("Elige al menos un tipo de gestión.",true);
+  if(!["mujer","hombre","otro"].includes(v("provider_gender")))return toast("Indica cómo te identificas para las preferencias de atención.",true);
   if(!v("phone").trim()||!v("email").trim())return toast("Falta tu WhatsApp o tu correo.",true);
   if(!field(f,"consent").checked)return toast(ERRORS.consent,true);
 
@@ -977,9 +1321,10 @@ async function submitProvider(e){
     if(g){lat=g.lat;lng=g.lng}
   }
   const res=await api("gx_register_provider",{
-    token:providerToken(),role,name:v("name").trim(),credential:v("credential").trim(),
+    token:providerToken(),role,profession:v("profession"),role_other:v("role_other").trim(),name:v("name").trim(),id_number:v("id_number").trim(),credential:v("credential").trim(),
     country,city:v("city").trim(),dept:v("dept").trim(),lat,lng,radius_km:v("radius_km"),tipos,
-    phone:toE164(country,v("phone")),email:v("email").trim(),bio:v("bio").trim(),
+    provider_gender:v("provider_gender"),
+    phone_country:v("phone_country"),phone:toE164(v("phone_country"),v("phone")),email:v("email").trim(),bio:v("bio").trim(),
     consent:true,website:v("website")
   });
   setBusy(btn,false);
