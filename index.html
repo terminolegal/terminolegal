@@ -715,6 +715,102 @@ body.dark .error{
   flex:0 0 auto
 }
 
+/* GESTIONES — acceso integrado al estilo de Término Legal */
+.gx-help-card{
+  margin-top:14px;
+  padding:18px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:var(--surface);
+  box-shadow:0 8px 24px var(--shadow);
+  text-align:left;
+}
+
+.gx-help-single{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  min-height:48px;
+  border-radius:10px;
+  background:var(--navy);
+  color:var(--btn-text);
+  text-decoration:none;
+  border:1px solid var(--navy);
+  font-size:.68rem;
+  letter-spacing:.02em;
+  box-shadow:0 3px 8px var(--shadow);
+  transition:filter .15s,transform .15s;
+}
+.gx-help-single:hover{
+  filter:brightness(1.08);
+  transform:translateY(-1px);
+}
+.gx-help-header{
+  text-align:center;
+  margin-bottom:13px;
+}
+
+.gx-help-header strong{
+  display:block;
+  color:var(--navy);
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:1.05rem;
+  margin-bottom:4px;
+}
+
+.gx-help-header span{
+  display:block;
+  color:var(--muted);
+  font-size:.68rem;
+  line-height:1.5;
+}
+
+.gx-help-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+
+.gx-help-actions .advice-link{
+  width:100%;
+  margin:0;
+  height:42px;
+  justify-content:center;
+  border-radius:10px;
+  font-size:.65rem;
+}
+
+.gx-help-primary{
+  background:var(--navy);
+  color:var(--btn-text);
+  border-color:var(--navy);
+}
+
+.gx-help-primary svg{
+  color:var(--gold);
+}
+
+.gx-help-primary:hover{
+  background:var(--navy);
+  color:var(--btn-text);
+  border-color:var(--navy);
+  filter:brightness(1.08);
+  transform:translateY(-1px);
+}
+
+.gx-help-secondary{
+  background:transparent;
+  color:var(--navy);
+}
+
+.gx-help-secondary:hover{
+  background:var(--surface-alt);
+  border-color:var(--gold);
+  filter:none;
+  transform:translateY(-1px);
+}
+
 .advice-link:disabled{
   opacity:.6;
   cursor:wait
@@ -2294,25 +2390,25 @@ footer{
   </div>
 
   <!-- GESTIONES (sutil, debajo de Guardar PDF / Compartir) -->
-<div class="advice-cta" id="gxWidget" hidden>
+<div class="advice-cta gx-help-card" id="gxWidget" hidden>
 
-  <button type="button" id="gxDetectBtn" class="advice-link">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"></path>
-      <circle cx="12" cy="10" r="2.5"></circle>
-    </svg>
-    <span>Ver gestiones cerca de ti</span>
-  </button>
-
-  <a href="gestiones.html" class="advice-link" style="text-decoration:none;margin-left:6px">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <circle cx="9" cy="8" r="3.5"></circle>
-      <path d="M2.5 20c0-3.6 2.9-6 6.5-6"></path>
-      <circle cx="17" cy="16" r="3"></circle>
-      <path d="M19.2 18.2 22 21"></path>
-    </svg>
-    <span>Publicar una gestión</span>
+  <a href="gestiones.html" class="gx-help-single" aria-label="Requiero ayuda">
+    <strong>REQUIERO AYUDA</strong>
   </a>
+
+  <div class="gx-help-actions" hidden>
+  <button type="button" id="gxDetectBtn" class="advice-link gx-help-primary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"></path>
+        <circle cx="12" cy="10" r="2.5"></circle>
+      </svg>
+      <span>BUSCAR AYUDA</span>
+    </button>
+
+    <a href="gestiones.html" class="advice-link gx-help-secondary">
+      <span>PUBLICAR UNA GESTIÓN</span>
+    </a>
+  </div>
 
   <div id="gxWidgetStats" class="gx-widget-stats" hidden></div>
 
@@ -2352,7 +2448,6 @@ footer{
       <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.61 0 4.28 2.38 4.28 5.47v6.27zM5.34 7.43a2.07 2.07 0 110-4.13 2.07 2.07 0 010 4.13zM7.12 20.45H3.56V9h3.56v11.45z"/>
     </svg>
   </a>
-<a href="gestiones.html" class="footer-social-btn" style="color:inherit;text-decoration:none;font-size:12px;display:inline-flex;align-items:center;padding:0 6px" title="Gestiones">Gestiones</a>
 </div>
 
 </div><!-- /feedbackCard -->
@@ -5549,7 +5644,7 @@ function gxRenderStats(place,data){
   if(!data||!data.ok){
 
     gxWidgetStats.innerHTML=
-      `No pudimos consultar tu zona en este momento. <a href="gestiones.html">Entrar a Gestiones</a>`;
+      `No pudimos consultar tu zona en este momento. <a href="gestiones.html">Buscar ayuda en Gestiones</a>`;
 
     return;
 
@@ -5575,7 +5670,7 @@ function gxRenderStats(place,data){
         ?"gestión abierta"
         :"gestiones abiertas"
     } cerca de ti. `+
-    `<a href="gestiones.html">Ver o publicar una gestión</a>`;
+    `<a href="gestiones.html">Ver gestiones o publicar una gestión</a>`;
 
 }
 
@@ -5590,14 +5685,14 @@ async function gxDetectAndShowStats(){
     gxWidgetStats.hidden=false;
 
     gxWidgetStats.innerHTML=
-      `Tu navegador no permite detectar tu ubicación. <a href="gestiones.html">Entra directamente a Gestiones</a>.`;
+      `Tu navegador no permite detectar tu ubicación. <a href="gestiones.html">Busca ayuda directamente en Gestiones</a>.`;
 
     return;
 
   }
 
   gxDetectBtn.disabled=true;
-  gxSetDetectLabel("Buscando tu zona…");
+  gxSetDetectLabel("BUSCANDO…");
 
   navigator.geolocation.getCurrentPosition(
 
@@ -5618,7 +5713,7 @@ async function gxDetectAndShowStats(){
         await gxFetchZoneStats(place);
 
       gxDetectBtn.disabled=false;
-      gxSetDetectLabel("Ver gestiones cerca de ti");
+      gxSetDetectLabel("BUSCAR AYUDA");
 
       gxRenderStats(place,data);
 
@@ -5632,12 +5727,12 @@ async function gxDetectAndShowStats(){
     ()=>{
 
       gxDetectBtn.disabled=false;
-      gxSetDetectLabel("Ver gestiones cerca de ti");
+      gxSetDetectLabel("BUSCAR AYUDA");
 
       gxWidgetStats.hidden=false;
 
       gxWidgetStats.innerHTML=
-        `Activa la ubicación para ver gestiones cerca, o <a href="gestiones.html">entra directamente a Gestiones</a>.`;
+        `Activa la ubicación para buscar gestiones cerca, o <a href="gestiones.html">entra a Gestiones</a>.`;
 
     },
 
