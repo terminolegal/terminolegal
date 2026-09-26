@@ -216,9 +216,9 @@ button.primary,button.secondary,button.link{font:inherit;cursor:pointer}
 .tl-map-wrap{margin:10px 0 4px;border:1px solid var(--input-border);border-radius:12px;overflow:hidden;background:var(--surface)}
 .tl-map-tools{display:flex;gap:6px;padding:8px;background:var(--surface-alt);border-bottom:1px solid var(--line)}
 .tl-map-tools input{min-width:0;flex:1;margin:0}
-.tl-map{height:230px;width:100%}
+.tl-map{height:220px;width:100%;display:block;position:relative;overflow:hidden}
 .tl-map-note{padding:7px 9px;font-size:.78rem;color:var(--muted)}
-@media(max-width:520px){.tl-map{height:210px}.tl-map-tools{padding:7px}}
+@media(max-width:520px){.tl-map{height:200px}.tl-map-tools{padding:7px}}
 </style>
 </head>
 
@@ -772,10 +772,10 @@ async function initBasicMap(id,lat,lng,onPick,countryOverride){
   try{
     const has=Number.isFinite(Number(lat))&&Number.isFinite(Number(lng));
     const center=[has?Number(lat):4.65,has?Number(lng):-74.1];
-    const map=L.map(el,{scrollWheelZoom:true,zoomControl:true}).setView(center,has?13:5);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    const map=L.map(el,{scrollWheelZoom:false,zoomControl:true,attributionControl:true}).setView(center,has?11:5);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
       maxZoom:19,
-      attribution:'&copy; OpenStreetMap contributors'
+      attribution:'&copy; OpenStreetMap contributors &copy; CARTO'
     }).addTo(map);
 
     let marker=has?L.marker(center,{draggable:true}).addTo(map):null;
@@ -788,7 +788,7 @@ async function initBasicMap(id,lat,lng,onPick,countryOverride){
         marker=L.marker(pos,{draggable:true}).addTo(map);
         bindMarker();
       }else marker.setLatLng(pos);
-      if(zoom)map.setView(pos,14);
+      if(zoom)map.setView(pos,13);
       onPick&&onPick(la,lo);
     };
 
@@ -843,7 +843,8 @@ async function initBasicMap(id,lat,lng,onPick,countryOverride){
     });
 
     TL_MAP[id]={map,pick,marker:()=>marker};
-    setTimeout(()=>map.invalidateSize(),100);
+    setTimeout(()=>{map.invalidateSize();},100);
+    setTimeout(()=>{map.invalidateSize();},500);
     return TL_MAP[id];
   }catch(err){
     console.error(err);
