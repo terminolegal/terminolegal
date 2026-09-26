@@ -715,6 +715,37 @@ body.dark .error{
   flex:0 0 auto
 }
 
+.advice-link:disabled{
+  opacity:.6;
+  cursor:wait
+}
+
+.gx-widget-stats{
+  margin-top:10px;
+  padding:9px 12px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--surface-alt);
+  font-size:.68rem;
+  line-height:1.55;
+  color:var(--muted);
+  text-align:left
+}
+
+.gx-widget-stats strong{
+  color:var(--navy)
+}
+
+.gx-widget-stats a{
+  color:var(--navy);
+  font-weight:700;
+  text-decoration:none
+}
+
+.gx-widget-stats a:hover{
+  text-decoration:underline
+}
+
 /* NOTA INFERIOR (aviso de cálculo + versión), debajo de todas las cajas */
 .result-footnote{
   margin:16px auto 0;
@@ -1502,6 +1533,55 @@ footer{
   line-height:1.5
 }
 
+/* Secciones contraíbles (3, 4 y 5) — solo en pantalla; el PDF siempre
+   se genera completo, sin <details>. */
+.certification-collapsible{
+  border:0;
+  margin:0
+}
+
+.certification-collapsible>summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  list-style:none;
+  cursor:pointer;
+  color:#10243e;
+  font-size:11px;
+  letter-spacing:.06em;
+  margin:0 0 9px;
+  padding-bottom:6px;
+  border-bottom:1px solid #e4e8ed
+}
+
+.certification-collapsible>summary::-webkit-details-marker{
+  display:none
+}
+
+.certification-collapsible>summary::marker{
+  content:""
+}
+
+.certification-collapsible>summary:hover{
+  color:#b9964f
+}
+
+.certification-collapsible-chevron{
+  flex:0 0 auto;
+  color:#687383;
+  font-size:12px;
+  transition:transform .15s
+}
+
+.certification-collapsible[open] .certification-collapsible-chevron{
+  transform:rotate(90deg)
+}
+
+.certification-collapsible-body{
+  padding-top:2px
+}
+
 @media(max-width:600px){
   .certification-document{
     padding:24px 16px 28px
@@ -2214,8 +2294,17 @@ footer{
   </div>
 
   <!-- GESTIONES (sutil, debajo de Guardar PDF / Compartir) -->
-<div class="advice-cta">
-  <a href="gestiones.html" class="advice-link" style="text-decoration:none">
+<div class="advice-cta" id="gxWidget" hidden>
+
+  <button type="button" id="gxDetectBtn" class="advice-link">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"></path>
+      <circle cx="12" cy="10" r="2.5"></circle>
+    </svg>
+    <span>Ver gestiones cerca de ti</span>
+  </button>
+
+  <a href="gestiones.html" class="advice-link" style="text-decoration:none;margin-left:6px">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <circle cx="9" cy="8" r="3.5"></circle>
       <path d="M2.5 20c0-3.6 2.9-6 6.5-6"></path>
@@ -2224,6 +2313,9 @@ footer{
     </svg>
     <span>Publicar una gestión</span>
   </a>
+
+  <div id="gxWidgetStats" class="gx-widget-stats" hidden></div>
+
 </div>
 
 </div>
@@ -5336,7 +5428,234 @@ function applyCountryUI(){
   if(!showLegalOption)
     clearLegalTerm();
 
+  updateGxWidgetVisibility();
+
 }
+
+
+/* =========================================================
+   GESTIONES — vista previa dinámica
+   Muestra, bajo "Publicar una gestión", cuántos profesionales
+   cubren la zona del usuario y cuántas gestiones hay abiertas
+   cerca, usando el mismo backend (Apps Script) de gestiones.html.
+   Disponible por ahora solo donde opera Gestiones (Colombia).
+   ========================================================= */
+
+const GX_ENABLED=["CO"];
+
+const gxWidget=
+  document.getElementById("gxWidget");
+
+const gxDetectBtn=
+  document.getElementById("gxDetectBtn");
+
+const gxWidgetStats=
+  document.getElementById("gxWidgetStats");
+
+
+function updateGxWidgetVisibility(){
+
+  if(!gxWidget)
+    return;
+
+  const enabled=
+    GX_ENABLED.includes(currentCountry);
+
+  gxWidget.hidden=!enabled;
+
+  if(!enabled&&gxWidgetStats){
+
+    gxWidgetStats.hidden=true;
+    gxWidgetStats.innerHTML="";
+
+  }
+
+}
+
+
+function gxSetDetectLabel(text){
+
+  const span=
+    gxDetectBtn?.querySelector("span");
+
+  if(span)
+    span.textContent=text;
+
+}
+
+
+async function gxReverseGeocode(lat,lng){
+
+  try{
+
+    const r=await fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=es`
+    );
+
+    const j=await r.json();
+
+    return{
+      city:j.city||j.locality||"",
+      dept:j.principalSubdivision||""
+    };
+
+  }catch{
+
+    return{city:"",dept:""};
+
+  }
+
+}
+
+
+async function gxFetchZoneStats(place){
+
+  try{
+
+    const res=await fetch(
+      CALCULATION_SHEET_ENDPOINT,
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":
+            "text/plain;charset=utf-8"
+        },
+        body:JSON.stringify({
+          action:"gx_zone_stats",
+          visitor_id:getAnonymousVisitorId(),
+          country:"CO",
+          city:place.city,
+          lat:place.lat,
+          lng:place.lng
+        })
+      }
+    );
+
+    return await res.json();
+
+  }catch{
+
+    return{ok:false,error:"network"};
+
+  }
+
+}
+
+
+function gxRenderStats(place,data){
+
+  gxWidgetStats.hidden=false;
+
+  if(!data||!data.ok){
+
+    gxWidgetStats.innerHTML=
+      `No pudimos consultar tu zona en este momento. <a href="gestiones.html">Entrar a Gestiones</a>`;
+
+    return;
+
+  }
+
+  const zoneName=
+    place.city||"tu zona";
+
+  const proCount=
+    data.providers?.total||0;
+
+  const openCount=
+    data.open_gestiones||0;
+
+  gxWidgetStats.innerHTML=
+    `<strong>${proCount}</strong> ${
+      proCount===1
+        ?"profesional cubre"
+        :"profesionales cubren"
+    } ${escapeHtml(zoneName)} · `+
+    `<strong>${openCount}</strong> ${
+      openCount===1
+        ?"gestión abierta"
+        :"gestiones abiertas"
+    } cerca de ti. `+
+    `<a href="gestiones.html">Ver o publicar una gestión</a>`;
+
+}
+
+
+async function gxDetectAndShowStats(){
+
+  if(!gxDetectBtn)
+    return;
+
+  if(!navigator.geolocation){
+
+    gxWidgetStats.hidden=false;
+
+    gxWidgetStats.innerHTML=
+      `Tu navegador no permite detectar tu ubicación. <a href="gestiones.html">Entra directamente a Gestiones</a>.`;
+
+    return;
+
+  }
+
+  gxDetectBtn.disabled=true;
+  gxSetDetectLabel("Buscando tu zona…");
+
+  navigator.geolocation.getCurrentPosition(
+
+    async pos=>{
+
+      const lat=
+        Math.round(pos.coords.latitude*100)/100;
+
+      const lng=
+        Math.round(pos.coords.longitude*100)/100;
+
+      const{city,dept}=
+        await gxReverseGeocode(lat,lng);
+
+      const place={lat,lng,city,dept};
+
+      const data=
+        await gxFetchZoneStats(place);
+
+      gxDetectBtn.disabled=false;
+      gxSetDetectLabel("Ver gestiones cerca de ti");
+
+      gxRenderStats(place,data);
+
+      trackEvent(
+        "gx_widget_stats",
+        {ciudad:city,pais:"CO"}
+      );
+
+    },
+
+    ()=>{
+
+      gxDetectBtn.disabled=false;
+      gxSetDetectLabel("Ver gestiones cerca de ti");
+
+      gxWidgetStats.hidden=false;
+
+      gxWidgetStats.innerHTML=
+        `Activa la ubicación para ver gestiones cerca, o <a href="gestiones.html">entra directamente a Gestiones</a>.`;
+
+    },
+
+    {
+      enableHighAccuracy:false,
+      timeout:12000,
+      maximumAge:600000
+    }
+
+  );
+
+}
+
+
+gxDetectBtn?.addEventListener(
+  "click",
+  gxDetectAndShowStats
+);
 
 
 function setCountry(code,persist){
@@ -6273,7 +6592,43 @@ function buildGlossaryHTML(lang){
 }
 
 
-function buildCertificationHTML(termData,includeCalendar=true){
+/* Sección 3, 4 y 5: en pantalla se muestran contraídas por defecto
+   (usando <details>/<summary>, sin JS adicional); en el PDF siempre
+   van completas y expandidas, como antes. */
+function buildCertificationSectionHTML(titleText,bodyHtml,sectionClass,collapsible){
+
+  const cls=
+    sectionClass
+      ?`certification-section ${sectionClass}`
+      :"certification-section";
+
+  if(!collapsible){
+
+    return`
+    <section class="${cls}">
+      <h3>${escapeHtml(titleText)}</h3>
+      ${bodyHtml}
+    </section>`;
+
+  }
+
+  return`
+    <section class="${cls}">
+      <details class="certification-collapsible">
+        <summary class="certification-collapsible-summary">
+          <span>${escapeHtml(titleText)}</span>
+          <span class="certification-collapsible-chevron" aria-hidden="true">›</span>
+        </summary>
+        <div class="certification-collapsible-body">
+          ${bodyHtml}
+        </div>
+      </details>
+    </section>`;
+
+}
+
+
+function buildCertificationHTML(termData,includeCalendar=true,collapsible=false){
 
   const{
     start,
@@ -6393,25 +6748,31 @@ function buildCertificationHTML(termData,includeCalendar=true){
       ${calendarHtml}
     </section>
 
-    <section class="certification-section certification-sequence-section">
-      <h3>${escapeHtml(tr(lang,"certSec3"))}</h3>
-      <div class="certification-sequence" style="margin-top:0">
+    ${buildCertificationSectionHTML(
+      tr(lang,"certSec3"),
+      `<div class="certification-sequence" style="margin-top:0">
         ${buildCertificationSequence(termData)}
-      </div>
-    </section>
+      </div>`,
+      "certification-sequence-section",
+      collapsible
+    )}
 
-    <section class="certification-section">
-      <h3>${escapeHtml(tr(lang,"certSec4"))}</h3>
-      <p class="certification-method">${escapeHtml(methodText)}</p>
+    ${buildCertificationSectionHTML(
+      tr(lang,"certSec4"),
+      `<p class="certification-method">${escapeHtml(methodText)}</p>
 
       <h4 class="certification-glossary-title">${escapeHtml(tr(lang,"certGlossaryTitle"))}</h4>
-      ${buildGlossaryHTML(lang)}
-    </section>
+      ${buildGlossaryHTML(lang)}`,
+      "",
+      collapsible
+    )}
 
-    <section class="certification-section">
-      <h3>${escapeHtml(tr(lang,"certSec5"))}</h3>
-      <p class="certification-legal">${escapeHtml(legalText)}</p>
-    </section>
+    ${buildCertificationSectionHTML(
+      tr(lang,"certSec5"),
+      `<p class="certification-legal">${escapeHtml(legalText)}</p>`,
+      "",
+      collapsible
+    )}
 
     <div class="certification-end">
       <div class="certification-trace">
@@ -6444,6 +6805,7 @@ function renderCertification(termData){
   certificationDocument.innerHTML=
     buildCertificationHTML(
       termData,
+      true,
       true
     );
 
@@ -6488,7 +6850,7 @@ exportPdfBtn.addEventListener(
 
     printArea.innerHTML=
       `<div class="certification-document">
-        ${buildCertificationHTML(lastTermData,true)}
+        ${buildCertificationHTML(lastTermData,true,false)}
       </div>`;
 
     const calendarImage=
