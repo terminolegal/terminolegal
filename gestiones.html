@@ -766,19 +766,59 @@ function mapHtml(id,placeholder){
   </div>`;
 }
 
-async function initBasicMap(id,lat,lng,onPick,countryOverride){
+async function initBasicMap(id,lat,lng,onPick,countryOverride,points=[]){
   const el=document.getElementById(id);
   if(!el||!window.L)return null;
   try{
     const has=Number.isFinite(Number(lat))&&Number.isFinite(Number(lng));
     const center=[has?Number(lat):4.65,has?Number(lng):-74.1];
-    const map=L.map(el,{scrollWheelZoom:false,zoomControl:true,attributionControl:true}).setView(center,has?11:5);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+    const map=L.map(el,{scrollWheelZoom:false,zoomControl:true,attributionControl:true}).setView(center,has?12:5);
+
+    /* OpenStreetMap: mapa gratuito y sin API key */
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
       maxZoom:19,
-      attribution:'&copy; OpenStreetMap contributors &copy; CARTO'
+      attribution:'&copy; OpenStreetMap contributors'
     }).addTo(map);
 
     let marker=has?L.marker(center,{draggable:true}).addTo(map):null;
+    const gestionLayer=L.layerGroup().addTo(map);
+
+    const cleanPoints=Array.isArray(points)?points.filter(g=>{
+      const la=Number(g?.lat),lo=Number(g?.lng);
+      return Number.isFinite(la)&&Number.isFinite(lo);
+    }):[];
+
+    const markerPopup=g=>{
+      const title=esc(TIPOS[g.tipo]||g.title||'Gestión disponible');
+      const city=esc(g.city||'');
+      const price=g.price!=null?esc(money(g.price,g.currency||'COP')):'';
+      const distance=g.distance_km!=null?`<div class="muted">A ${esc(g.distance_km)} km</div>`:'';
+      return `<strong>${title}</strong>${city?`<div class="muted">${city}</div>`:''}${price?`<div class="price">${price}</div>`:''}${distance}`;
+    };
+
+    cleanPoints.forEach(g=>{
+      const m=L.circleMarker([Number(g.lat),Number(g.lng)],{
+        radius:7,weight:2,fillOpacity:.85
+      }).addTo(gestionLayer);
+      m.bindPopup(markerPopup(g));
+    });
+
+    const note=document.getElementById(id+'Note');
+    if(note){
+      note.textContent=cleanPoints.length
+        ?`${cleanPoints.length} ${cleanPoints.length===1?'gestión disponible':'gestiones disponibles'} en la zona.`
+        :'Mueve el punto para ajustar el lugar.';
+    }
+
+    const bindMarker=()=>{
+      if(!marker)return;
+      marker.off('dragend');
+      marker.on('dragend',()=>{
+        const q=marker.getLatLng();
+        onPick&&onPick(r2(q.lat),r2(q.lng));
+      });
+    };
+    bindMarker();
 
     const pick=(la,lo,zoom=true)=>{
       la=Number(la);lo=Number(lo);
@@ -791,16 +831,6 @@ async function initBasicMap(id,lat,lng,onPick,countryOverride){
       if(zoom)map.setView(pos,13);
       onPick&&onPick(la,lo);
     };
-
-    const bindMarker=()=>{
-      if(!marker)return;
-      marker.off('dragend');
-      marker.on('dragend',()=>{
-        const q=marker.getLatLng();
-        onPick&&onPick(r2(q.lat),r2(q.lng));
-      });
-    };
-    bindMarker();
 
     map.on('click',e=>{
       if(e.latlng)pick(e.latlng.lat,e.latlng.lng,false);
@@ -819,7 +849,6 @@ async function initBasicMap(id,lat,lng,onPick,countryOverride){
         if(!result){toast('No encontramos ese lugar.',true);return}
         const la=Number(result.lat),lo=Number(result.lon);
         pick(la,lo);
-        const note=document.getElementById(id+'Note');
         if(note)note.textContent=result.display_name||'Lugar seleccionado';
         input.value=(result.display_name||q).split(',').slice(0,2).join(',');
       }catch(err){
@@ -838,13 +867,12 @@ async function initBasicMap(id,lat,lng,onPick,countryOverride){
       pick(p.lat,p.lng);
       const input=document.getElementById(id+'Search');
       if(input)input.value=[p.city,p.dept].filter(Boolean).join(', ');
-      const note=document.getElementById(id+'Note');
       if(note)note.textContent='Ubicación aproximada aplicada.';
     });
 
-    TL_MAP[id]={map,pick,marker:()=>marker};
-    setTimeout(()=>{map.invalidateSize();},100);
-    setTimeout(()=>{map.invalidateSize();},500);
+    TL_MAP[id]={map,pick,marker:()=>marker,gestionLayer};
+    setTimeout(()=>map.invalidateSize(),100);
+    setTimeout(()=>map.invalidateSize(),500);
     return TL_MAP[id];
   }catch(err){
     console.error(err);
@@ -886,7 +914,7 @@ async function renderZone(){
         <span><b>${res.open_gestiones}</b> ${res.open_gestiones===1?"gestión abierta":"gestiones abiertas"} a menos de 50 km</span>
       </div>
       ${roles?`<p class="muted" style="margin-top:4px">${roles}</p>`:""}
-      <div id="gestionesMapWrap">${mapHtml("gestionesMap","Buscar una zona o lugar")}</div>
+      <div id="gestionesMapWrap">${mapHtml("gestionesMap","Buscar dirección, municipio o lugar")}</div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       ${res.group_url?`<a class="btn-sm" style="display:inline-flex;align-items:center;text-decoration:none" href="${esc(res.group_url)}" target="_blank" rel="noopener noreferrer">UNIRME AL GRUPO</a>`:""}
@@ -894,6 +922,14 @@ async function renderZone(){
     </div>
   </div>`;
   $("#detectZone").onclick=onDetectZone;
+  const mapPoints=Array.isArray(res.gestiones)
+    ?res.gestiones
+    :Array.isArray(res.open_gestiones_items)
+      ?res.open_gestiones_items
+      :Array.isArray(res.items)
+        ?res.items
+        :[];
+
   initBasicMap("gestionesMap",S.loc.lat,S.loc.lng,async(lat,lng)=>{
     const p=await reverseGeocode(lat,lng);
     if(p){
@@ -904,7 +940,7 @@ async function renderZone(){
       S.loc.lat=lat;S.loc.lng=lng;
       saveLoc(S.loc);
     }
-  },S.loc.country);
+  },S.loc.country,mapPoints);
 }
 
 async function onDetectZone(){
