@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Gestiones en Término Legal</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ3lLq4x4h0bKQ3X1m8h9nJ8j1gK8mQ=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 <style>
 *{box-sizing:border-box}
@@ -746,35 +748,11 @@ document.addEventListener("visibilitychange",()=>{
 
 /* =========================================================
    MAPA ÚNICO DE GESTIONES CERCA DE TI
-   Google Maps + Geocoder.
+   Leaflet + OpenStreetMap + Nominatim.
+   No requiere API key ni facturación de Google.
    Todo el flujo de ubicación trabaja sobre este único mapa.
    ========================================================= */
 const TL_MAP={};
-const GOOGLE_MAPS_API_KEY="PON_AQUI_TU_API_KEY_DE_GOOGLE_MAPS";
-let TL_GOOGLE_READY=null;
-
-function loadGoogleMaps(){
-  if(window.google?.maps)return Promise.resolve();
-  if(TL_GOOGLE_READY)return TL_GOOGLE_READY;
-  TL_GOOGLE_READY=new Promise((resolve,reject)=>{
-    if(!GOOGLE_MAPS_API_KEY||GOOGLE_MAPS_API_KEY.includes('PON_AQUI')){
-      reject(new Error('Falta la API key de Google Maps.'));
-      return;
-    }
-    const callback='__tlGoogleMapsReady';
-    window[callback]=()=>{
-      delete window[callback];
-      resolve();
-    };
-    const script=document.createElement('script');
-    script.src=`https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(GOOGLE_MAPS_API_KEY)}&loading=async&callback=${callback}&language=es&region=CO`;
-    script.async=true;
-    script.defer=true;
-    script.onerror=()=>{delete window[callback];reject(new Error('No se pudo cargar Google Maps.'))};
-    document.head.appendChild(script);
-  });
-  return TL_GOOGLE_READY;
-}
 
 function mapHtml(id,placeholder){
   return `<div class="tl-map-wrap">
@@ -790,44 +768,42 @@ function mapHtml(id,placeholder){
 
 async function initBasicMap(id,lat,lng,onPick,countryOverride){
   const el=document.getElementById(id);
-  if(!el)return null;
+  if(!el||!window.L)return null;
   try{
-    await loadGoogleMaps();
-    if(!document.getElementById(id))return null;
-
     const has=Number.isFinite(Number(lat))&&Number.isFinite(Number(lng));
-    const center={lat:has?Number(lat):4.65,lng:has?Number(lng):-74.1};
-    const map=new google.maps.Map(el,{
-      center,
-      zoom:has?13:5,
-      mapTypeControl:false,
-      streetViewControl:false,
-      fullscreenControl:true,
-      gestureHandling:'greedy'
-    });
-    let marker=has?new google.maps.Marker({map,position:center,draggable:true}):null;
+    const center=[has?Number(lat):4.65,has?Number(lng):-74.1];
+    const map=L.map(el,{scrollWheelZoom:true,zoomControl:true}).setView(center,has?13:5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+      maxZoom:19,
+      attribution:'&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker=has?L.marker(center,{draggable:true}).addTo(map):null;
 
     const pick=(la,lo,zoom=true)=>{
       la=Number(la);lo=Number(lo);
       if(!Number.isFinite(la)||!Number.isFinite(lo))return;
-      const pos={lat:la,lng:lo};
-      if(!marker)marker=new google.maps.Marker({map,position:pos,draggable:true});
-      else marker.setPosition(pos);
-      if(zoom)map.setCenter(pos),map.setZoom(14);
+      const pos=[la,lo];
+      if(!marker){
+        marker=L.marker(pos,{draggable:true}).addTo(map);
+        bindMarker();
+      }else marker.setLatLng(pos);
+      if(zoom)map.setView(pos,14);
       onPick&&onPick(la,lo);
     };
 
     const bindMarker=()=>{
       if(!marker)return;
-      marker.addListener('dragend',()=>{
-        const q=marker.getPosition();
-        onPick&&onPick(r2(q.lat()),r2(q.lng()));
+      marker.off('dragend');
+      marker.on('dragend',()=>{
+        const q=marker.getLatLng();
+        onPick&&onPick(r2(q.lat),r2(q.lng));
       });
     };
     bindMarker();
 
-    map.addListener('click',e=>{
-      if(e.latLng)pick(e.latLng.lat(),e.latLng.lng(),false);
+    map.on('click',e=>{
+      if(e.latlng)pick(e.latlng.lat,e.latlng.lng,false);
     });
 
     const search=async()=>{
@@ -835,25 +811,20 @@ async function initBasicMap(id,lat,lng,onPick,countryOverride){
       const q=(input?.value||'').trim();
       if(!q)return;
       try{
-        const {Geocoder}=await google.maps.importLibrary('geocoding');
-        const geocoder=new Geocoder();
-        const country=countryOverride||((S.loc&&S.loc.country)||ENABLED[0]);
-        const response=await geocoder.geocode({
-          address:q,
-          componentRestrictions:{country:String(country).toLowerCase()},
-          language:'es',
-          region:'CO'
-        });
-        const result=response.results?.[0];
+        const cc=String(countryOverride||((S.loc&&S.loc.country)||ENABLED[0])||'CO').toLowerCase();
+        const url=`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&accept-language=es&countrycodes=${encodeURIComponent(cc)}&q=${encodeURIComponent(q)}`;
+        const response=await fetch(url,{headers:{'Accept':'application/json'}});
+        const results=await response.json();
+        const result=results?.[0];
         if(!result){toast('No encontramos ese lugar.',true);return}
-        const p=result.geometry.location;
-        pick(p.lat(),p.lng());
+        const la=Number(result.lat),lo=Number(result.lon);
+        pick(la,lo);
         const note=document.getElementById(id+'Note');
-        if(note)note.textContent=result.formatted_address||'Lugar seleccionado';
-        input.value=(result.formatted_address||q).split(',').slice(0,2).join(',');
+        if(note)note.textContent=result.display_name||'Lugar seleccionado';
+        input.value=(result.display_name||q).split(',').slice(0,2).join(',');
       }catch(err){
         console.error(err);
-        toast('No pudimos buscar ese lugar en Google Maps.',true);
+        toast('No pudimos buscar ese lugar.',true);
       }
     };
 
@@ -872,12 +843,12 @@ async function initBasicMap(id,lat,lng,onPick,countryOverride){
     });
 
     TL_MAP[id]={map,pick,marker:()=>marker};
-    setTimeout(()=>google.maps.event.trigger(map,'resize'),80);
+    setTimeout(()=>map.invalidateSize(),100);
     return TL_MAP[id];
   }catch(err){
     console.error(err);
     const note=document.getElementById(id+'Note');
-    if(note)note.textContent=(GOOGLE_MAPS_API_KEY.includes('PON_AQUI')?'Falta configurar la API key de Google Maps.':'No se pudo cargar Google Maps. Revisa la API key, Maps JavaScript API y la facturación de Google Cloud.');
+    if(note)note.textContent='No se pudo cargar el mapa. Comprueba tu conexión a Internet.';
     return null;
   }
 }
