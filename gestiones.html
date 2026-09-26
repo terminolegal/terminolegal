@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Gestiones en Término Legal</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ3lLq4x4h0bKQ3X1m8h9nJ8j1gK8mQ=" crossorigin=""/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
 *{box-sizing:border-box}
@@ -216,9 +216,21 @@ button.primary,button.secondary,button.link{font:inherit;cursor:pointer}
 .tl-map-wrap{margin:10px 0 4px;border:1px solid var(--input-border);border-radius:12px;overflow:hidden;background:var(--surface)}
 .tl-map-tools{display:flex;gap:6px;padding:8px;background:var(--surface-alt);border-bottom:1px solid var(--line)}
 .tl-map-tools input{min-width:0;flex:1;margin:0}
-.tl-map{height:220px;width:100%;display:block;position:relative;overflow:hidden}
+.tl-map{height:260px;width:100%;display:block;position:relative;overflow:hidden;background:#e9edf2}
+.tl-map .leaflet-container{width:100%;height:100%;font:inherit;background:#e9edf2;z-index:0}
+.tl-map .leaflet-map-pane{z-index:1}
+.tl-map .leaflet-tile-pane{z-index:2}
+.tl-map .leaflet-overlay-pane{z-index:4}
+.tl-map .leaflet-marker-pane{z-index:6}
+.tl-map .leaflet-tooltip-pane{z-index:7}
+.tl-map .leaflet-popup-pane{z-index:8}
+.tl-map .leaflet-control{z-index:9}
+.tl-map img.leaflet-tile{display:block!important;max-width:none!important;max-height:none!important;width:256px!important;height:256px!important}
+.tl-map .leaflet-tile-container{width:256px;height:256px}
+.tl-map .leaflet-tile-pane img{max-width:none!important;max-height:none!important}
+.tl-map .leaflet-control-zoom a{box-sizing:border-box}
 .tl-map-note{padding:7px 9px;font-size:.78rem;color:var(--muted)}
-@media(max-width:520px){.tl-map{height:200px}.tl-map-tools{padding:7px}}
+@media(max-width:520px){.tl-map{height:230px}.tl-map-tools{padding:7px}}
 </style>
 </head>
 
