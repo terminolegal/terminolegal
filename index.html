@@ -2569,6 +2569,7 @@ const I18N={
     typeBusiness:"Días hábiles",
     typeCalendar:"Días calendario ({unit})",
     typeLegal:"Término frecuente: {term} — {unit} calendario",
+    typeLegalBusiness:"Término frecuente: {term} — días hábiles",
     frequentTerm:"Término frecuente",
 
     seqStart:"Fecha de inicio — no contabilizada",
@@ -2631,6 +2632,7 @@ const I18N={
     typeBusiness:"Dias úteis",
     typeCalendar:"Dias corridos ({unit})",
     typeLegal:"Prazo frequente: {term} — {unit} corridos",
+    typeLegalBusiness:"Prazo frequente: {term} — dias úteis",
     frequentTerm:"Prazo frequente",
 
     seqStart:"Data de início — não contabilizada",
@@ -3883,7 +3885,7 @@ function getCountedDates(
 
 
 /* ETIQUETAS */
-function typeDisplayLabel(type,unit,lang="es"){
+function typeDisplayLabel(type,unit,lang="es",mode){
 
   const unitWord=
     unit==="months"
@@ -3895,6 +3897,10 @@ function typeDisplayLabel(type,unit,lang="es"){
 
   if(type==="legal"){
     const term=selectedLegalTerm||tr(lang,"frequentTerm");
+
+    if(mode==="business")
+      return tr(lang,"typeLegalBusiness",{term});
+
     return tr(lang,"typeLegal",{term,unit:unitWord});
   }
 
@@ -4619,6 +4625,13 @@ calculateBtn.addEventListener(
       return;
     }
 
+    /* Modalidad efectiva de conteo: en "Términos frecuentes" la define
+       el concepto elegido (p. ej. tutela = días hábiles). */
+    const mode=
+      type==="legal"
+        ?selectedLegalMode
+        :type;
+
     const{
       countedDates,
       holidaysEncountered
@@ -4626,7 +4639,7 @@ calculateBtn.addEventListener(
       getCountedDates(
         start,
         amount,
-        type,
+        mode,
         unit
       );
 
@@ -4643,7 +4656,7 @@ calculateBtn.addEventListener(
     const lang=outputLang(currentCountry);
 
     const amountLabel=
-      amountText(amount,type,unit,lang);
+      amountText(amount,mode,unit,lang);
 
     resultDate.textContent=
       formatDate(end,lang).toLowerCase();
@@ -4661,12 +4674,13 @@ calculateBtn.addEventListener(
       typeDisplayLabel(
         type,
         unit,
-        lang
+        lang,
+        mode
       );
 
     if(
       holidaysEncountered.length>0 &&
-      type==="business"
+      mode==="business"
     ){
 
       const names=
@@ -4693,6 +4707,7 @@ calculateBtn.addEventListener(
       holidaysEncountered,
       amount,
       type,
+      countMode:mode,
       unit,
       country:currentCountry,
       legalTerm:
@@ -4811,46 +4826,88 @@ const daysRadio=
 
 const COLOMBIA_LEGAL_TERMS=[
 
+  /* norm: fundamento normativo que se muestra junto al nombre (Nombre - Artículo X Norma).
+     mode:"business": los términos del concepto se cuentan en días hábiles. */
+
   {id:"constitucional-administrativo",name:"Derecho Constitucional y Administrativo",terms:[
-    {name:"Acción de tutela",refs:[{label:"10 días",amount:10,unit:"days",detail:"Plazo para proferir el fallo · Decreto 2591 de 1991, art. 29"},{label:"3 días",amount:3,unit:"days",detail:"Impugnación del fallo · art. 31"},{label:"48 horas",amount:null,unit:null,detail:"Plazo máximo fijado en el fallo para su cumplimiento · art. 29"}]},
-    {name:"Derecho de petición",refs:[{label:"15 días",amount:15,unit:"days",detail:"Regla general para resolver · Ley 1755 de 2015, art. 14"},{label:"10 días",amount:10,unit:"days",detail:"Documentos e información · art. 14.1"},{label:"30 días",amount:30,unit:"days",detail:"Consultas a las autoridades · art. 14.2"}]},
-    {name:"Habeas corpus",refs:[{label:"36 horas",amount:null,unit:null,detail:"Decisión sobre la solicitud · Constitución, art. 30; Ley 1095 de 2006"}]},
-    {name:"Habeas data",refs:[]},{name:"Debido proceso",refs:[]},
-    {name:"Acción popular",refs:[{label:"10 días",amount:10,unit:"days",detail:"Traslado para contestar la demanda · Ley 472 de 1998, art. 22"},{label:"20 días",amount:20,unit:"days",detail:"Plazo del juez para sentencia después de alegar · art. 34"}]},
-    {name:"Acción de cumplimiento",refs:[{label:"10 días",amount:10,unit:"days",detail:"Término para que la autoridad atienda la solicitud de renuencia · Ley 393 de 1997, art. 8"},{label:"20 días",amount:20,unit:"days",detail:"Plazo para proferir decisión después de la admisión · art. 13"},{label:"3 días",amount:3,unit:"days",detail:"Corrección de la solicitud / decisión sobre admisión según el trámite · arts. 12 y 13"}]},
-    {name:"Nulidad",refs:[{label:"En cualquier tiempo",amount:null,unit:null,detail:"Regla general para la nulidad en los supuestos del CPACA · Ley 1437 de 2011, art. 164.1"}]},
-    {name:"Nulidad y restablecimiento del derecho",refs:[{label:"4 meses",amount:4,unit:"months",detail:"Regla general de caducidad · CPACA, art. 164.2.d"}]},
-    {name:"Reparación directa",refs:[{label:"2 años",amount:24,unit:"months",detail:"Regla general de caducidad · CPACA, art. 164.2.i"}]}
+    {name:"Acción de tutela",norm:"Artículo 86 Constitución Política",mode:"business",refs:[{label:"10 días hábiles",amount:10,unit:"days",detail:"Plazo para proferir el fallo · Decreto 2591 de 1991, art. 29"},{label:"3 días hábiles",amount:3,unit:"days",detail:"Impugnación del fallo · Decreto 2591 de 1991, art. 31"},{label:"48 horas",amount:null,unit:null,detail:"Plazo máximo fijado en el fallo para su cumplimiento · art. 29"}]},
+    {name:"Derecho de petición",norm:"Artículo 14 Ley 1755 de 2015",refs:[{label:"15 días",amount:15,unit:"days",detail:"Regla general para resolver · Ley 1755 de 2015, art. 14"},{label:"10 días",amount:10,unit:"days",detail:"Documentos e información · art. 14.1"},{label:"30 días",amount:30,unit:"days",detail:"Consultas a las autoridades · art. 14.2"}]},
+    {name:"Habeas corpus",norm:"Artículo 30 Constitución Política",refs:[{label:"36 horas",amount:null,unit:null,detail:"Decisión sobre la solicitud · Constitución, art. 30; Ley 1095 de 2006"}]},
+    {name:"Habeas data",norm:"Artículo 15 Constitución Política",refs:[]},
+    {name:"Debido proceso",norm:"Artículo 29 Constitución Política",refs:[]},
+    {name:"Acción popular",norm:"Artículo 88 Constitución Política",refs:[{label:"10 días",amount:10,unit:"days",detail:"Traslado para contestar la demanda · Ley 472 de 1998, art. 22"},{label:"20 días",amount:20,unit:"days",detail:"Plazo del juez para sentencia después de alegar · art. 34"}]},
+    {name:"Acción de cumplimiento",norm:"Artículo 87 Constitución Política",refs:[{label:"10 días",amount:10,unit:"days",detail:"Término para que la autoridad atienda la solicitud de renuencia · Ley 393 de 1997, art. 8"},{label:"20 días",amount:20,unit:"days",detail:"Plazo para proferir decisión después de la admisión · art. 13"},{label:"3 días",amount:3,unit:"days",detail:"Corrección de la solicitud / decisión sobre admisión según el trámite · arts. 12 y 13"}]},
+    {name:"Nulidad",norm:"Artículo 137 Ley 1437 de 2011",refs:[{label:"En cualquier tiempo",amount:null,unit:null,detail:"Regla general para la nulidad en los supuestos del CPACA · Ley 1437 de 2011, art. 164.1"}]},
+    {name:"Nulidad y restablecimiento del derecho",norm:"Artículo 138 Ley 1437 de 2011",refs:[{label:"4 meses",amount:4,unit:"months",detail:"Regla general de caducidad · CPACA, art. 164.2.d"}]},
+    {name:"Reparación directa",norm:"Artículo 140 Ley 1437 de 2011",refs:[{label:"2 años",amount:24,unit:"months",detail:"Regla general de caducidad · CPACA, art. 164.2.i"}]}
   ]},
 
   {id:"laboral",name:"Derecho Laboral",terms:[
-    {name:"Contrato de trabajo",refs:[]},{name:"Despido sin justa causa",refs:[]},{name:"Indemnización laboral",refs:[]},{name:"Liquidación laboral",refs:[]},
-    {name:"Acoso laboral",refs:[]},{name:"Estabilidad laboral reforzada",refs:[]},{name:"Fuero de salud",refs:[]},
-    {name:"Prestaciones sociales",refs:[]},{name:"Seguridad social",refs:[]},
-    {name:"Pensión",refs:[]}
+    {name:"Contrato de trabajo",norm:"Artículo 22 Código Sustantivo del Trabajo",refs:[]},
+    {name:"Despido sin justa causa",norm:"Artículo 64 Código Sustantivo del Trabajo",refs:[]},
+    {name:"Indemnización laboral",norm:"Artículo 64 Código Sustantivo del Trabajo",refs:[]},
+    {name:"Liquidación laboral",refs:[]},
+    {name:"Acoso laboral",norm:"Artículo 2 Ley 1010 de 2006",refs:[]},
+    {name:"Estabilidad laboral reforzada",norm:"Artículo 26 Ley 361 de 1997",refs:[]},
+    {name:"Fuero de salud",norm:"Artículo 26 Ley 361 de 1997",refs:[]},
+    {name:"Prestaciones sociales",refs:[]},
+    {name:"Seguridad social",norm:"Artículo 48 Constitución Política",refs:[]},
+    {name:"Pensión",norm:"Artículo 33 Ley 100 de 1993",refs:[]}
   ]},
 
   {id:"civil",name:"Derecho Civil",terms:[
-    {name:"Responsabilidad civil",refs:[]},{name:"Daños y perjuicios",refs:[]},{name:"Incumplimiento contractual",refs:[]},{name:"Obligaciones",refs:[]},{name:"Contrato",refs:[]},{name:"Compraventa",refs:[]},{name:"Arrendamiento",refs:[]},
-    {name:"Prescripción",refs:[{label:"3 años",amount:36,unit:"months",detail:"Regla general de prescripción de obligaciones civiles no sometidas a término especial: verificar naturaleza de la acción y norma aplicable."}]},
-    {name:"Conciliación",refs:[]},{name:"Transacción",refs:[]}
+    {name:"Responsabilidad civil",norm:"Artículo 2341 Código Civil",refs:[]},
+    {name:"Daños y perjuicios",norm:"Artículo 1613 Código Civil",refs:[]},
+    {name:"Incumplimiento contractual",norm:"Artículo 1546 Código Civil",refs:[]},
+    {name:"Obligaciones",norm:"Artículo 1494 Código Civil",refs:[]},
+    {name:"Contrato",norm:"Artículo 1495 Código Civil",refs:[]},
+    {name:"Compraventa",norm:"Artículo 1849 Código Civil",refs:[]},
+    {name:"Arrendamiento",norm:"Artículo 1973 Código Civil",refs:[]},
+    {name:"Prescripción",norm:"Artículo 2512 Código Civil",refs:[{label:"3 años",amount:36,unit:"months",detail:"Regla general de prescripción de obligaciones civiles no sometidas a término especial: verificar naturaleza de la acción y norma aplicable."}]},
+    {name:"Conciliación",norm:"Artículo 67 Ley 2220 de 2022",refs:[]},
+    {name:"Transacción",norm:"Artículo 2469 Código Civil",refs:[]}
   ]},
 
   {id:"familia",name:"Derecho de Familia",terms:[
-    {name:"Divorcio",refs:[]},{name:"Unión marital de hecho",refs:[]},{name:"Pensión alimentaria",refs:[]},{name:"Custodia y cuidado personal",refs:[]},{name:"Patria potestad",refs:[]},{name:"Sucesión",refs:[]},{name:"Herencia",refs:[]},{name:"Testamento",refs:[]}
+    {name:"Divorcio",norm:"Artículo 154 Código Civil",refs:[]},
+    {name:"Unión marital de hecho",norm:"Artículo 1 Ley 54 de 1990",refs:[]},
+    {name:"Pensión alimentaria",norm:"Artículo 411 Código Civil",refs:[]},
+    {name:"Custodia y cuidado personal",norm:"Artículo 23 Ley 1098 de 2006",refs:[]},
+    {name:"Patria potestad",norm:"Artículo 288 Código Civil",refs:[]},
+    {name:"Sucesión",norm:"Artículo 1008 Código Civil",refs:[]},
+    {name:"Herencia",refs:[]},
+    {name:"Testamento",norm:"Artículo 1055 Código Civil",refs:[]}
   ]},
 
   {id:"penal",name:"Derecho Penal",terms:[
-    {name:"Denuncia penal",refs:[{label:"Depende del delito y actuación",amount:null,unit:null,detail:"No existe un único plazo procesal asociado a la simple denuncia; deben identificarse delito, etapa y actuación concreta."}]},
-    {name:"Estafa",refs:[]},{name:"Fraude",refs:[]},{name:"Delito informático",refs:[]},{name:"Lavado de activos",refs:[]},{name:"Prevaricato",refs:[]},{name:"Extinción de dominio",refs:[]}
+    {name:"Denuncia penal",norm:"Artículo 67 Ley 906 de 2004",refs:[{label:"Depende del delito y actuación",amount:null,unit:null,detail:"No existe un único plazo procesal asociado a la simple denuncia; deben identificarse delito, etapa y actuación concreta."}]},
+    {name:"Estafa",norm:"Artículo 246 Ley 599 de 2000",refs:[]},
+    {name:"Fraude",refs:[]},
+    {name:"Delito informático",norm:"Artículos 269A a 269J Ley 599 de 2000",refs:[]},
+    {name:"Lavado de activos",norm:"Artículo 323 Ley 599 de 2000",refs:[]},
+    {name:"Prevaricato",norm:"Artículos 413 y 414 Ley 599 de 2000",refs:[]},
+    {name:"Extinción de dominio",norm:"Artículo 34 Constitución Política",refs:[]}
   ]},
 
   {id:"corporativo-comercial",name:"Derecho Corporativo y Comercial",terms:[
-    {name:"Sociedad por Acciones Simplificada (SAS)",refs:[]},{name:"Cámara de Comercio",refs:[]},{name:"Due Diligence (debida diligencia)",refs:[]},{name:"Gobierno corporativo",refs:[]},{name:"Protección de datos personales",refs:[]}
+    {name:"Sociedad por Acciones Simplificada (SAS)",norm:"Artículo 1 Ley 1258 de 2008",refs:[]},
+    {name:"Cámara de Comercio",norm:"Artículo 78 Código de Comercio",refs:[]},
+    {name:"Due Diligence (debida diligencia)",refs:[]},
+    {name:"Gobierno corporativo",norm:"Artículo 23 Ley 222 de 1995",refs:[]},
+    {name:"Protección de datos personales",norm:"Artículo 1 Ley 1581 de 2012",refs:[]}
   ]},
 
   {id:"empresas-entidades",name:"Empresas y entidades públicas",terms:[
-    {name:"Contratación estatal",refs:[]},{name:"SECOP II",refs:[]},{name:"Pliegos tipo",refs:[]},{name:"Equilibrio económico del contrato",refs:[]},{name:"Incumplimiento contractual",refs:[]},{name:"Multas y cláusula penal",refs:[]},{name:"Liquidación contractual",refs:[]},{name:"Debida diligencia (Due Diligence)",refs:[]},{name:"Protección de datos personales",refs:[]},{name:"Compliance o cumplimiento normativo",refs:[]}
+    {name:"Contratación estatal",norm:"Artículo 1 Ley 80 de 1993",refs:[]},
+    {name:"SECOP II",norm:"Artículo 3 Ley 1150 de 2007",refs:[]},
+    {name:"Pliegos tipo",refs:[]},
+    {name:"Equilibrio económico del contrato",norm:"Artículo 27 Ley 80 de 1993",refs:[]},
+    {name:"Incumplimiento contractual",norm:"Artículo 1546 Código Civil",refs:[]},
+    {name:"Multas y cláusula penal",norm:"Artículo 86 Ley 1474 de 2011",refs:[]},
+    {name:"Liquidación contractual",norm:"Artículo 11 Ley 1150 de 2007",refs:[]},
+    {name:"Debida diligencia (Due Diligence)",refs:[]},
+    {name:"Protección de datos personales",norm:"Artículo 1 Ley 1581 de 2012",refs:[]},
+    {name:"Compliance o cumplimiento normativo",refs:[]}
   ]}
 
 ];
@@ -4888,6 +4945,9 @@ const legalTermHint=
 
 let selectedLegalTerm="";
 
+/* Modalidad de conteo del término frecuente elegido: "business" (hábiles) o "calendar". */
+let selectedLegalMode="calendar";
+
 
 function normalizeSearchText(value){
 
@@ -4913,6 +4973,8 @@ function flattenLegalTerms(){
           list.push({
             term:term.name,
             refs:term.refs||[],
+            norm:term.norm||"",
+            mode:term.mode||"calendar",
             categoryId:category.id,
             categoryName:category.name
           });
@@ -4922,6 +4984,21 @@ function flattenLegalTerms(){
   );
 
   return list;
+
+}
+
+
+/* "Nombre - Artículo X Norma" cuando el término tiene fundamento normativo. */
+function legalTermLabel(name){
+
+  const info=
+    flattenLegalTerms().find(
+      x=>x.term===name
+    );
+
+  return info&&info.norm
+    ?`${name} - ${info.norm}`
+    :name;
 
 }
 
@@ -4987,7 +5064,7 @@ function renderLegalCategories(){
               :"Requiere verificar el plazo aplicable";
 
           button.innerHTML=`
-            <span>${escapeHtml(term.name)}</span>
+            <span>${escapeHtml(term.norm?`${term.name} - ${term.norm}`:term.name)}</span>
             <small class="legal-reference-badge">${escapeHtml(refLabel)}</small>
           `;
 
@@ -5061,7 +5138,7 @@ function populateLegalSelect(){
             document.createElement("option");
 
           option.value=term.name;
-          option.textContent=term.name;
+          option.textContent=term.norm?`${term.name} - ${term.norm}`:term.name;
 
           group.appendChild(option);
 
@@ -5080,24 +5157,36 @@ function selectLegalTerm(term,categoryName){
 
   selectedLegalTerm=term;
 
-  legalTermSelect.value=term;
-
-  legalSelectedTermName.textContent=term;
-  legalSelectedTerm.hidden=false;
-
   const selectedInfo=
     flattenLegalTerms().find(
       item=>item.term===term
     );
 
+  selectedLegalMode=
+    selectedInfo?.mode||"calendar";
+
+  legalTermSelect.value=term;
+
+  legalSelectedTermName.textContent=
+    legalTermLabel(term);
+
+  legalSelectedTerm.hidden=false;
+
   renderLegalReferenceOptions(
     selectedInfo?.refs||[]
   );
 
+  const modeNote=
+    selectedLegalMode==="business"
+      ? " Los términos de este concepto se cuentan en días hábiles."
+      : "";
+
   legalTermHint.textContent=
-    selectedInfo?.refs?.length
-      ? `${categoryName} · La legislación contempla una o más referencias de plazo. Selecciona la actuación que quieres calcular.`
-      : `${categoryName} · No hay un único plazo general para este concepto. Aquí puedes identificar la actuación concreta.`;
+    (
+      selectedInfo?.refs?.length
+        ? `${categoryName} · La legislación contempla una o más referencias de plazo. Selecciona la actuación que quieres calcular.`
+        : `${categoryName} · No hay un único plazo general para este concepto. Aquí puedes identificar la actuación concreta.`
+    )+modeNote;
 
   legalTermSearch.value="";
   legalTermSearchClear.hidden=true;
@@ -5185,6 +5274,7 @@ function applyLegalReference(ref){
 function clearLegalTerm(){
 
   selectedLegalTerm="";
+  selectedLegalMode="calendar";
   legalTermSelect.value="";
   legalSelectedTerm.hidden=true;
 
@@ -5226,6 +5316,7 @@ function searchLegalTerms(){
     flattenLegalTerms()
       .filter(item=>
         normalizeSearchText(item.term).includes(query) ||
+        normalizeSearchText(item.norm).includes(query) ||
         normalizeSearchText(item.categoryName).includes(query)
       )
       .slice(0,10);
@@ -5254,7 +5345,7 @@ function searchLegalTerms(){
       button.className="legal-search-result";
 
       button.innerHTML=`
-        <strong>${escapeHtml(item.term)}</strong>
+        <strong>${escapeHtml(item.norm?`${item.term} - ${item.norm}`:item.term)}</strong>
         <span>${escapeHtml(item.categoryName)}</span>
       `;
 
@@ -5321,6 +5412,7 @@ legalTermSelect.addEventListener(
 
 
 populateLegalSelect();
+renderLegalCategories();
 
 
 const TERM_TYPE_NOTES_BY_COUNTRY={
@@ -5371,7 +5463,12 @@ function syncUnitAvailability(){
   const monthsLabel=
     monthsRadio.closest("label");
 
-  if(type==="business"){
+  const effectiveMode=
+    type==="legal"
+      ?selectedLegalMode
+      :type;
+
+  if(effectiveMode==="business"){
 
     if(monthsRadio.checked)
       daysRadio.checked=true;
@@ -6101,7 +6198,7 @@ function buildColombiaLegalReference(term){
 }
 
 
-function buildLegalText(type,lang="es"){
+function buildLegalText(type,lang="es",mode){
 
   if(lang==="pt"){
 
@@ -6133,7 +6230,12 @@ function buildLegalText(type,lang="es"){
       ?` Referencias disponibles: ${refs.map(r=>r.label).join("; ")}.`
       :` No existe un único plazo general asociado a este concepto; debe precisarse la actuación y la norma aplicable.`;
 
-    return`REFERENCIA JURÍDICA SELECCIONADA: ${term}. ${buildColombiaLegalReference(term)}${refText} El resultado del cómputo debe verificarse frente a la norma específica, la actuación, la autoridad y las circunstancias del caso.`;
+    const modeText=
+      mode==="business"
+        ?" Modalidad de conteo aplicada: días hábiles."
+        :"";
+
+    return`REFERENCIA JURÍDICA SELECCIONADA: ${legalTermLabel(term)}. ${buildColombiaLegalReference(term)}${refText}${modeText} El resultado del cómputo debe verificarse frente a la norma específica, la actuación, la autoridad y las circunstancias del caso.`;
 
   }
 
@@ -6629,9 +6731,12 @@ function buildCertificationSequence(termData){
 
   const{
     start,
-    countedDates,
-    type
+    countedDates
   }=termData;
+
+  const type=
+    termData.countMode||
+    termData.type;
 
   const lang=
     outputLang(
@@ -6759,6 +6864,10 @@ function buildCertificationHTML(termData,includeCalendar=true,collapsible=false)
   if(type==="legal" && legalTerm)
     selectedLegalTerm=legalTerm;
 
+  const mode=
+    termData.countMode||
+    type;
+
   const countryInfo=
     COUNTRIES[country]||
     COUNTRIES[currentCountry];
@@ -6773,17 +6882,18 @@ function buildCertificationHTML(termData,includeCalendar=true,collapsible=false)
     formatShortDate(end,lang);
 
   const amountLabel=
-    amountText(amount,type,unit,lang);
+    amountText(amount,mode,unit,lang);
 
   const typeLabel=
     typeDisplayLabel(
       type,
       unit,
-      lang
+      lang,
+      mode
     );
 
   const legalText=
-    buildLegalText(type,lang);
+    buildLegalText(type,lang,mode);
 
   const methodText=
     tr(
@@ -6843,7 +6953,7 @@ function buildCertificationHTML(termData,includeCalendar=true,collapsible=false)
         ${type==="legal" && legalTerm ? `
         <div class="certification-item full">
           <span>${escapeHtml(tr(lang,"certLblLegalTerm"))}</span>
-          <strong>${escapeHtml(legalTerm)}</strong>
+          <strong>${escapeHtml(legalTermLabel(legalTerm))}</strong>
         </div>` : ""}
 
       </div>
@@ -7118,7 +7228,7 @@ function buildCalculationMetrics(termData){
      los días que sí fueron contabilizados. Por tanto, businessDays
      coincide con el total contado.
   */
-  if(termData.type==="business"){
+  if((termData.countMode||termData.type)==="business"){
     businessDaysCounted=totalDaysCounted;
 
     /*
@@ -7188,6 +7298,7 @@ function buildCalculationRecord(termData){
     unit:termData.unit,
     term_type:termData.type,
     legal_term:termData.legalTerm||"",
+    count_mode:termData.countMode||termData.type,
 
     counted_days:metrics.totalDaysCounted,
     total_days_counted:metrics.totalDaysCounted,
