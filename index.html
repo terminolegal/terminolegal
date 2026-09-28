@@ -539,8 +539,21 @@ small{
 .unit-select:focus{outline:2px solid rgba(185,150,79,.25);border-color:var(--gold)}
 .legacy-unit-radios{display:none!important}
 #timeField[hidden]{display:none!important}
-#startTime{width:100%;height:48px;border:1px solid var(--input-border);border-radius:10px;background:var(--input-bg);color:var(--ink);padding:0 12px;font:inherit}
+#start-time-wrap{display:flex;align-items:center;gap:10px}
+#startTime{flex:1;min-width:0;height:48px;border:1px solid var(--input-border);border-radius:10px;background:var(--input-bg);color:var(--ink);padding:0 12px;font:inherit}
 #startTime:focus{outline:2px solid rgba(185,150,79,.25);border-color:var(--gold)}
+#start-time-unit{font-weight:700;color:var(--muted);white-space:nowrap}
+.hour-presets{margin-top:10px;padding:12px;border:1px solid var(--input-border);border-radius:12px;background:var(--surface-alt)}
+.hour-presets-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;font-size:.72rem;font-weight:800}
+.hour-presets-title span:last-child{font-size:.65rem;font-weight:600;color:var(--muted)}
+.hour-preset-list{display:flex;flex-wrap:wrap;gap:7px}
+.hour-preset{border:1px solid var(--input-border);border-radius:999px;background:var(--input-bg);color:var(--ink);padding:7px 11px;font:inherit;font-size:.68rem;font-weight:800;cursor:pointer}
+.hour-preset:hover{border-color:var(--gold)}
+.hour-preset.active{border-color:var(--gold);box-shadow:0 0 0 2px rgba(185,150,79,.16)}
+.legal-hour-presets{margin-top:12px;background:var(--surface)}
+.legal-hour-presets-note{margin:0 0 9px;color:var(--muted);font-size:.64rem;line-height:1.45}
+.legal-catalog-heading{margin:14px 0 8px;color:var(--navy);font-size:.72rem;font-weight:800;letter-spacing:.01em}
+.legal-catalog-empty{padding:10px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);font-size:.65rem;line-height:1.45;background:var(--surface)}
 
 .field-note{
   font-size:.7rem;
@@ -2214,8 +2227,11 @@ footer{
 
   <div class="field" id="timeField" hidden>
     <label for="startTime">Hora de inicio</label>
-    <input type="time" id="startTime" value="00:00" step="60" aria-describedby="startHint">
-    <p class="field-note">Para términos en horas, el cálculo conserva la hora de inicio y obtiene la hora exacta de vencimiento.</p>
+    <div id="start-time-wrap">
+      <input type="text" id="startTime" value="00:00" inputmode="numeric" autocomplete="off" maxlength="5" pattern="(?:[01]\d|2[0-3]):[0-5]\d" placeholder="HH:MM" aria-label="Hora de inicio en formato de 24 horas" aria-describedby="startHint">
+      <span id="start-time-unit" aria-hidden="true">horas</span>
+    </div>
+    <p class="field-note">Escribe directamente la hora y los minutos. Ejemplo: 15:45. Se usa el formato de 24 horas.</p>
   </div>
 
   <!-- TIPO DE TIEMPO -->
@@ -2258,9 +2274,20 @@ footer{
          hidden>
 
       <div class="legal-terms-header">
-        <strong>Revisa tu término jurídico</strong>
-        <span>Revisa los términos disponibles por materia antes de calcular.</span>
+        <strong>Selecciona un término frecuente</strong>
+        <span>Consulta referencias organizadas por jurisdicción. Puedes buscar un concepto o usar las referencias horarias frecuentes cuando trabajes en horas.</span>
       </div>
+
+      <div class="hour-presets legal-hour-presets" id="legalHourPresets" hidden aria-label="Referencias horarias frecuentes de la jurisdicción">
+        <div class="hour-presets-title">
+          <span id="hourPresetsTitle">Referencias horarias frecuentes</span>
+          <span id="hourPresetsJurisdiction">Jurisdicción seleccionada</span>
+        </div>
+        <p class="legal-hour-presets-note" id="hourPresetsNote">Selecciona una referencia para llevarla al campo de término. Estas opciones son ayudas de consulta y deben verificarse frente a la norma y actuación concreta.</p>
+        <div class="hour-preset-list" id="hourPresetList"></div>
+      </div>
+
+      <div class="legal-catalog-heading" id="legalCatalogHeading">Términos jurídicos frecuentes</div>
 
       <div class="legal-search-wrap">
         <span class="legal-search-icon" aria-hidden="true">⌕</span>
@@ -2600,7 +2627,7 @@ const I18N={
     typeLegalBusiness:"Término frecuente: {term} — días hábiles",
     frequentTerm:"Término frecuente",
 
-    seqStart:"Fecha de inicio — no contabilizada",
+    seqStart:"Fecha de inicio",
     seqCounted:"Unidad contabilizada",
     seqHourCounted:"Hora {n} contabilizada",
     seqBusinessHoliday:"Día hábil contabilizado — {name}",
@@ -2669,7 +2696,7 @@ const I18N={
     typeLegalBusiness:"Prazo frequente: {term} — dias úteis",
     frequentTerm:"Prazo frequente",
 
-    seqStart:"Data de início — não contabilizada",
+    seqStart:"Data de início",
     seqCounted:"Unidade contabilizada",
     seqHourCounted:"Hora {n} contabilizada",
     seqBusinessHoliday:"Dia útil contabilizado — {name}",
@@ -2872,15 +2899,34 @@ function addCalendarYears(date,years){
 function formatDateTime(date,lang="es"){
   return new Intl.DateTimeFormat(
     LOCALES[lang]||LOCALES.es,
-    {day:"2-digit",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit"}
+    {
+      day:"2-digit",
+      month:"long",
+      year:"numeric",
+      hour:"2-digit",
+      minute:"2-digit",
+      hourCycle:"h23"
+    }
   ).format(date);
 }
 
 function formatShortDateTime(date,lang="es"){
   return new Intl.DateTimeFormat(
     LOCALES[lang]||LOCALES.es,
-    {day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}
+    {
+      day:"2-digit",
+      month:"2-digit",
+      year:"numeric",
+      hour:"2-digit",
+      minute:"2-digit",
+      hourCycle:"h23"
+    }
   ).format(date);
+}
+
+function formatResultDateTime(date,lang="es"){
+  const base=formatDateTime(date,lang);
+  return `${base} ${lang==="pt"?"horas":"Horas"}`;
 }
 
 
@@ -3867,6 +3913,11 @@ function getCountedDates(
   const holidaysEncountered=[];
 
   if(unit==="hours"){
+    /* En la secuencia de trazabilidad, la fecha/hora de inicio se muestra
+       por separado y no constituye una hora ya contabilizada. Por eso
+       Hora 1 corresponde a una hora después del inicio, Hora 2 a dos
+       horas después, etc. El vencimiento coincide con la última hora
+       contabilizada y también se obtiene sumando el total de horas al inicio. */
     const dates=[];
     for(let i=1;i<=amount;i++){
       dates.push(new Date(start.getTime()+i*60*60*1000));
@@ -4592,7 +4643,6 @@ calculateBtn.addEventListener(
 
     if(
       type==="legal" &&
-      currentCountry==="CO" &&
       !selectedLegalTerm
     ){
 
@@ -4633,11 +4683,18 @@ calculateBtn.addEventListener(
       start=parseLocalDate(startDateInput.value);
 
       if(unit==="hours"){
-        const time=(startTime.value||"00:00").split(":").map(Number);
-        if(time.length<2 || !Number.isInteger(time[0]) || !Number.isInteger(time[1]) || time[0]<0 || time[0]>23 || time[1]<0 || time[1]>59){
+        const raw=(startTime.value||"00:00").trim();
+        const match=/^(\d{1,2}):(\d{2})$/.exec(raw);
+        if(!match){
           throw new Error("Hora inválida");
         }
-        start.setHours(time[0],time[1],0,0);
+        const hour=Number(match[1]);
+        const minute=Number(match[2]);
+        if(!Number.isInteger(hour) || !Number.isInteger(minute) || hour<0 || hour>23 || minute<0 || minute>59){
+          throw new Error("Hora inválida");
+        }
+        startTime.value=`${String(hour).padStart(2,"0")}:${String(minute).padStart(2,"0")}`;
+        start.setHours(hour,minute,0,0);
       }
 
     }catch{
@@ -4682,7 +4739,9 @@ calculateBtn.addEventListener(
       amountText(amount,mode,unit,lang);
 
     resultDate.textContent=
-      (unit==="hours" ? formatDateTime(end,lang) : formatDate(end,lang)).toLowerCase();
+      unit==="hours"
+        ?formatResultDateTime(end,lang)
+        :formatDate(end,lang).toLowerCase();
 
     resultSummary.textContent=
       amountLabel;
@@ -4835,6 +4894,61 @@ const startHint=
 const unitSelect=document.getElementById("unitSelect");
 const timeField=document.getElementById("timeField");
 const startTime=document.getElementById("startTime");
+
+/* Campo horario: la edición debe sentirse como un campo normal.
+   No se reescribe el valor mientras la persona está tecleando, porque
+   hacerlo puede mover el cursor o la selección (por ejemplo, al cambiar
+   00 por 12). La normalización se hace al salir del campo. */
+startTime.addEventListener("focus",()=>{
+  /* Si es el valor inicial, queda seleccionado para poder reemplazarlo
+     directamente; si la persona ya está editando, conserva su selección/cursor. */
+  if(startTime.value==="00:00"){
+    requestAnimationFrame(()=>startTime.select());
+  }
+});
+
+startTime.addEventListener("input",()=>{
+  /* Solo permitimos números y los dos puntos. No modificamos la posición
+     del cursor ni convertimos el texto durante la escritura. */
+  const pos=startTime.selectionStart;
+  const raw=startTime.value;
+  const clean=raw.replace(/[^0-9:]/g,"").slice(0,5);
+  if(clean!==raw){
+    startTime.value=clean;
+    const next=Math.min(pos||0,clean.length);
+    requestAnimationFrame(()=>{
+      try{startTime.setSelectionRange(next,next);}catch(e){}
+    });
+  }
+});
+
+startTime.addEventListener("blur",()=>{
+  let raw=(startTime.value||"").trim();
+  const digits=raw.replace(/\D/g,"").slice(0,4);
+
+  /* Permite escribir 1545 sin tener que teclear los dos puntos. */
+  if(/^\d{4}$/.test(digits)){
+    raw=`${digits.slice(0,2)}:${digits.slice(2)}`;
+  }else if(/^\d{1,2}:\d{0,2}$/.test(raw)){
+    const parts=raw.split(":");
+    const h=parts[0].padStart(2,"0");
+    const m=(parts[1]||"").padEnd(2,"0");
+    raw=`${h}:${m}`;
+  }
+
+  const match=/^(\d{2}):(\d{2})$/.exec(raw);
+  if(match){
+    const hour=Number(match[1]);
+    const minute=Number(match[2]);
+    if(hour>=0 && hour<=23 && minute>=0 && minute<=59){
+      startTime.value=raw;
+      return;
+    }
+  }
+
+  /* Si el valor no es válido, volvemos al formato inicial seguro. */
+  startTime.value="00:00";
+});
 
 const monthsRadio=
   document.querySelector(
@@ -4998,11 +5112,68 @@ function normalizeSearchText(value){
 }
 
 
+function buildCountryFrequentCatalog(countryCode=currentCountry){
+
+  const base=countryCode==="CO"
+    ?COLOMBIA_LEGAL_TERMS.map(category=>({
+        ...category,
+        terms:category.terms.map(term=>({
+          ...term,
+          refs:(term.refs||[]).map(ref=>({...ref}))
+        }))
+      }))
+    :[];
+
+  const presets=getHourPresetsForCountry();
+  if(presets.length){
+    base.push({
+      id:"referencias-horarias",
+      name:"Referencias horarias",
+      terms:[
+        {
+          name:"Plazos horarios frecuentes",
+          norm:"Referencia de jurisdicción",
+          mode:"calendar",
+          refs:presets.map(p=>({
+            label:p.label,
+            amount:p.hours,
+            unit:"hours",
+            detail:p.detail
+          }))
+        }
+      ]
+    });
+  }
+
+  if(!base.length){
+    base.push({
+      id:"catalogo-en-expansion",
+      name:"Referencias de la jurisdicción",
+      terms:[
+        {
+          name:"Catálogo frecuente en expansión",
+          norm:"Referencia territorial",
+          refs:[]
+        }
+      ]
+    });
+  }
+
+  return base;
+}
+
+function renderLegalCatalogForCountry(){
+  if(!legalCategories)return;
+  populateLegalSelect();
+  renderLegalCategories();
+}
+
 function flattenLegalTerms(){
 
   const list=[];
+  const catalog=buildCountryFrequentCatalog();
 
-  COLOMBIA_LEGAL_TERMS.forEach(
+  catalog.forEach(
     category=>{
       category.terms.forEach(
         term=>{
@@ -5043,7 +5214,7 @@ function renderLegalCategories(){
 
   legalCategories.innerHTML="";
 
-  COLOMBIA_LEGAL_TERMS.forEach(
+  buildCountryFrequentCatalog().forEach(
     (category,index)=>{
 
       const wrapper=
@@ -5156,10 +5327,11 @@ function renderLegalCategories(){
 
 function populateLegalSelect(){
 
+  const previousValue=selectedLegalTerm||"";
   legalTermSelect.innerHTML=
     `<option value="">Selecciona un término</option>`;
 
-  COLOMBIA_LEGAL_TERMS.forEach(
+  buildCountryFrequentCatalog().forEach(
     category=>{
 
       const group=
@@ -5185,6 +5357,8 @@ function populateLegalSelect(){
 
     }
   );
+
+  if(previousValue) legalTermSelect.value=previousValue;
 
 }
 
@@ -5231,6 +5405,7 @@ function selectLegalTerm(term,categoryName){
 
   renderLegalCategories();
   syncUnitAvailability();
+  renderHourPresets();
 
 }
 
@@ -5303,6 +5478,7 @@ function applyLegalReference(ref){
     `Referencia aplicada: ${ref.label}. Revisa la norma y las circunstancias del caso antes de usar el resultado.`;
 
   syncUnitAvailability();
+  renderHourPresets();
 
   daysInput.focus();
 
@@ -5450,6 +5626,7 @@ legalTermSelect.addEventListener(
 
 populateLegalSelect();
 renderLegalCategories();
+renderHourPresets();
 
 
 const TERM_TYPE_NOTES_BY_COUNTRY={
@@ -5457,7 +5634,7 @@ const TERM_TYPE_NOTES_BY_COUNTRY={
   CO:{
     business:"Excluye sábados, domingos y festivos según el calendario de referencia de la jurisdicción. Las reglas especiales de cada trámite pueden modificar el cómputo y deben verificarse en la norma aplicable.",
     calendar:"Cuenta todos los días de forma continua e ininterrumpida, sin excluir fines de semana ni festivos.",
-    legal:"Explora términos jurídicos frecuentes de Colombia por materia o mediante búsqueda. La selección sirve como guía de contexto; la duración y la forma de conteo deben determinarse según la norma específica aplicable."
+    legal:"Explora términos jurídicos frecuentes de la jurisdicción seleccionada, por materia o mediante búsqueda. La selección sirve como guía de contexto; la duración y la forma de conteo deben determinarse según la norma específica aplicable."
   },
 
   DEFAULT:{
@@ -5518,11 +5695,10 @@ function syncUnitAvailability(){
   termTypeNote.textContent=
     getTermTypeNotes()[type]||"";
 
-  legalTermsPanel.hidden=
-    !(
-      type==="legal" &&
-      currentCountry==="CO"
-    );
+  legalTermsPanel.hidden=type!=="legal";
+
+  renderHourPresets();
+  renderLegalCatalogForCountry();
 
   if(getSelectedUnit()!=="days" && type==="business"){
     const calendarRadio=document.querySelector('input[name="termType"][value="calendar"]');
@@ -5533,6 +5709,125 @@ function syncUnitAvailability(){
 
 }
 
+
+const HOUR_TERM_PRESETS={
+  AR:[
+    {hours:24,label:"24 horas",detail:"Indagatoria de persona detenida · CPP Nación, art. 294"},
+    {hours:48,label:"48 horas",detail:"Prórroga de la indagatoria en los supuestos previstos por el art. 294"}
+  ],
+  BO:[
+    {hours:24,label:"24 horas",detail:"Puesta a disposición judicial de la persona aprehendida · Ley 1970, art. 226"}
+  ],
+  BR:[
+    {hours:24,label:"24 horas",detail:"Audiencia de custodia tras la prisión · Código de Processo Penal, art. 310"}
+  ],
+  CL:[
+    {hours:24,label:"24 horas",detail:"Puesta a disposición del juez en detención por flagrancia · Constitución, art. 19 N.º 7"}
+  ],
+  CA:[
+    {hours:24,label:"24 horas",detail:"Regla federal para llevar a una persona arrestada ante un juez de paz cuando esté disponible · Criminal Code, s. 503"}
+  ],
+  CO:[
+    {hours:36,label:"36 horas",detail:"Presentación ante juez de control de garantías en el procedimiento de flagrancia · Ley 906 de 2004, art. 302"}
+  ],
+  CR:[
+    {hours:24,label:"24 horas",detail:"Referencia inicial de presentación ante la autoridad competente"},
+    {hours:48,label:"48 horas",detail:"Referencia acumulada en determinados trámites de detención"}
+  ],
+  EC:[
+    {hours:24,label:"24 horas",detail:"Audiencia de calificación de flagrancia · COIP"}
+  ],
+  SV:[
+    {hours:72,label:"72 horas",detail:"Límite constitucional de la detención administrativa · Constitución, art. 13"}
+  ],
+  ES:[
+    {hours:72,label:"72 horas",detail:"Límite máximo general de la detención preventiva antes de libertad o puesta a disposición judicial · LECrim, art. 520"}
+  ],
+  US:[
+    {hours:48,label:"48 horas",detail:"Referencia para la determinación de prontitud de la comparecencia inicial en el ámbito federal, según la doctrina de Riverside"}
+  ],
+  GT:[
+    {hours:6,label:"6 horas",detail:"Puesta a disposición de la autoridad judicial · referencia constitucional"}
+  ],
+  HN:[
+    {hours:24,label:"24 horas",detail:"Presentación ante juez competente"},
+    {hours:48,label:"48 horas",detail:"Supuestos más complejos de investigación, según la información del Poder Judicial"}
+  ],
+  MX:[
+    {hours:48,label:"48 horas",detail:"Plazo constitucional del Ministerio Público · Constitución, art. 16"},
+    {hours:96,label:"96 horas",detail:"Supuesto especial de delincuencia organizada · Constitución, art. 16"}
+  ],
+  NI:[
+    {hours:48,label:"48 horas",detail:"Presentación de la persona detenida ante el juez · Código Procesal Penal, art. 256"}
+  ],
+  PA:[
+    {hours:48,label:"48 horas",detail:"Presentación ante Juez de Garantías"}
+  ],
+  PY:[
+    {hours:24,label:"24 horas",detail:"Puesta a disposición del juez para resolver sobre la procedencia de la prisión preventiva o libertad · CPP, art. 240"}
+  ],
+  PE:[
+    {hours:48,label:"48 horas",detail:"Regla general indicada para la detención policial"},
+    {hours:72,label:"72 horas",detail:"Referencia utilizada en supuestos de detención preliminar"}
+  ],
+  DO:[
+    {hours:48,label:"48 horas",detail:"Solicitud de medida de coerción dentro de las 48 horas contadas desde el arresto · CPP, art. 225 modificado"}
+  ],
+  UY:[
+    {hours:24,label:"24 horas",detail:"Referencia para declaración del detenido en los supuestos previstos"},
+    {hours:48,label:"48 horas",detail:"Auto de procesamiento dentro de 48 horas desde la detención · art. 125"}
+  ],
+  VE:[
+    {hours:48,label:"48 horas",detail:"Presentación ante autoridad judicial"}
+  ]
+};
+
+function getHourPresetsForCountry(){
+  if(typeof HOUR_TERM_PRESETS==="undefined") return [];
+  return HOUR_TERM_PRESETS[currentCountry]||[];
+}
+
+function renderHourPresets(){
+  const box=document.getElementById("legalHourPresets"),list=document.getElementById("hourPresetList"),jur=document.getElementById("hourPresetsJurisdiction");
+  if(!box||!list)return;
+
+  const unit=getSelectedUnit();
+  const type=document.querySelector('input[name="termType"]:checked')?.value;
+
+  box.hidden=!(type==="legal" && unit==="hours");
+  if(box.hidden){list.innerHTML="";return;}
+
+  const country=COUNTRIES[currentCountry];
+  const presets=getHourPresetsForCountry();
+  if(jur)jur.textContent=country?.name||"Jurisdicción seleccionada";
+
+  if(!presets.length){
+    list.innerHTML='<div class="legal-catalog-empty">Aún no hay una referencia horaria jurídica precargada para esta jurisdicción. El campo de horas sigue disponible para ingresar manualmente la duración.</div>';
+    return;
+  }
+
+  list.innerHTML=presets.map(p=>`<button type="button" class="hour-preset${Number(daysInput.value)===p.hours?" active":""}" data-hours="${p.hours}" title="${escapeHtml(p.detail)}">${escapeHtml(p.label)}</button>`).join("");
+  list.querySelectorAll(".hour-preset").forEach(btn=>btn.addEventListener("click",()=>{
+    daysInput.value=btn.dataset.hours;
+    const ref=getHourPresetsForCountry().find(p=>String(p.hours)===String(btn.dataset.hours));
+    if(ref){
+      selectLegalTerm("Plazos horarios frecuentes","Referencias horarias");
+      legalTermHint.textContent=`Referencia aplicada: ${ref.label}. Revisa la norma y la actuación concreta antes de usar el resultado.`;
+    }
+    daysInput.dispatchEvent(new Event("input",{bubbles:true}));
+    renderHourPresets();
+  }));
+}
+
+function applyDefaultHourPreset(force=false){
+  if(getSelectedUnit()!=="hours")return;
+  const presets=getHourPresetsForCountry();
+  const current=Number(daysInput.value);
+  const countryChanged=daysInput.dataset.hourPresetCountry!==currentCountry;
+  if(presets.length && (force||countryChanged||!Number.isFinite(current)||current<=0))daysInput.value=presets[0].hours;
+  daysInput.dataset.hourPresetCountry=currentCountry;
+  renderHourPresets();
+}
 
 function updateDaysLabel(){
 
@@ -5549,10 +5844,13 @@ function updateDaysLabel(){
 
   startHint.textContent=
     unit==="hours"
-      ?"Selecciona la fecha y la hora de inicio. El vencimiento se obtiene conservando el conteo horario."
+      ?"Ingresa la hora de inicio en formato de 24 horas (HH:MM). Ejemplo: 15:45."
       :unit==="months" || unit==="years"
         ?"El plazo se cuenta de fecha a fecha desde el día indicado."
         :"El conteo inicia el día siguiente a la fecha indicada.";
+
+  if(unit==="hours") applyDefaultHourPreset();
+  else renderHourPresets();
 
 }
 
@@ -5580,6 +5878,7 @@ unitSelect.addEventListener("change",()=>{
     }
   }
   syncLegacyUnitRadios(selectedUnit);
+  if(selectedUnit==="hours") applyDefaultHourPreset(true);
   updateDaysLabel();
   resetResultView();
 });
@@ -5664,29 +5963,13 @@ function applyCountryUI(){
   countryInline.title=
     `${info.name} — ${info.note} Haz clic para cambiar de jurisdicción.`;
 
-  /* La guía de términos frecuentes se encuentra
-     disponible actualmente para Colombia. */
-  const showLegalOption=
-    currentCountry==="CO";
-
-  legalTermTypeLabel.style.display=
-    showLegalOption
-      ?""
-      :"none";
-
-  if(
-    !showLegalOption &&
-    legalTermRadio.checked
-  ){
-
-    document.querySelector(
-      'input[name="termType"][value="business"]'
-    ).checked=true;
-
-  }
-
-  if(!showLegalOption)
-    clearLegalTerm();
+  /* Términos frecuentes es una sección transversal de la plataforma.
+     Colombia conserva su catálogo inicial y las demás jurisdicciones
+     utilizan el mismo espacio para referencias ya verificadas,
+     comenzando por las horarias. */
+  legalTermTypeLabel.style.display="";
+  renderLegalCatalogForCountry();
+  renderHourPresets();
 
   updateGxWidgetVisibility();
 
@@ -5925,6 +6208,13 @@ function setCountry(code,persist){
 
   currentCountry=code;
 
+  const currentCatalogTerms=buildCountryFrequentCatalog(code)
+    .flatMap(category=>category.terms||[])
+    .map(term=>term.name);
+  if(selectedLegalTerm && !currentCatalogTerms.includes(selectedLegalTerm)){
+    clearLegalTerm();
+  }
+
   countrySelect.value=code;
 
   if(persist){
@@ -5943,6 +6233,7 @@ function setCountry(code,persist){
   applyCountryUI();
 
   syncUnitAvailability();
+  if(getSelectedUnit()==="hours") applyDefaultHourPreset(true);
 
   if(!calendarPicker.hidden)
     renderCalendar();
@@ -6322,31 +6613,116 @@ function buildCalendarCanvas(termData){
 
   if(unit==="hours"){
     const lang=outputLang(termData.country||currentCountry);
-    const cols=Math.min(12,Math.max(1,countedDates.length));
+
+    /*
+      Trazabilidad horaria: diseño tipo línea de tiempo, con una tarjeta por
+      hora y una secuencia explícita. Se evita la cuadrícula comprimida que
+      hacía que los textos se salieran de las cajas.
+    */
+    const cols=6;
+    const cardW=166;
+    const gap=14;
+    const left=34;
+    const right=34;
+    const top=116;
+    const cardH=66;
+    const rowGap=28;
     const rows=Math.max(1,Math.ceil(countedDates.length/cols));
-    const W=960,H=170+rows*64;
+    const W=left+right+(cols*cardW)+((cols-1)*gap);
+    const H=top+(rows*cardH)+((rows-1)*rowGap)+46;
+
     const canvas=document.createElement("canvas");
     const scale=2;
-    canvas.width=W*scale; canvas.height=H*scale;
-    const ctx=canvas.getContext("2d"); ctx.scale(scale,scale);
-    ctx.fillStyle="#ffffff"; ctx.fillRect(0,0,W,H);
-    ctx.fillStyle="#17202b"; ctx.font="700 18px Arial,sans-serif";
-    ctx.fillText(`Trazabilidad horaria · ${amountText(amount,type,unit,lang)}`,32,34);
-    ctx.fillStyle="#687383"; ctx.font="12px Arial,sans-serif";
-    ctx.fillText(`${formatShortDateTime(start,lang)} → ${formatShortDateTime(end,lang)}`,32,55);
+    canvas.width=W*scale;
+    canvas.height=H*scale;
+    canvas.style.width="100%";
+    canvas.style.height="auto";
+
+    const ctx=canvas.getContext("2d");
+    ctx.scale(scale,scale);
+    ctx.clearRect(0,0,W,H);
+
+    /* Fondo */
+    ctx.fillStyle="#ffffff";
+    ctx.fillRect(0,0,W,H);
+
+    /* Encabezado */
+    ctx.fillStyle="#17202b";
+    ctx.font="700 20px Arial,sans-serif";
+    ctx.fillText("Trazabilidad horaria",left,30);
+
+    ctx.fillStyle="#667085";
+    ctx.font="12px Arial,sans-serif";
+    ctx.fillText(amountText(amount,type,unit,lang),left,51);
+
+    /* Inicio y vencimiento, separados visualmente */
+    const startText=formatShortDateTime(start,lang);
+    const endText=formatShortDateTime(end,lang);
+
+    ctx.fillStyle="#F4F6F8";
+    ctx.fillRect(left,66,255,34);
+    ctx.fillStyle="#344054";
+    ctx.font="600 11px Arial,sans-serif";
+    ctx.fillText("INICIO",left+12,80);
+    ctx.font="700 12px Arial,sans-serif";
+    ctx.fillText(startText,left+12,94);
+
+    ctx.fillStyle="#F4F6F8";
+    ctx.fillRect(W-right-255,66,255,34);
+    ctx.fillStyle="#344054";
+    ctx.font="600 11px Arial,sans-serif";
+    ctx.fillText("VENCIMIENTO",W-right-243,80);
+    ctx.font="700 12px Arial,sans-serif";
+    ctx.fillText(endText,W-right-243,94);
+
     countedDates.forEach((d,i)=>{
-      const col=i%cols,row=Math.floor(i/cols);
-      const x=32+col*((W-64)/cols), y=78+row*64, w=(W-64)/cols-8;
-      ctx.fillStyle="#10243e"; ctx.fillRect(x,y,w,38);
-      ctx.fillStyle="#ffffff"; ctx.font="700 12px Arial,sans-serif"; ctx.textAlign="center";
-      ctx.fillText(`H${i+1}`,x+w/2,y+15);
+      const col=i%cols;
+      const row=Math.floor(i/cols);
+      const x=left+col*(cardW+gap);
+      const y=top+row*(cardH+rowGap);
+
+      /* Línea de continuidad entre horas */
+      if(col>0){
+        ctx.strokeStyle="#D0D5DD";
+        ctx.lineWidth=2;
+        ctx.beginPath();
+        ctx.moveTo(x-gap,y+cardH/2);
+        ctx.lineTo(x,y+cardH/2);
+        ctx.stroke();
+      }
+
+      /* Tarjeta */
+      ctx.fillStyle="#F8FAFC";
+      ctx.fillRect(x,y,cardW,cardH);
+      ctx.strokeStyle="#D0D5DD";
+      ctx.lineWidth=1;
+      ctx.strokeRect(x+0.5,y+0.5,cardW-1,cardH-1);
+
+      /* Indicador de hora */
+      ctx.fillStyle="#10243E";
+      ctx.beginPath();
+      ctx.arc(x+24,y+23,13,0,Math.PI*2);
+      ctx.fill();
+      ctx.fillStyle="#FFFFFF";
+      ctx.font="700 9px Arial,sans-serif";
+      ctx.textAlign="center";
+      ctx.fillText(`H${i+1}`,x+24,y+26);
+
+      /* Fecha y hora */
+      ctx.textAlign="left";
+      ctx.fillStyle="#17202B";
+      ctx.font="700 11px Arial,sans-serif";
+      const dateText=formatShortDateTime(d,lang);
+      ctx.fillText(dateText,x+45,y+21);
+
+      ctx.fillStyle="#667085";
       ctx.font="10px Arial,sans-serif";
-      ctx.fillText(formatShortDateTime(d,lang),x+w/2,y+30);
+      ctx.fillText("Hora contabilizada",x+45,y+39);
     });
+
     ctx.textAlign="left";
     return canvas;
   }
-
   const countedKeys=
     new Set(
       countedDates.map(
@@ -7023,7 +7399,7 @@ function buildCertificationHTML(termData,includeCalendar=true,collapsible=false)
 
       <div class="certification-result">
         <div class="certification-result-label">${escapeHtml(tr(lang,"certLblResult"))}</div>
-        <div class="certification-result-date">${escapeHtml(formatDate(end,lang))}</div>
+        <div class="certification-result-date">${escapeHtml(unit==="hours" ? formatResultDateTime(end,lang) : formatDate(end,lang))}</div>
       </div>
     </section>
 
@@ -7199,7 +7575,7 @@ const SHARE_URL=
 const CALCULATION_SHEET_ENDPOINT=
   "https://script.google.com/macros/s/AKfycbxx6oWsJMDZvQVtf9arU2dBhk62v5TwWjsx1oAmXdVy1R4EZHGy2d3x_C6wwY2rtNwL/exec";
 
-const APP_VERSION="11.2";
+const APP_VERSION="11.3";
 
 /* Mantiene el número de versión mostrado en el resultado
    sincronizado con APP_VERSION. */
