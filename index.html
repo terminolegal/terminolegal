@@ -545,7 +545,6 @@ small{
 }
 
 @media(max-width:520px){
-  .brand-nav{gap:12px}
   .annual-calendar-view{margin-top:26px}
   .annual-calendar-heading{align-items:flex-start}
   .annual-calendar-heading h1{font-size:1.18rem}
@@ -574,10 +573,35 @@ small{
 
 .calendar-head{
   display:grid;
-  grid-template-columns:36px 1fr 36px;
+  grid-template-columns:36px 1fr auto 36px;
   align-items:center;
   gap:4px;
   margin-bottom:8px
+}
+
+.calendar-full-btn{
+  all:unset;
+  box-sizing:border-box;
+  width:28px;
+  height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:7px;
+  color:var(--muted);
+  font-size:1rem;
+  line-height:1;
+  cursor:pointer
+}
+
+.calendar-full-btn:hover{
+  background:var(--surface-alt);
+  color:var(--navy)
+}
+
+.calendar-full-btn:focus-visible{
+  outline:2px solid rgba(185,150,79,.35);
+  outline-offset:2px
 }
 
 .calendar-head strong{
@@ -2706,9 +2730,6 @@ body.dark .usage-guide-panel{
   <a href="#calcular" id="brandHomeLink" class="brand-name" aria-label="Término Legal — volver al calculador">
     TÉRMINO <span>LEGAL</span>
   </a>
-  <nav class="brand-nav" aria-label="Navegación principal">
-    <a href="#calendario" id="viewCalendarLink" data-view-link="calendar">Calendario</a>
-  </nav>
 </header>
 
 <main class="hero"></main>
@@ -2821,6 +2842,12 @@ body.dark .usage-guide-panel{
           <button type="button" id="calendarMonthBtn" class="calendar-title-btn">-</button>
           <button type="button" id="calendarYearBtn" class="calendar-title-btn">-</button>
         </span>
+
+        <button type="button"
+                id="calendarFullViewBtn"
+                class="calendar-full-btn"
+                aria-label="Ver calendario completo"
+                title="Ver calendario completo">🗓️</button>
 
         <button type="button"
                 id="nextMonth"
@@ -3306,6 +3333,7 @@ const calendarYearBtn=document.getElementById("calendarYearBtn");
 const calendarDays=document.getElementById("calendarDays");
 const calendarWeekdays=document.getElementById("calendarWeekdays");
 const calendarLegend=document.getElementById("calendarLegend");
+const calendarFullViewBtn=document.getElementById("calendarFullViewBtn");
 const prevMonth=document.getElementById("prevMonth");
 const nextMonth=document.getElementById("nextMonth");
 
@@ -3599,7 +3627,8 @@ const ANNUAL_CALENDAR_I18N={
     businessMany:"{n} días hábiles",
     prevYear:"Año anterior",
     nextYear:"Año siguiente",
-    jurisdiction:"Jurisdicción del calendario anual"
+    jurisdiction:"Jurisdicción del calendario anual",
+    fullCalendar:"Ver calendario completo"
   },
   pt:{
     back:"Calcular prazo",
@@ -3615,7 +3644,8 @@ const ANNUAL_CALENDAR_I18N={
     businessMany:"{n} dias úteis",
     prevYear:"Ano anterior",
     nextYear:"Próximo ano",
-    jurisdiction:"Jurisdição do calendário anual"
+    jurisdiction:"Jurisdição do calendário anual",
+    fullCalendar:"Ver calendário completo"
   },
   en:{
     back:"Calculate term",
@@ -3631,7 +3661,8 @@ const ANNUAL_CALENDAR_I18N={
     businessMany:"{n} business days",
     prevYear:"Previous year",
     nextYear:"Next year",
-    jurisdiction:"Annual calendar jurisdiction"
+    jurisdiction:"Annual calendar jurisdiction",
+    fullCalendar:"View full calendar"
   }
 };
 
@@ -5648,6 +5679,17 @@ dateIconBadge.addEventListener(
   }
 );
 
+/* Desde el calendario mensual, abre la vista anual conservando la fecha
+   actualmente seleccionada como referencia. */
+calendarFullViewBtn?.addEventListener("click",()=>{
+  const selected=startDateInput.value?parseLocalDate(startDateInput.value):new Date();
+  annualCalendarYear=selected.getFullYear();
+  closeCalendar();
+  history.replaceState(null,"",`${location.pathname}${location.search}#calendario`);
+  showAppRoute("calendario");
+  window.scrollTo({top:0,behavior:"auto"});
+});
+
 
 /* ESCRITURA MANUAL DE LA FECHA (dd/mm/aaaa) */
 function formatDateMask(digits){
@@ -7452,6 +7494,10 @@ function updateAnnualCalendarLanguage(){
   });
   if(annualCalendarBack) annualCalendarBack.setAttribute("aria-label",dict.back);
   if(annualCountrySelect) annualCountrySelect.setAttribute("aria-label",dict.jurisdiction);
+  if(calendarFullViewBtn){
+    calendarFullViewBtn.setAttribute("aria-label",dict.fullCalendar);
+    calendarFullViewBtn.setAttribute("title",dict.fullCalendar);
+  }
   if(annualPrevYear) annualPrevYear.setAttribute("aria-label",dict.prevYear);
   if(annualNextYear) annualNextYear.setAttribute("aria-label",dict.nextYear);
 }
