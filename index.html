@@ -543,17 +543,13 @@ small{
 #startTime{flex:1;min-width:0;height:48px;border:1px solid var(--input-border);border-radius:10px;background:var(--input-bg);color:var(--ink);padding:0 12px;font:inherit}
 #startTime:focus{outline:2px solid rgba(185,150,79,.25);border-color:var(--gold)}
 #start-time-unit{font-weight:700;color:var(--muted);white-space:nowrap}
-.hour-presets{margin-top:10px;padding:12px;border:1px solid var(--input-border);border-radius:12px;background:var(--surface-alt)}
+.hour-presets{margin-top:10px;padding:12px;border:1px solid var(--input-border);border-radius:12px;background:var(--soft-bg)}
 .hour-presets-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;font-size:.72rem;font-weight:800}
 .hour-presets-title span:last-child{font-size:.65rem;font-weight:600;color:var(--muted)}
 .hour-preset-list{display:flex;flex-wrap:wrap;gap:7px}
 .hour-preset{border:1px solid var(--input-border);border-radius:999px;background:var(--input-bg);color:var(--ink);padding:7px 11px;font:inherit;font-size:.68rem;font-weight:800;cursor:pointer}
 .hour-preset:hover{border-color:var(--gold)}
 .hour-preset.active{border-color:var(--gold);box-shadow:0 0 0 2px rgba(185,150,79,.16)}
-.legal-hour-presets{margin-top:12px;background:var(--surface)}
-.legal-hour-presets-note{margin:0 0 9px;color:var(--muted);font-size:.64rem;line-height:1.45}
-.legal-catalog-heading{margin:14px 0 8px;color:var(--navy);font-size:.72rem;font-weight:800;letter-spacing:.01em}
-.legal-catalog-empty{padding:10px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);font-size:.65rem;line-height:1.45;background:var(--surface)}
 
 .field-note{
   font-size:.7rem;
@@ -2232,6 +2228,10 @@ footer{
       <span id="start-time-unit" aria-hidden="true">horas</span>
     </div>
     <p class="field-note">Escribe directamente la hora y los minutos. Ejemplo: 15:45. Se usa el formato de 24 horas.</p>
+    <div class="hour-presets" id="hourPresets" hidden aria-label="Términos horarios frecuentes de referencia">
+      <div class="hour-presets-title"><span id="hourPresetsTitle">Términos horarios frecuentes</span><span id="hourPresetsJurisdiction">Jurisdicción seleccionada</span></div>
+      <div class="hour-preset-list" id="hourPresetList"></div>
+    </div>
   </div>
 
   <!-- TIPO DE TIEMPO -->
@@ -2274,20 +2274,9 @@ footer{
          hidden>
 
       <div class="legal-terms-header">
-        <strong>Selecciona un término frecuente</strong>
-        <span>Consulta referencias organizadas por jurisdicción. Puedes buscar un concepto o usar las referencias horarias frecuentes cuando trabajes en horas.</span>
+        <strong>Revisa tu término jurídico</strong>
+        <span>Revisa los términos disponibles por materia antes de calcular.</span>
       </div>
-
-      <div class="hour-presets legal-hour-presets" id="legalHourPresets" hidden aria-label="Referencias horarias frecuentes de la jurisdicción">
-        <div class="hour-presets-title">
-          <span id="hourPresetsTitle">Referencias horarias frecuentes</span>
-          <span id="hourPresetsJurisdiction">Jurisdicción seleccionada</span>
-        </div>
-        <p class="legal-hour-presets-note" id="hourPresetsNote">Selecciona una referencia para llevarla al campo de término. Estas opciones son ayudas de consulta y deben verificarse frente a la norma y actuación concreta.</p>
-        <div class="hour-preset-list" id="hourPresetList"></div>
-      </div>
-
-      <div class="legal-catalog-heading" id="legalCatalogHeading">Términos jurídicos frecuentes</div>
 
       <div class="legal-search-wrap">
         <span class="legal-search-icon" aria-hidden="true">⌕</span>
@@ -4643,6 +4632,7 @@ calculateBtn.addEventListener(
 
     if(
       type==="legal" &&
+      currentCountry==="CO" &&
       !selectedLegalTerm
     ){
 
@@ -5112,68 +5102,11 @@ function normalizeSearchText(value){
 }
 
 
-function buildCountryFrequentCatalog(countryCode=currentCountry){
-
-  const base=countryCode==="CO"
-    ?COLOMBIA_LEGAL_TERMS.map(category=>({
-        ...category,
-        terms:category.terms.map(term=>({
-          ...term,
-          refs:(term.refs||[]).map(ref=>({...ref}))
-        }))
-      }))
-    :[];
-
-  const presets=getHourPresetsForCountry();
-  if(presets.length){
-    base.push({
-      id:"referencias-horarias",
-      name:"Referencias horarias",
-      terms:[
-        {
-          name:"Plazos horarios frecuentes",
-          norm:"Referencia de jurisdicción",
-          mode:"calendar",
-          refs:presets.map(p=>({
-            label:p.label,
-            amount:p.hours,
-            unit:"hours",
-            detail:p.detail
-          }))
-        }
-      ]
-    });
-  }
-
-  if(!base.length){
-    base.push({
-      id:"catalogo-en-expansion",
-      name:"Referencias de la jurisdicción",
-      terms:[
-        {
-          name:"Catálogo frecuente en expansión",
-          norm:"Referencia territorial",
-          refs:[]
-        }
-      ]
-    });
-  }
-
-  return base;
-}
-
-function renderLegalCatalogForCountry(){
-  if(!legalCategories)return;
-  populateLegalSelect();
-  renderLegalCategories();
-}
-
 function flattenLegalTerms(){
 
   const list=[];
-  const catalog=buildCountryFrequentCatalog();
 
-  catalog.forEach(
+  COLOMBIA_LEGAL_TERMS.forEach(
     category=>{
       category.terms.forEach(
         term=>{
@@ -5214,7 +5147,7 @@ function renderLegalCategories(){
 
   legalCategories.innerHTML="";
 
-  buildCountryFrequentCatalog().forEach(
+  COLOMBIA_LEGAL_TERMS.forEach(
     (category,index)=>{
 
       const wrapper=
@@ -5327,11 +5260,10 @@ function renderLegalCategories(){
 
 function populateLegalSelect(){
 
-  const previousValue=selectedLegalTerm||"";
   legalTermSelect.innerHTML=
     `<option value="">Selecciona un término</option>`;
 
-  buildCountryFrequentCatalog().forEach(
+  COLOMBIA_LEGAL_TERMS.forEach(
     category=>{
 
       const group=
@@ -5357,8 +5289,6 @@ function populateLegalSelect(){
 
     }
   );
-
-  if(previousValue) legalTermSelect.value=previousValue;
 
 }
 
@@ -5405,7 +5335,6 @@ function selectLegalTerm(term,categoryName){
 
   renderLegalCategories();
   syncUnitAvailability();
-  renderHourPresets();
 
 }
 
@@ -5478,7 +5407,6 @@ function applyLegalReference(ref){
     `Referencia aplicada: ${ref.label}. Revisa la norma y las circunstancias del caso antes de usar el resultado.`;
 
   syncUnitAvailability();
-  renderHourPresets();
 
   daysInput.focus();
 
@@ -5626,7 +5554,6 @@ legalTermSelect.addEventListener(
 
 populateLegalSelect();
 renderLegalCategories();
-renderHourPresets();
 
 
 const TERM_TYPE_NOTES_BY_COUNTRY={
@@ -5634,7 +5561,7 @@ const TERM_TYPE_NOTES_BY_COUNTRY={
   CO:{
     business:"Excluye sábados, domingos y festivos según el calendario de referencia de la jurisdicción. Las reglas especiales de cada trámite pueden modificar el cómputo y deben verificarse en la norma aplicable.",
     calendar:"Cuenta todos los días de forma continua e ininterrumpida, sin excluir fines de semana ni festivos.",
-    legal:"Explora términos jurídicos frecuentes de la jurisdicción seleccionada, por materia o mediante búsqueda. La selección sirve como guía de contexto; la duración y la forma de conteo deben determinarse según la norma específica aplicable."
+    legal:"Explora términos jurídicos frecuentes de Colombia por materia o mediante búsqueda. La selección sirve como guía de contexto; la duración y la forma de conteo deben determinarse según la norma específica aplicable."
   },
 
   DEFAULT:{
@@ -5695,10 +5622,11 @@ function syncUnitAvailability(){
   termTypeNote.textContent=
     getTermTypeNotes()[type]||"";
 
-  legalTermsPanel.hidden=type!=="legal";
-
-  renderHourPresets();
-  renderLegalCatalogForCountry();
+  legalTermsPanel.hidden=
+    !(
+      type==="legal" &&
+      currentCountry==="CO"
+    );
 
   if(getSelectedUnit()!=="days" && type==="business"){
     const calendarRadio=document.querySelector('input[name="termType"][value="calendar"]');
@@ -5711,120 +5639,35 @@ function syncUnitAvailability(){
 
 
 const HOUR_TERM_PRESETS={
-  AR:[
-    {hours:24,label:"24 horas",detail:"Indagatoria de persona detenida · CPP Nación, art. 294"},
-    {hours:48,label:"48 horas",detail:"Prórroga de la indagatoria en los supuestos previstos por el art. 294"}
-  ],
-  BO:[
-    {hours:24,label:"24 horas",detail:"Puesta a disposición judicial de la persona aprehendida · Ley 1970, art. 226"}
-  ],
-  BR:[
-    {hours:24,label:"24 horas",detail:"Audiencia de custodia tras la prisión · Código de Processo Penal, art. 310"}
-  ],
-  CL:[
-    {hours:24,label:"24 horas",detail:"Puesta a disposición del juez en detención por flagrancia · Constitución, art. 19 N.º 7"}
-  ],
-  CA:[
-    {hours:24,label:"24 horas",detail:"Regla federal para llevar a una persona arrestada ante un juez de paz cuando esté disponible · Criminal Code, s. 503"}
-  ],
-  CO:[
-    {hours:36,label:"36 horas",detail:"Presentación ante juez de control de garantías en el procedimiento de flagrancia · Ley 906 de 2004, art. 302"}
-  ],
-  CR:[
-    {hours:24,label:"24 horas",detail:"Referencia inicial de presentación ante la autoridad competente"},
-    {hours:48,label:"48 horas",detail:"Referencia acumulada en determinados trámites de detención"}
-  ],
-  EC:[
-    {hours:24,label:"24 horas",detail:"Audiencia de calificación de flagrancia · COIP"}
-  ],
-  SV:[
-    {hours:72,label:"72 horas",detail:"Límite constitucional de la detención administrativa · Constitución, art. 13"}
-  ],
-  ES:[
-    {hours:72,label:"72 horas",detail:"Límite máximo general de la detención preventiva antes de libertad o puesta a disposición judicial · LECrim, art. 520"}
-  ],
-  US:[
-    {hours:48,label:"48 horas",detail:"Referencia para la determinación de prontitud de la comparecencia inicial en el ámbito federal, según la doctrina de Riverside"}
-  ],
-  GT:[
-    {hours:6,label:"6 horas",detail:"Puesta a disposición de la autoridad judicial · referencia constitucional"}
-  ],
-  HN:[
-    {hours:24,label:"24 horas",detail:"Presentación ante juez competente"},
-    {hours:48,label:"48 horas",detail:"Supuestos más complejos de investigación, según la información del Poder Judicial"}
-  ],
-  MX:[
-    {hours:48,label:"48 horas",detail:"Plazo constitucional del Ministerio Público · Constitución, art. 16"},
-    {hours:96,label:"96 horas",detail:"Supuesto especial de delincuencia organizada · Constitución, art. 16"}
-  ],
-  NI:[
-    {hours:48,label:"48 horas",detail:"Presentación de la persona detenida ante el juez · Código Procesal Penal, art. 256"}
-  ],
-  PA:[
-    {hours:48,label:"48 horas",detail:"Presentación ante Juez de Garantías"}
-  ],
-  PY:[
-    {hours:24,label:"24 horas",detail:"Puesta a disposición del juez para resolver sobre la procedencia de la prisión preventiva o libertad · CPP, art. 240"}
-  ],
-  PE:[
-    {hours:48,label:"48 horas",detail:"Regla general indicada para la detención policial"},
-    {hours:72,label:"72 horas",detail:"Referencia utilizada en supuestos de detención preliminar"}
-  ],
-  DO:[
-    {hours:48,label:"48 horas",detail:"Solicitud de medida de coerción dentro de las 48 horas contadas desde el arresto · CPP, art. 225 modificado"}
-  ],
-  UY:[
-    {hours:24,label:"24 horas",detail:"Referencia para declaración del detenido en los supuestos previstos"},
-    {hours:48,label:"48 horas",detail:"Auto de procesamiento dentro de 48 horas desde la detención · art. 125"}
-  ],
-  VE:[
-    {hours:48,label:"48 horas",detail:"Presentación ante autoridad judicial"}
-  ]
+  CO:[{hours:36,label:"36 horas",detail:"Legalización de captura / presentación ante juez"}],
+  MX:[{hours:48,label:"48 horas",detail:"Plazo constitucional del Ministerio Público"},{hours:96,label:"96 horas",detail:"Supuesto especial de delincuencia organizada"}],
+  PE:[{hours:48,label:"48 horas",detail:"Detención policial"},{hours:72,label:"72 horas",detail:"Detención preliminar"}],
+  AR:[{hours:24,label:"24 horas",detail:"Indagatoria de persona detenida"},{hours:48,label:"48 horas",detail:"Prórroga prevista en determinados supuestos"}],
+  CL:[{hours:24,label:"24 horas",detail:"Puesta a disposición judicial en flagrancia"},{hours:72,label:"72 horas",detail:"Ampliación judicial en supuestos previstos por la ley"}],
+  EC:[{hours:24,label:"24 horas",detail:"Audiencia de calificación de flagrancia"}],
+  CR:[{hours:24,label:"24 horas",detail:"Referencia inicial para presentación ante autoridad competente"},{hours:48,label:"48 horas",detail:"Referencia acumulada en determinados trámites"}],
+  PA:[{hours:48,label:"48 horas",detail:"Presentación ante Juez de Garantías"}],
+  GT:[{hours:6,label:"6 horas",detail:"Puesta a disposición de autoridad judicial"}],
+  VE:[{hours:48,label:"48 horas",detail:"Presentación ante autoridad judicial"}],
+  UY:[{hours:24,label:"24 horas",detail:"Declaración del detenido ante el juez"},{hours:48,label:"48 horas",detail:"Referencia de procesamiento en determinados supuestos"}]
 };
-
-function getHourPresetsForCountry(){
-  if(typeof HOUR_TERM_PRESETS==="undefined") return [];
-  return HOUR_TERM_PRESETS[currentCountry]||[];
-}
-
+const GENERIC_HOUR_PRESETS=[{hours:24,label:"24 horas",detail:"Referencia general"},{hours:36,label:"36 horas",detail:"Referencia general"},{hours:48,label:"48 horas",detail:"Referencia general"},{hours:72,label:"72 horas",detail:"Referencia general"}];
 function renderHourPresets(){
-  const box=document.getElementById("legalHourPresets"),list=document.getElementById("hourPresetList"),jur=document.getElementById("hourPresetsJurisdiction");
+  const box=document.getElementById("hourPresets"),list=document.getElementById("hourPresetList"),jur=document.getElementById("hourPresetsJurisdiction");
   if(!box||!list)return;
-
-  const unit=getSelectedUnit();
-  const type=document.querySelector('input[name="termType"]:checked')?.value;
-
-  box.hidden=!(type==="legal" && unit==="hours");
-  if(box.hidden){list.innerHTML="";return;}
-
-  const country=COUNTRIES[currentCountry];
-  const presets=getHourPresetsForCountry();
+  if(getSelectedUnit()!=="hours"){box.hidden=true;list.innerHTML="";return;}
+  const country=COUNTRIES[currentCountry],presets=HOUR_TERM_PRESETS[currentCountry]||GENERIC_HOUR_PRESETS;
   if(jur)jur.textContent=country?.name||"Jurisdicción seleccionada";
-
-  if(!presets.length){
-    list.innerHTML='<div class="legal-catalog-empty">Aún no hay una referencia horaria jurídica precargada para esta jurisdicción. El campo de horas sigue disponible para ingresar manualmente la duración.</div>';
-    return;
-  }
-
   list.innerHTML=presets.map(p=>`<button type="button" class="hour-preset${Number(daysInput.value)===p.hours?" active":""}" data-hours="${p.hours}" title="${escapeHtml(p.detail)}">${escapeHtml(p.label)}</button>`).join("");
-  list.querySelectorAll(".hour-preset").forEach(btn=>btn.addEventListener("click",()=>{
-    daysInput.value=btn.dataset.hours;
-    const ref=getHourPresetsForCountry().find(p=>String(p.hours)===String(btn.dataset.hours));
-    if(ref){
-      selectLegalTerm("Plazos horarios frecuentes","Referencias horarias");
-      legalTermHint.textContent=`Referencia aplicada: ${ref.label}. Revisa la norma y la actuación concreta antes de usar el resultado.`;
-    }
-    daysInput.dispatchEvent(new Event("input",{bubbles:true}));
-    renderHourPresets();
-  }));
+  list.querySelectorAll(".hour-preset").forEach(btn=>btn.addEventListener("click",()=>{daysInput.value=btn.dataset.hours;renderHourPresets();}));
+  box.hidden=false;
 }
-
 function applyDefaultHourPreset(force=false){
   if(getSelectedUnit()!=="hours")return;
-  const presets=getHourPresetsForCountry();
-  const current=Number(daysInput.value);
-  const countryChanged=daysInput.dataset.hourPresetCountry!==currentCountry;
-  if(presets.length && (force||countryChanged||!Number.isFinite(current)||current<=0))daysInput.value=presets[0].hours;
+  const presets=HOUR_TERM_PRESETS[currentCountry];
+  if(!presets?.length)return;
+  const current=Number(daysInput.value), countryChanged=daysInput.dataset.hourPresetCountry!==currentCountry;
+  if(force||countryChanged||!Number.isFinite(current)||current<=0)daysInput.value=presets[0].hours;
   daysInput.dataset.hourPresetCountry=currentCountry;
   renderHourPresets();
 }
@@ -5963,13 +5806,29 @@ function applyCountryUI(){
   countryInline.title=
     `${info.name} — ${info.note} Haz clic para cambiar de jurisdicción.`;
 
-  /* Términos frecuentes es una sección transversal de la plataforma.
-     Colombia conserva su catálogo inicial y las demás jurisdicciones
-     utilizan el mismo espacio para referencias ya verificadas,
-     comenzando por las horarias. */
-  legalTermTypeLabel.style.display="";
-  renderLegalCatalogForCountry();
-  renderHourPresets();
+  /* La guía de términos frecuentes se encuentra
+     disponible actualmente para Colombia. */
+  const showLegalOption=
+    currentCountry==="CO";
+
+  legalTermTypeLabel.style.display=
+    showLegalOption
+      ?""
+      :"none";
+
+  if(
+    !showLegalOption &&
+    legalTermRadio.checked
+  ){
+
+    document.querySelector(
+      'input[name="termType"][value="business"]'
+    ).checked=true;
+
+  }
+
+  if(!showLegalOption)
+    clearLegalTerm();
 
   updateGxWidgetVisibility();
 
@@ -6207,13 +6066,6 @@ function setCountry(code,persist){
     code=DEFAULT_COUNTRY;
 
   currentCountry=code;
-
-  const currentCatalogTerms=buildCountryFrequentCatalog(code)
-    .flatMap(category=>category.terms||[])
-    .map(term=>term.name);
-  if(selectedLegalTerm && !currentCatalogTerms.includes(selectedLegalTerm)){
-    clearLegalTerm();
-  }
 
   countrySelect.value=code;
 
@@ -7575,7 +7427,7 @@ const SHARE_URL=
 const CALCULATION_SHEET_ENDPOINT=
   "https://script.google.com/macros/s/AKfycbxx6oWsJMDZvQVtf9arU2dBhk62v5TwWjsx1oAmXdVy1R4EZHGy2d3x_C6wwY2rtNwL/exec";
 
-const APP_VERSION="11.3";
+const APP_VERSION="11.2";
 
 /* Mantiene el número de versión mostrado en el resultado
    sincronizado con APP_VERSION. */
