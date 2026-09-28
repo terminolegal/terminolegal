@@ -555,12 +555,6 @@ small{
 .legal-catalog-heading{margin:14px 0 8px;color:var(--navy);font-size:.72rem;font-weight:800;letter-spacing:.01em}
 .legal-catalog-empty{padding:10px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);font-size:.65rem;line-height:1.45;background:var(--surface)}
 
-.field-note{
-  font-size:.7rem;
-  color:var(--muted);
-  margin-top:8px;
-  line-height:1.5
-}
 
 /* BOTONES */
 button{
@@ -2133,9 +2127,6 @@ footer{
 
     </div>
 
-    <small id="startHint">
-      El conteo inicia el día siguiente a la fecha indicada.
-    </small>
 
     <!-- CALENDARIO -->
     <div id="calendarPicker"
@@ -2228,10 +2219,9 @@ footer{
   <div class="field" id="timeField" hidden>
     <label for="startTime">Hora de inicio</label>
     <div id="start-time-wrap">
-      <input type="text" id="startTime" value="00:00" inputmode="numeric" autocomplete="off" maxlength="5" pattern="(?:[01]\d|2[0-3]):[0-5]\d" placeholder="HH:MM" aria-label="Hora de inicio en formato de 24 horas" aria-describedby="startHint">
+      <input type="text" id="startTime" value="00:00" inputmode="numeric" autocomplete="off" maxlength="5" pattern="(?:[01]\d|2[0-3]):[0-5]\d" placeholder="HH:MM" aria-label="Hora de inicio en formato de 24 horas">
       <span id="start-time-unit" aria-hidden="true">horas</span>
     </div>
-    <p class="field-note">Escribe directamente la hora y los minutos. Ejemplo: 15:45. Se usa el formato de 24 horas.</p>
   </div>
 
   <!-- TIPO DE TIEMPO -->
@@ -2266,8 +2256,6 @@ footer{
 
     </div>
 
-    <p class="field-note"
-       id="termTypeNote"></p>
 
     <div id="legalTermsPanel"
          class="legal-terms-panel"
@@ -4882,14 +4870,10 @@ document.addEventListener(
    TIPO DE TÉRMINO / UNIDAD
    ========================================================= */
 
-const termTypeNote=
-  document.getElementById("termTypeNote");
 
 const daysLabel=
   document.getElementById("daysLabel");
 
-const startHint=
-  document.getElementById("startHint");
 
 const unitSelect=document.getElementById("unitSelect");
 const timeField=document.getElementById("timeField");
@@ -5764,8 +5748,6 @@ function syncUnitAvailability(){
     monthsLabel.title="";
   }
 
-  termTypeNote.textContent=
-    getTermTypeNotes()[type]||"";
 
   legalTermsPanel.hidden=type!=="legal";
 
@@ -5841,12 +5823,6 @@ function updateDaysLabel(){
 
   timeField.hidden=unit!=="hours";
 
-  startHint.textContent=
-    unit==="hours"
-      ?"Ingresa la hora de inicio en formato de 24 horas (HH:MM). Ejemplo: 15:45."
-      :unit==="months" || unit==="years"
-        ?"El plazo se cuenta de fecha a fecha desde el día indicado."
-        :"El conteo inicia el día siguiente a la fecha indicada.";
 
   if(unit==="hours") applyDefaultHourPreset();
   else renderHourPresets();
@@ -5873,7 +5849,6 @@ unitSelect.addEventListener("change",()=>{
     const calendarRadio=document.querySelector('input[name="termType"][value="calendar"]');
     if(calendarRadio){
       calendarRadio.checked=true;
-      termTypeNote.textContent=getTermTypeNotes().calendar||"";
     }
   }
   syncLegacyUnitRadios(selectedUnit);
