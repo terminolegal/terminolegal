@@ -935,9 +935,13 @@ footer{
   width:min(900px,calc(100vw - 24px));
   overflow:visible;
   text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
 
 .usage-guide-summary{
+  order:2;
   min-height:22px;
 
   display:inline-flex;
@@ -1005,6 +1009,8 @@ footer{
 }
 
 .usage-guide-panel{
+  order:1;
+  width:min(900px,calc(100vw - 24px));
   max-height:min(72vh,680px);
   text-align:left;
   overflow:auto;
@@ -2857,7 +2863,7 @@ body.dark .usage-guide-panel{
         <details class="guide-section">
           <summary><span>03</span><strong data-guide="calculateTitle">¿Cómo calcular un término?</strong><span class="guide-section-chevron" aria-hidden="true"></span></summary>
           <div class="guide-section-body">
-            <p data-guide="calculateText">Completa los campos y pulsa “Correr término” —o “Calcular plazo” según el idioma de la interfaz—. El sistema toma los parámetros visibles del formulario y genera la fecha resultante y la trazabilidad del cómputo.</p>
+            <p data-guide="calculateText">Completa los campos y pulsa “Calcular término” —o “Calcular plazo” según el idioma de la interfaz—. El sistema toma los parámetros visibles del formulario y genera la fecha resultante y la trazabilidad del cómputo.</p>
             <div class="guide-example">
               <strong data-guide="exampleLabel2">Ejemplo con horas</strong>
               <span data-guide="hoursExample">28/09/2026 a las 02:02 + 36 horas = 29/09/2026 a las 14:02.</span>
@@ -3228,7 +3234,7 @@ function amountText(amount,type,unit,lang){
 
 
 const FORM_LABELS={
-  es:{start:"Fecha de inicio",jurisdiction:"Jurisdicción de referencia (calendario aplicado)",term:"Término",unit:"Unidad",days:"Días",hours:"Horas",months:"Meses",years:"Años",time:"Hora de inicio",timeAria:"Hora de inicio en formato de 24 horas",timeUnit:"horas",type:"Tipo de término",business:"Días hábiles",calendar:"Días calendario",frequent:"Términos frecuentes",panel:"Selecciona un término frecuente",panelDesc:"Consulta referencias organizadas por jurisdicción.",hourTitle:"Referencias horarias frecuentes",hourNote:"Selecciona la referencia por su duración y actuación.",catalog:"Términos jurídicos frecuentes",search:"Ej.: tutela, despido, liquidación...",searchAria:"Buscar término jurídico",clear:"Limpiar búsqueda",selected:"Término seleccionado",change:"Cambiar",hint:"Selecciona un término para usarlo como contexto de la consulta.",run:"CORRER TÉRMINO"},
+  es:{start:"Fecha de inicio",jurisdiction:"Jurisdicción de referencia (calendario aplicado)",term:"Término",unit:"Unidad",days:"Días",hours:"Horas",months:"Meses",years:"Años",time:"Hora de inicio",timeAria:"Hora de inicio en formato de 24 horas",timeUnit:"horas",type:"Tipo de término",business:"Días hábiles",calendar:"Días calendario",frequent:"Términos frecuentes",panel:"Selecciona un término frecuente",panelDesc:"Consulta referencias organizadas por jurisdicción.",hourTitle:"Referencias horarias frecuentes",hourNote:"Selecciona la referencia por su duración y actuación.",catalog:"Términos jurídicos frecuentes",search:"Ej.: tutela, despido, liquidación...",searchAria:"Buscar término jurídico",clear:"Limpiar búsqueda",selected:"Término seleccionado",change:"Cambiar",hint:"Selecciona un término para usarlo como contexto de la consulta.",run:"CALCULAR TÉRMINO"},
   pt:{start:"Data de início",jurisdiction:"Jurisdição de referência (calendário aplicado)",term:"Prazo",unit:"Unidade",days:"Dias",hours:"Horas",months:"Meses",years:"Anos",time:"Hora de início",timeAria:"Hora de início em formato de 24 horas",timeUnit:"horas",type:"Tipo de prazo",business:"Dias úteis",calendar:"Dias corridos",frequent:"Prazos frequentes",panel:"Selecione um prazo frequente",panelDesc:"Consulte referências organizadas por jurisdição.",hourTitle:"Referências horárias frequentes",hourNote:"Selecione a referência pela duração e atuação.",catalog:"Prazos jurídicos frequentes",search:"Ex.: tutela, demissão, liquidação...",searchAria:"Buscar prazo jurídico",clear:"Limpar busca",selected:"Prazo selecionado",change:"Alterar",hint:"Selecione um prazo para usá-lo como contexto da consulta.",run:"CALCULAR PRAZO"},
   en:{start:"Start date",jurisdiction:"Reference jurisdiction (calendar applied)",term:"Term",unit:"Unit",days:"Days",hours:"Hours",months:"Months",years:"Years",time:"Start time",timeAria:"Start time in 24-hour format",timeUnit:"hours",type:"Term type",business:"Business days",calendar:"Calendar days",frequent:"Frequent terms",panel:"Select a frequent term",panelDesc:"Browse references organized by jurisdiction.",hourTitle:"Frequent hourly references",hourNote:"Select a reference by duration and legal action.",catalog:"Frequent legal terms",search:"E.g.: detention, appeal, filing...",searchAria:"Search legal term",clear:"Clear search",selected:"Selected term",change:"Change",hint:"Select a term to use it as the context for the query.",run:"CALCULATE TERM"}
 };
@@ -3391,9 +3397,13 @@ function applyOutputLanguage(lang){
   }
 
   const htmlLang=
-    lang==="pt"
-      ?"pt-BR"
-      :"es";
+    lang==="en"
+      ?"en-US"
+      :lang==="pt"
+        ?(currentCountry==="PT"?"pt-PT":"pt-BR")
+        :"es-CO";
+
+  document.documentElement.lang=htmlLang;
 
   document
     .querySelectorAll("[data-i18n]")
@@ -6670,6 +6680,11 @@ function applyCountryUI(){
      utilizan el mismo espacio para referencias ya verificadas,
      comenzando por las horarias. */
   legalTermTypeLabel.style.display="";
+
+  /* El idioma de la guía/about cambia en el mismo momento en que cambia
+     la jurisdicción, sin esperar a ejecutar un cálculo. */
+  applyOutputLanguage(outputLang(currentCountry));
+
   applyTerminologyLabels();
   renderLegalCatalogForCountry();
   renderHourPresets();
