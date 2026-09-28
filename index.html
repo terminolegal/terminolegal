@@ -896,6 +896,303 @@ footer{
   font-size:.65rem;
   padding:22px 3px 0
 }
+footer{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  flex-wrap:wrap;
+  color:var(--muted);
+  font-size:.65rem;
+  padding:22px 3px 0
+}
+
+/* =========================================================
+   GUÍA / ABOUT — PIE FIJO, MÍNIMO Y DISCRETO
+   ========================================================= */
+.site-footer-fixed{
+  position:fixed;
+  left:50%;
+  bottom:8px;
+  transform:translateX(-50%);
+  width:max-content;
+  max-width:calc(100vw - 20px);
+  margin:0;
+  padding:0;
+  display:block;
+  color:var(--ink);
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:.70rem;
+  line-height:1.4;
+  z-index:950;
+}
+
+/* Reserva solo un espacio pequeño para el pie cerrado. */
+.app{
+  padding-bottom:54px;
+}
+
+.usage-guide{
+  width:min(900px,calc(100vw - 24px));
+  overflow:visible;
+  text-align:center;
+}
+
+.usage-guide-summary{
+  min-height:22px;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  padding:2px 3px;
+  list-style:none;
+  cursor:pointer;
+  user-select:none;
+  color:var(--muted);
+  font-size:.69rem;
+  font-weight:450;
+  letter-spacing:.01em;
+  background:transparent;
+  border:0;
+  border-radius:4px;
+  transition:color .15s ease,opacity .15s ease;
+}
+
+.usage-guide-summary::-webkit-details-marker{
+  display:none;
+}
+
+.usage-guide-summary::marker{
+  content:"";
+}
+
+.usage-guide-summary:hover{
+  color:var(--navy);
+  background:transparent;
+}
+
+.usage-guide-summary:focus-visible{
+  outline:1px solid var(--gold);
+  outline-offset:3px;
+}
+
+.usage-guide-brand,
+.usage-guide-divider{
+  display:none;
+}
+
+.usage-guide-title{
+  color:inherit;
+  white-space:nowrap;
+}
+
+.usage-guide-chevron{
+  display:none;
+}
+
+.guide-section-chevron{
+  width:7px;
+  height:7px;
+  border-right:1.5px solid currentColor;
+  border-bottom:1.5px solid currentColor;
+  transform:rotate(45deg) translateY(-1px);
+  transition:transform .16s ease;
+  opacity:.75;
+}
+
+.usage-guide[open] .usage-guide-chevron{
+  transform:rotate(225deg) translate(-1px,-1px);
+}
+
+.usage-guide-panel{
+  max-height:min(72vh,680px);
+  text-align:left;
+  overflow:auto;
+  margin-bottom:7px;
+  border:1px solid color-mix(in srgb,var(--line) 75%,transparent);
+  border-radius:12px;
+  box-shadow:0 8px 26px rgba(16,36,62,.10);
+  padding:14px 16px 11px;
+  background:var(--surface);
+  scrollbar-width:thin;
+}
+
+body.dark .usage-guide-panel{
+  box-shadow:0 10px 28px rgba(0,0,0,.28);
+}
+
+.usage-guide-intro{
+  max-width:680px;
+  margin:0 auto 10px;
+  text-align:center;
+}
+
+.usage-guide-intro strong{
+  display:block;
+  color:var(--navy);
+  font-size:.82rem;
+  font-weight:600;
+  letter-spacing:.005em;
+}
+
+.usage-guide-intro p{
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:.68rem;
+  line-height:1.55;
+}
+
+.guide-accordion{
+  max-width:760px;
+  margin:0 auto;
+  border-top:1px solid var(--line);
+}
+
+.guide-section{
+  border-bottom:1px solid var(--line);
+}
+
+.guide-section summary{
+  display:grid;
+  grid-template-columns:30px 1fr auto;
+  align-items:center;
+  gap:8px;
+  min-height:42px;
+  padding:8px 2px;
+  list-style:none;
+  cursor:pointer;
+  color:var(--ink);
+}
+
+.guide-section summary::-webkit-details-marker{
+  display:none;
+}
+
+.guide-section summary::marker{
+  content:"";
+}
+
+.guide-section summary:hover strong{
+  color:var(--navy);
+}
+
+.guide-section summary:focus-visible{
+  outline:2px solid var(--gold);
+  outline-offset:-2px;
+  border-radius:6px;
+}
+
+.guide-section summary > span:first-child{
+  color:var(--gold);
+  font-size:.61rem;
+  font-weight:700;
+  letter-spacing:.08em;
+}
+
+.guide-section summary strong{
+  font-size:.72rem;
+  font-weight:600;
+}
+
+.guide-section-chevron{
+  justify-self:end;
+  color:var(--muted);
+}
+
+.guide-section[open] .guide-section-chevron{
+  transform:rotate(225deg) translate(-1px,-1px);
+}
+
+.guide-section-body{
+  padding:0 12px 13px 38px;
+  color:var(--muted);
+  font-size:.68rem;
+  line-height:1.6;
+}
+
+.guide-section-body p{
+  margin:0 0 8px;
+}
+
+.guide-section-body p:last-child{
+  margin-bottom:0;
+}
+
+.guide-note,
+.guide-example,
+.guide-source-line{
+  margin-top:8px;
+  padding:8px 10px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:var(--surface-alt);
+}
+
+.guide-note{
+  color:var(--muted);
+}
+
+.guide-example{
+  display:block;
+}
+
+.guide-example strong{
+  display:block;
+  margin-bottom:2px;
+  color:var(--navy);
+  font-size:.64rem;
+  font-weight:650;
+}
+
+.guide-source-line{
+  color:var(--muted);
+}
+
+.guide-source-line span:first-child{
+  color:var(--navy);
+  font-weight:600;
+}
+
+.usage-guide-footer-note{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  padding:9px 2px 1px;
+  color:var(--muted);
+  font-size:.58rem;
+  letter-spacing:.01em;
+}
+
+@media(max-width:600px){
+  .site-footer-fixed{
+    bottom:5px;
+  }
+
+  .app{
+    padding-bottom:46px;
+  }
+
+  .usage-guide-summary{
+    min-height:21px;
+    padding:2px 3px;
+  }
+
+  .usage-guide-panel{
+    max-height:78vh;
+    padding:11px 11px 9px;
+  }
+
+  .guide-section summary{
+    grid-template-columns:25px 1fr auto;
+    padding:7px 1px;
+  }
+
+  .guide-section-body{
+    padding:0 5px 12px 32px;
+    font-size:.67rem;
+  }
+}
 
 /* =========================================================
    FEEDBACK / PQRS
@@ -1750,6 +2047,9 @@ footer{
 #printArea{display:none}
 
 @media print{
+  .site-footer-fixed{display:none!important}
+  .app{padding-bottom:0!important}
+
   @page{
     size:A4;
     margin:8mm 10mm 8mm
@@ -2510,13 +2810,99 @@ footer{
     Las reglas especiales pueden variar según la materia, autoridad o territorio aplicable.
   </p>
   <p id="versionNotice">
-    Versión <span id="appVersionLabel">11.4</span> — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.
+    Versión <span id="appVersionLabel">11.5</span> — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.
   </p>
 </div>
 
-<footer>
-  <span>© 2026 TÉRMINO LEGAL</span>
-  <span>Calculador jurídico — versión experimental</span>
+<footer class="site-footer-fixed" id="siteFooter" aria-label="Guía de uso de Término Legal">
+
+  <details class="usage-guide" id="usageGuide">
+
+    <summary class="usage-guide-summary">
+      <span class="usage-guide-brand">TÉRMINO LEGAL</span>
+      <span class="usage-guide-divider" aria-hidden="true"></span>
+      <span class="usage-guide-title" data-guide="title">Guía de uso</span>
+      <span class="usage-guide-chevron" aria-hidden="true"></span>
+    </summary>
+
+    <div class="usage-guide-panel">
+
+      <div class="usage-guide-intro">
+        <strong data-guide="introTitle">Una guía breve para usar el calculador</strong>
+        <p data-guide="introText">Consulta para qué sirve cada opción, cómo hacer un cálculo y cómo leer la trazabilidad del resultado.</p>
+      </div>
+
+      <div class="guide-accordion" id="guideAccordion">
+
+        <details class="guide-section">
+          <summary><span>01</span><strong data-guide="purposeTitle">¿Para qué sirve?</strong><span class="guide-section-chevron" aria-hidden="true"></span></summary>
+          <div class="guide-section-body">
+            <p data-guide="purposeText">Término Legal ayuda a calcular una fecha a partir de una fecha de inicio, una cantidad y una unidad de tiempo, aplicando el tipo de conteo y la jurisdicción seleccionados.</p>
+            <div class="guide-note" data-guide="purposeNote">La herramienta calcula. La norma aplicable sigue siendo la referencia para determinar qué regla corresponde al caso concreto.</div>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary><span>02</span><strong data-guide="searchTitle">¿Cómo buscar?</strong><span class="guide-section-chevron" aria-hidden="true"></span></summary>
+          <div class="guide-section-body">
+            <p data-guide="searchText">Primero elige la fecha de inicio y la jurisdicción. Después indica la cantidad y la unidad: días, horas, meses o años.</p>
+            <p data-guide="searchText2">Cuando elijas “Términos frecuentes”, usa el buscador del catálogo para localizar un concepto o una referencia disponible. En horas también pueden aparecer referencias horarias frecuentes de la jurisdicción.</p>
+            <div class="guide-example">
+              <strong data-guide="exampleLabel">Ejemplo</strong>
+              <span data-guide="searchExample">Buscar “tutela” en Términos frecuentes para revisar las referencias que el catálogo tenga disponibles en la jurisdicción seleccionada.</span>
+            </div>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary><span>03</span><strong data-guide="calculateTitle">¿Cómo calcular un término?</strong><span class="guide-section-chevron" aria-hidden="true"></span></summary>
+          <div class="guide-section-body">
+            <p data-guide="calculateText">Completa los campos y pulsa “Correr término” —o “Calcular plazo” según el idioma de la interfaz—. El sistema toma los parámetros visibles del formulario y genera la fecha resultante y la trazabilidad del cómputo.</p>
+            <div class="guide-example">
+              <strong data-guide="exampleLabel2">Ejemplo con horas</strong>
+              <span data-guide="hoursExample">28/09/2026 a las 02:02 + 36 horas = 29/09/2026 a las 14:02.</span>
+            </div>
+            <div class="guide-example">
+              <strong data-guide="exampleLabel3">Ejemplo con días calendario</strong>
+              <span data-guide="daysExample">28/09/2026 + 10 días calendario = 08/10/2026. Es un ejemplo de suma de fechas; la regla jurídica concreta puede establecer una forma distinta de cómputo.</span>
+            </div>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary><span>04</span><strong data-guide="readTitle">¿Cómo leer el resultado?</strong><span class="guide-section-chevron" aria-hidden="true"></span></summary>
+          <div class="guide-section-body">
+            <p data-guide="readText">La fecha grande es la fecha resultante del cálculo. Debajo encontrarás el resumen y, cuando corresponda, la fecha de inicio, la fecha de vencimiento, el tipo de días y la información de festivos excluidos.</p>
+            <p data-guide="readText2">La certificación muestra la secuencia del conteo para poder revisar cómo llegó el motor al resultado. También puedes guardar el PDF o compartir el cálculo.</p>
+            <div class="guide-note" data-guide="readNote">Para revisar un cómputo, comprueba especialmente: jurisdicción, fecha de inicio, unidad, modalidad de conteo y resultado final.</div>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary><span>05</span><strong data-guide="sourcesTitle">Fuentes y metodología</strong><span class="guide-section-chevron" aria-hidden="true"></span></summary>
+          <div class="guide-section-body">
+            <p data-guide="sourcesText">El motor separa el cálculo de la jurisdicción. La jurisdicción aporta el calendario de referencia y, cuando existe, referencias jurídicas informativas para términos frecuentes.</p>
+            <p data-guide="sourcesText2">En días hábiles se consideran los días de descanso semanal y los festivos incorporados al calendario disponible. En días calendario se cuentan consecutivamente. En horas se suma el tiempo de forma continua a partir de la fecha y hora de inicio. Los meses y años se calculan con reglas de calendario del motor.</p>
+            <p data-guide="sourcesText3">Las referencias legales y los calendarios deben contrastarse con la fuente normativa u oficial que corresponda al caso, especialmente cuando exista una regla especial de suspensión, interrupción, prórroga, horario procesal o ámbito territorial.</p>
+            <div class="guide-source-line">
+              <span data-guide="sourcesLabel">Fuentes de referencia:</span>
+              <span data-guide="sourcesValue">normativa aplicable, calendarios oficiales por jurisdicción y referencias documentadas incorporadas al catálogo de Término Legal.</span>
+            </div>
+          </div>
+        </details>
+
+      </div>
+
+      <div class="usage-guide-footer-note">
+        <span>© 2026 TÉRMINO LEGAL</span>
+        <span>·</span>
+        <span data-guide="footerNote">Herramienta de referencia para cómputo de términos.</span>
+      </div>
+
+    </div>
+
+  </details>
+
 </footer>
 
 </div><!-- /app -->
@@ -2886,10 +3272,123 @@ function applyFormLanguage(lang){
   setText("#calculateBtn",f.run);
 }
 
+const GUIDE_I18N={
+
+  es:{
+    title:"Guía de uso",
+    introTitle:"Una guía breve para usar el calculador",
+    introText:"Consulta para qué sirve cada opción, cómo hacer un cálculo y cómo leer la trazabilidad del resultado.",
+    purposeTitle:"¿Para qué sirve?",
+    purposeText:"Término Legal ayuda a calcular una fecha a partir de una fecha de inicio, una cantidad y una unidad de tiempo, aplicando el tipo de conteo y la jurisdicción seleccionados.",
+    purposeNote:"La herramienta calcula. La norma aplicable sigue siendo la referencia para determinar qué regla corresponde al caso concreto.",
+    searchTitle:"¿Cómo buscar?",
+    searchText:"Primero elige la fecha de inicio y la jurisdicción. Después indica la cantidad y la unidad: días, horas, meses o años.",
+    searchText2:"Cuando elijas “Términos frecuentes”, usa el buscador del catálogo para localizar un concepto o una referencia disponible. En horas también pueden aparecer referencias horarias frecuentes de la jurisdicción.",
+    exampleLabel:"Ejemplo",
+    searchExample:"Buscar “tutela” en Términos frecuentes para revisar las referencias que el catálogo tenga disponibles en la jurisdicción seleccionada.",
+    calculateTitle:"¿Cómo calcular un término?",
+    calculateText:"Completa los campos y pulsa “Correr término” —o “Calcular plazo” según el idioma de la interfaz—. El sistema toma los parámetros visibles del formulario y genera la fecha resultante y la trazabilidad del cómputo.",
+    exampleLabel2:"Ejemplo con horas",
+    hoursExample:"28/09/2026 a las 02:02 + 36 horas = 29/09/2026 a las 14:02.",
+    exampleLabel3:"Ejemplo con días calendario",
+    daysExample:"28/09/2026 + 10 días calendario = 08/10/2026. Es un ejemplo de suma de fechas; la regla jurídica concreta puede establecer una forma distinta de cómputo.",
+    readTitle:"¿Cómo leer el resultado?",
+    readText:"La fecha grande es la fecha resultante del cálculo. Debajo encontrarás el resumen y, cuando corresponda, la fecha de inicio, la fecha de vencimiento, el tipo de días y la información de festivos excluidos.",
+    readText2:"La certificación muestra la secuencia del conteo para poder revisar cómo llegó el motor al resultado. También puedes guardar el PDF o compartir el cálculo.",
+    readNote:"Para revisar un cómputo, comprueba especialmente: jurisdicción, fecha de inicio, unidad, modalidad de conteo y resultado final.",
+    sourcesTitle:"Fuentes y metodología",
+    sourcesText:"El motor separa el cálculo de la jurisdicción. La jurisdicción aporta el calendario de referencia y, cuando existe, referencias jurídicas informativas para términos frecuentes.",
+    sourcesText2:"En días hábiles se consideran los días de descanso semanal y los festivos incorporados al calendario disponible. En días calendario se cuentan consecutivamente. En horas se suma el tiempo de forma continua a partir de la fecha y hora de inicio. Los meses y años se calculan con reglas de calendario del motor.",
+    sourcesText3:"Las referencias legales y los calendarios deben contrastarse con la fuente normativa u oficial que corresponda al caso, especialmente cuando exista una regla especial de suspensión, interrupción, prórroga, horario procesal o ámbito territorial.",
+    sourcesLabel:"Fuentes de referencia:",
+    sourcesValue:"normativa aplicable, calendarios oficiales por jurisdicción y referencias documentadas incorporadas al catálogo de Término Legal.",
+    footerNote:"Herramienta de referencia para cómputo de términos."
+  },
+
+  pt:{
+    title:"Sobre",
+    introTitle:"Um guia breve para usar o calculador",
+    introText:"Veja para que serve cada opção, como fazer um cálculo e como ler a rastreabilidade do resultado.",
+    purposeTitle:"Para que serve?",
+    purposeText:"O Término Legal ajuda a calcular uma data a partir de uma data de início, uma quantidade e uma unidade de tempo, aplicando o tipo de contagem e a jurisdição selecionados.",
+    purposeNote:"A ferramenta calcula. A norma aplicável continua sendo a referência para determinar qual regra corresponde ao caso concreto.",
+    searchTitle:"Como buscar?",
+    searchText:"Primeiro escolha a data de início e a jurisdição. Depois informe a quantidade e a unidade: dias, horas, meses ou anos.",
+    searchText2:"Ao escolher “Prazos frequentes”, use o buscador do catálogo para localizar um conceito ou uma referência disponível. Em horas também podem aparecer referências horárias frequentes da jurisdição.",
+    exampleLabel:"Exemplo",
+    searchExample:"Buscar “tutela” em Prazos frequentes para consultar as referências disponíveis no catálogo para a jurisdição selecionada.",
+    calculateTitle:"Como calcular um prazo?",
+    calculateText:"Preencha os campos e clique em “Calcular prazo”. O sistema usa os parâmetros visíveis do formulário e gera a data resultante e a rastreabilidade da contagem.",
+    exampleLabel2:"Exemplo com horas",
+    hoursExample:"28/09/2026 às 02:02 + 36 horas = 29/09/2026 às 14:02.",
+    exampleLabel3:"Exemplo com dias corridos",
+    daysExample:"28/09/2026 + 10 dias corridos = 08/10/2026. É um exemplo de soma de datas; a regra jurídica concreta pode estabelecer uma forma diferente de contagem.",
+    readTitle:"Como ler o resultado?",
+    readText:"A data em destaque é a data resultante do cálculo. Abaixo, você encontrará o resumo e, quando aplicável, a data de início, a data de vencimento, o tipo de dias e a informação de feriados excluídos.",
+    readText2:"A certificação mostra a sequência da contagem para conferir como o motor chegou ao resultado. Você também pode salvar o PDF ou compartilhar o cálculo.",
+    readNote:"Para revisar um cálculo, confira especialmente: jurisdição, data de início, unidade, modalidade de contagem e resultado final.",
+    sourcesTitle:"Fontes e metodologia",
+    sourcesText:"O motor separa o cálculo da jurisdição. A jurisdição fornece o calendário de referência e, quando disponível, referências jurídicas informativas para prazos frequentes.",
+    sourcesText2:"Em dias úteis, são considerados os dias de descanso semanal e os feriados incorporados ao calendário disponível. Em dias corridos, os dias são contados consecutivamente. Em horas, o tempo é somado de forma contínua a partir da data e hora de início. Meses e anos usam as regras de calendário do motor.",
+    sourcesText3:"As referências legais e os calendários devem ser conferidos na fonte normativa ou oficial correspondente ao caso, especialmente quando houver regra especial de suspensão, interrupção, prorrogação, horário processual ou âmbito territorial.",
+    sourcesLabel:"Fontes de referência:",
+    sourcesValue:"normas aplicáveis, calendários oficiais por jurisdição e referências documentadas incorporadas ao catálogo do Término Legal.",
+    footerNote:"Ferramenta de referência para cálculo de prazos."
+  },
+
+  en:{
+    title:"About",
+    introTitle:"A brief guide to using the calculator",
+    introText:"See what each option is for, how to calculate a term, and how to read the result traceability.",
+    purposeTitle:"What is it for?",
+    purposeText:"Término Legal helps calculate a date from a start date, an amount and a time unit, using the selected counting method and jurisdiction.",
+    purposeNote:"The tool performs the calculation. The applicable rule remains the reference for determining which legal counting rule applies to the specific case.",
+    searchTitle:"How do I search?",
+    searchText:"First choose the start date and jurisdiction. Then enter the amount and unit: days, hours, months or years.",
+    searchText2:"When you choose “Frequent terms”, use the catalog search to locate a concept or available reference. For hours, frequent hourly references may also appear for the selected jurisdiction.",
+    exampleLabel:"Example",
+    searchExample:"Search “tutela” under Frequent terms to review the references available in the catalog for the selected jurisdiction.",
+    calculateTitle:"How do I calculate a term?",
+    calculateText:"Fill in the fields and click “Calculate term”. The system uses the visible form parameters and generates the resulting date and calculation traceability.",
+    exampleLabel2:"Hourly example",
+    hoursExample:"28/09/2026 at 02:02 + 36 hours = 29/09/2026 at 14:02.",
+    exampleLabel3:"Calendar-day example",
+    daysExample:"28/09/2026 + 10 calendar days = 08/10/2026. This is an example of date addition; the applicable legal rule may establish a different counting method.",
+    readTitle:"How do I read the result?",
+    readText:"The large date is the calculated resulting date. Below it you will find the summary and, when applicable, the start date, expiry date, day type and information about excluded holidays.",
+    readText2:"The certification shows the counting sequence so you can review how the engine reached the result. You can also save the PDF or share the calculation.",
+    readNote:"To review a calculation, check in particular: jurisdiction, start date, unit, counting method and final result.",
+    sourcesTitle:"Sources and methodology",
+    sourcesText:"The engine separates calculation from jurisdiction. The jurisdiction supplies the reference calendar and, when available, informative legal references for frequent terms.",
+    sourcesText2:"For business days, weekly rest days and holidays included in the available calendar are excluded. For calendar days, days are counted consecutively. For hours, time is added continuously from the start date and time. Months and years use the engine's calendar rules.",
+    sourcesText3:"Legal references and calendars should be checked against the applicable normative or official source for the case, especially where special rules on suspension, interruption, extension, procedural hours or territorial scope apply.",
+    sourcesLabel:"Reference sources:",
+    sourcesValue:"applicable rules, official calendars by jurisdiction, and documented references incorporated into the Término Legal catalog.",
+    footerNote:"Reference tool for term calculations."
+  }
+};
+
+function applyGuideLanguage(lang){
+  const dict=GUIDE_I18N[lang]||GUIDE_I18N.es;
+  document
+    .querySelectorAll("[data-guide]")
+    .forEach(el=>{
+      const key=el.dataset.guide;
+      if(dict[key]!==undefined) el.textContent=dict[key];
+    });
+}
+
+
 /* Traduce los elementos estáticos del bloque de resultado. */
 function applyOutputLanguage(lang){
 
   applyFormLanguage(lang);
+  applyGuideLanguage(lang);
+
+  const siteFooter=document.getElementById("siteFooter");
+  if(siteFooter){
+    siteFooter.setAttribute("aria-label",lang==="en" ? "About Término Legal" : lang==="pt" ? "Sobre o Término Legal" : "Guía de uso de Término Legal");
+  }
 
   const htmlLang=
     lang==="pt"
@@ -8349,6 +8848,24 @@ increaseTextBtn.addEventListener(
 
   }
 );
+
+/* Acordeón de la guía: mantiene una sola sección abierta a la vez. */
+document
+  .querySelectorAll("#guideAccordion > .guide-section > summary")
+  .forEach(summary=>{
+    summary.addEventListener("click",()=>{
+      const current=summary.parentElement;
+      requestAnimationFrame(()=>{
+        if(!current.open) return;
+        document
+          .querySelectorAll("#guideAccordion > .guide-section[open]")
+          .forEach(section=>{
+            if(section!==current) section.open=false;
+          });
+      });
+    });
+  });
+
 
 /* Visita: se registra al final, cuando todo lo demás ya está listo. */
 trackVisit();
