@@ -547,7 +547,10 @@ small{
 .hour-presets-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;font-size:.72rem;font-weight:800}
 .hour-presets-title span:last-child{font-size:.65rem;font-weight:600;color:var(--muted)}
 .hour-preset-list{display:flex;flex-wrap:wrap;gap:7px}
-.hour-preset{border:1px solid var(--input-border);border-radius:999px;background:var(--input-bg);color:var(--ink);padding:7px 11px;font:inherit;font-size:.68rem;font-weight:800;cursor:pointer}
+.hour-preset{width:auto;min-width:150px;min-height:48px;height:auto;border:1px solid var(--input-border);border-radius:10px;background:var(--input-bg);color:var(--ink);padding:8px 11px;font:inherit;cursor:pointer;text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;line-height:1.2} 
+.hour-preset strong{display:block;color:var(--navy);font-size:.7rem;font-weight:800}
+.hour-preset span{display:block;color:var(--muted);font-size:.62rem;font-weight:600;white-space:normal}
+.hour-preset small{display:block;color:var(--gold);font-size:.55rem;font-weight:700;margin-top:1px}
 .hour-preset:hover{border-color:var(--gold)}
 .hour-preset.active{border-color:var(--gold);box-shadow:0 0 0 2px rgba(185,150,79,.16)}
 .legal-hour-presets{margin-top:12px;background:var(--surface)}
@@ -2271,7 +2274,7 @@ footer{
           <span id="hourPresetsTitle">Referencias horarias frecuentes</span>
           <span id="hourPresetsJurisdiction">Jurisdicción seleccionada</span>
         </div>
-        <p class="legal-hour-presets-note" id="hourPresetsNote">Selecciona una referencia para llevarla al campo de término. Estas opciones son ayudas de consulta y deben verificarse frente a la norma y actuación concreta.</p>
+        <p class="legal-hour-presets-note" id="hourPresetsNote">Selecciona la referencia por su duración y actuación. El nombre identifica el supuesto jurídico de referencia; verifica siempre la norma y las circunstancias concretas.</p>
         <div class="hour-preset-list" id="hourPresetList"></div>
       </div>
 
@@ -5085,73 +5088,71 @@ let selectedLegalMode="calendar";
 
 const HOUR_TERM_PRESETS={
   AR:[
-    {hours:24,label:"24 horas",detail:"Indagatoria de persona detenida · CPP Nación, art. 294"},
-    {hours:48,label:"48 horas",detail:"Prórroga de la indagatoria en los supuestos previstos por el art. 294"}
+    {hours:24,label:"24 horas — Indagatoria de persona detenida",name:"Indagatoria de persona detenida",reference:"CPP de la Nación, art. 294",detail:"Código Procesal Penal de la Nación, art. 294: si la persona estuviere detenida, la declaración debe recibirse inmediatamente o, a más tardar, dentro de 24 horas desde la detención."},
+    {hours:48,label:"48 horas — Prórroga de la indagatoria",name:"Prórroga de la indagatoria",reference:"CPP de la Nación, art. 294",detail:"Código Procesal Penal de la Nación, art. 294: el término puede prorrogarse por otro tanto en los supuestos previstos por la norma."}
   ],
   BO:[
-    {hours:24,label:"24 horas",detail:"Puesta a disposición judicial de la persona aprehendida · Ley 1970, art. 226"}
+    {hours:24,label:"24 horas — Puesta a disposición del juez",name:"Puesta a disposición del juez",reference:"Ley 1970, art. 226",detail:"Ley 1970, art. 226: la persona aprehendida debe ser puesta a disposición del juez dentro de 24 horas, quien resuelve dentro del mismo plazo."}
   ],
   BR:[
-    {hours:24,label:"24 horas",detail:"Audiencia de custodia tras la prisión · Código de Processo Penal, art. 310"}
+    {hours:24,label:"24 horas — Audiencia de custodia",name:"Audiencia de custodia",reference:"Código de Processo Penal, art. 310",detail:"Código de Processo Penal, art. 310: la audiencia de custodia debe realizarse en un plazo máximo de 24 horas después de la prisión en flagrancia."}
   ],
   CL:[
-    {hours:24,label:"24 horas",detail:"Puesta a disposición del juez en detención por flagrancia · Constitución, art. 19 N.º 7"}
+    {hours:24,label:"24 horas — Puesta a disposición del juez en flagrancia",name:"Puesta a disposición del juez en flagrancia",reference:"Constitución, art. 19 N.º 7; CPP, art. 131",detail:"Constitución Política, art. 19 N.º 7, y Código Procesal Penal, art. 131: la persona detenida en flagrancia debe ser puesta a disposición del juez dentro de 24 horas."}
   ],
   CA:[
-    {hours:24,label:"24 horas",detail:"Regla federal para llevar a una persona arrestada ante un juez de paz cuando esté disponible · Criminal Code, s. 503"}
+    {hours:24,label:"24 horas — Comparecencia ante juez",name:"Comparecencia ante juez",reference:"Criminal Code, s. 503",detail:"Criminal Code, s. 503: referencia federal para llevar a la persona arrestada ante un juez cuando corresponda."}
   ],
   CO:[
-    {hours:36,label:"36 horas",detail:"Presentación ante juez de control de garantías en el procedimiento de flagrancia · Ley 906 de 2004, art. 302"}
+    {hours:36,label:"36 horas — Control de legalidad de captura",name:"Control de legalidad de captura",reference:"Ley 906 de 2004, art. 302",detail:"Ley 906 de 2004, art. 302: el capturado en flagrancia debe ser puesto a disposición del juez de control de garantías inmediatamente o, a más tardar, dentro de 36 horas."}
   ],
   CR:[
-    {hours:24,label:"24 horas",detail:"Referencia inicial de presentación ante la autoridad competente"},
-    {hours:48,label:"48 horas",detail:"Referencia acumulada en determinados trámites de detención"}
+    {hours:24,label:"24 horas — Puesta a disposición del juez",name:"Puesta a disposición del juez",reference:"Constitución, art. 37",detail:"Constitución Política, art. 37: la persona detenida debe ser puesta a disposición de juez competente dentro del término perentorio de 24 horas."}
   ],
   EC:[
-    {hours:24,label:"24 horas",detail:"Audiencia de calificación de flagrancia · COIP"}
+    {hours:24,label:"24 horas — Audiencia de calificación de flagrancia",name:"Audiencia de calificación de flagrancia",reference:"COIP, art. 529",detail:"COIP, art. 529: en caso de infracción flagrante, la audiencia debe realizarse dentro de las 24 horas desde la aprehensión; allí se califica la legalidad de la aprehensión."}
   ],
   SV:[
-    {hours:72,label:"72 horas",detail:"Límite constitucional de la detención administrativa · Constitución, art. 13"}
+    {hours:72,label:"72 horas — Control judicial de la detención",name:"Control judicial de la detención",reference:"Constitución, art. 13",detail:"Constitución de El Salvador, art. 13: la detención administrativa y la detención para inquirir no excederán de 72 horas, dentro de las cuales debe actuarse ante el juez competente."}
   ],
   ES:[
-    {hours:72,label:"72 horas",detail:"Límite máximo general de la detención preventiva antes de libertad o puesta a disposición judicial · LECrim, art. 520"}
+    {hours:72,label:"72 horas — Límite general de detención",name:"Límite general de detención",reference:"LECrim, art. 520",detail:"Ley de Enjuiciamiento Criminal, art. 520: límite general citado para la detención, sujeto a las reglas y excepciones de la legislación española."}
   ],
   US:[
-    {hours:48,label:"48 horas",detail:"Referencia para la determinación de prontitud de la comparecencia inicial en el ámbito federal, según la doctrina de Riverside"}
+    {hours:48,label:"48 horas — Comparecencia inicial",name:"Comparecencia inicial",reference:"Riverside v. McLaughlin",detail:"Referencia federal de Riverside v. McLaughlin para la pronta determinación judicial tras un arresto sin orden, sujeta a las reglas del caso y la jurisdicción."}
   ],
   GT:[
-    {hours:6,label:"6 horas",detail:"Puesta a disposición de la autoridad judicial · referencia constitucional"}
+    {hours:6,label:"6 horas — Puesta a disposición judicial",name:"Puesta a disposición judicial",reference:"Constitución, art. 6",detail:"Constitución Política de Guatemala, art. 6: la persona detenida debe ser puesta a disposición de la autoridad judicial competente en un plazo que no exceda de seis horas."}
   ],
   HN:[
-    {hours:24,label:"24 horas",detail:"Presentación ante juez competente"},
-    {hours:48,label:"48 horas",detail:"Supuestos más complejos de investigación, según la información del Poder Judicial"}
+    {hours:24,label:"24 horas — Presentación ante juez competente",name:"Presentación ante juez competente",reference:"Poder Judicial de Honduras",detail:"Poder Judicial de Honduras: la persona no debe permanecer detenida por más de 24 horas sin ser presentada ante el juez competente."},
+    {hours:48,label:"48 horas — Detención en casos complejos",name:"Detención en casos complejos",reference:"Poder Judicial de Honduras",detail:"Poder Judicial de Honduras: en casos más difíciles de investigar puede existir detención preventiva de hasta 48 horas."}
   ],
   MX:[
-    {hours:48,label:"48 horas",detail:"Plazo constitucional del Ministerio Público · Constitución, art. 16"},
-    {hours:96,label:"96 horas",detail:"Supuesto especial de delincuencia organizada · Constitución, art. 16"}
+    {hours:48,label:"48 horas — Plazo del Ministerio Público",name:"Plazo del Ministerio Público",reference:"Constitución, art. 16",detail:"Constitución Política de los Estados Unidos Mexicanos, art. 16: plazo constitucional del Ministerio Público antes de ordenar la libertad o poner a la persona a disposición de la autoridad judicial."},
+    {hours:96,label:"96 horas — Delincuencia organizada",name:"Delincuencia organizada",reference:"Constitución, art. 16",detail:"Constitución Política de los Estados Unidos Mexicanos, art. 16: ampliación a 96 horas en los casos de delincuencia organizada."}
   ],
   NI:[
-    {hours:48,label:"48 horas",detail:"Presentación de la persona detenida ante el juez · Código Procesal Penal, art. 256"}
+    {hours:48,label:"48 horas — Audiencia preliminar de persona detenida",name:"Audiencia preliminar de persona detenida",reference:"CPP, art. 256; Ley 1060",detail:"Código Procesal Penal, art. 256, reformado por Ley 1060: dentro de 48 horas de la detención debe presentarse a la persona ante el juez para la audiencia preliminar."}
   ],
   PA:[
-    {hours:48,label:"48 horas",detail:"Presentación ante Juez de Garantías"}
+    {hours:48,label:"48 horas — Audiencia de medidas cautelares",name:"Audiencia de medidas cautelares",reference:"CPP, art. 226",detail:"Código Procesal Penal, art. 226: cuando el imputado está privado de libertad, el juez fija dentro de 48 horas la audiencia para decidir la medida cautelar personal."}
   ],
   PY:[
-    {hours:24,label:"24 horas",detail:"Puesta a disposición del juez para resolver sobre la procedencia de la prisión preventiva o libertad · CPP, art. 240"}
+    {hours:24,label:"24 horas — Control judicial de la detención",name:"Control judicial de la detención",reference:"CPP, art. 240",detail:"Código Procesal Penal, art. 240: la persona detenida debe ser puesta a disposición del juez en 24 horas para que resuelva sobre la medida o la libertad."}
   ],
   PE:[
-    {hours:48,label:"48 horas",detail:"Regla general indicada para la detención policial"},
-    {hours:72,label:"72 horas",detail:"Referencia utilizada en supuestos de detención preliminar"}
+    {hours:48,label:"48 horas — Detención policial",name:"Detención policial",reference:"Constitución, art. 2.24.f; CPP, art. 264",detail:"Constitución Política, art. 2.24.f, y Código Procesal Penal, art. 264: la detención policial dura 48 horas o el término de la distancia, salvo excepciones legales."},
+    {hours:72,label:"72 horas — Detención preliminar",name:"Detención preliminar",reference:"CPP, art. 264",detail:"Código Procesal Penal, art. 264: la detención preliminar dura 72 horas; existen ampliaciones excepcionales para supuestos de especial complejidad y delitos específicos."}
   ],
   DO:[
-    {hours:48,label:"48 horas",detail:"Solicitud de medida de coerción dentro de las 48 horas contadas desde el arresto · CPP, art. 225 modificado"}
+    {hours:24,label:"24 horas — Puesta a disposición judicial",name:"Puesta a disposición judicial",reference:"CPP, art. 284",detail:"Código Procesal Penal, art. 284: si la persona ha sido arrestada, debe ser puesta a disposición del juez sin demora innecesaria y siempre dentro de 24 horas."}
   ],
   UY:[
-    {hours:24,label:"24 horas",detail:"Referencia para declaración del detenido en los supuestos previstos"},
-    {hours:48,label:"48 horas",detail:"Auto de procesamiento dentro de 48 horas desde la detención · art. 125"}
+    {hours:24,label:"24 horas — Audiencia de formalización con detenido",name:"Audiencia de formalización con detenido",reference:"CPP 2017, art. 266.4",detail:"Código del Proceso Penal 2017, art. 266.4: si el imputado está detenido, la audiencia de formalización debe celebrarse dentro de las 24 horas siguientes a la detención y allí puede resolverse la legalidad de la detención."}
   ],
   VE:[
-    {hours:48,label:"48 horas",detail:"Presentación ante autoridad judicial"}
+    {hours:48,label:"48 horas — Audiencia de presentación",name:"Audiencia de presentación",reference:"Constitución, art. 44.1; COPP",detail:"Constitución de la República Bolivariana de Venezuela, art. 44.1, y Código Orgánico Procesal Penal: la persona detenida en flagrancia debe ser llevada ante autoridad judicial dentro de 48 horas."}
   ]
 };
 
@@ -5787,7 +5788,7 @@ function renderHourPresets(){
     return;
   }
 
-  list.innerHTML=presets.map(p=>`<button type="button" class="hour-preset${Number(daysInput.value)===p.hours?" active":""}" data-hours="${p.hours}" title="${escapeHtml(p.detail)}">${escapeHtml(p.label)}</button>`).join("");
+  list.innerHTML=presets.map(p=>`<button type="button" class="hour-preset${Number(daysInput.value)===p.hours?" active":""}" data-hours="${p.hours}" title="${escapeHtml(p.detail)}"><strong>${escapeHtml(p.hours+" horas")}</strong><span>${escapeHtml(p.name||p.label||"")}</span><small>${escapeHtml(p.reference||"")}</small></button>`).join("");
   list.querySelectorAll(".hour-preset").forEach(btn=>btn.addEventListener("click",()=>{
     daysInput.value=btn.dataset.hours;
     const ref=getHourPresetsForCountry().find(p=>String(p.hours)===String(btn.dataset.hours));
