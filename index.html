@@ -2638,7 +2638,7 @@ body.dark .usage-guide-panel{
   <!-- ACCIÓN PRINCIPAL -->
   <button type="button"
           id="calculateBtn">
-    CORRER TÉRMINO
+    CALCULAR TÉRMINO
   </button>
 
   <div id="error"
@@ -2816,7 +2816,7 @@ body.dark .usage-guide-panel{
     Las reglas especiales pueden variar según la materia, autoridad o territorio aplicable.
   </p>
   <p id="versionNotice">
-    Versión <span id="appVersionLabel">11.5</span> — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.
+    Versión <span id="appVersionLabel">11.6</span> — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.
   </p>
 </div>
 
@@ -2918,6 +2918,14 @@ body.dark .usage-guide-panel{
 /* =========================================================
    TÉRMINO LEGAL
    ========================================================= */
+
+/* CONFIGURACIÓN GLOBAL — debe inicializarse antes de registrar o ejecutar
+   cualquier interacción del usuario. */
+const APP_VERSION="11.6";
+const SHARE_TITLE="Término Legal — resultado";
+const SHARE_URL="https://terminolegal.vercel.app/";
+const CALCULATION_SHEET_ENDPOINT="https://script.google.com/macros/s/AKfycbxx6oWsJMDZvQVtf9arU2dBhk62v5TwWjsx1oAmXdVy1R4EZHGy2d3x_C6wwY2rtNwL/exec";
+const FEEDBACK_SHEET_ENDPOINT="https://script.google.com/macros/s/AKfycbxx6oWsJMDZvQVtf9arU2dBhk62v5TwWjsx1oAmXdVy1R4EZHGy2d3x_C6wwY2rtNwL/exec";
 
 /* ELEMENTOS */
 const startDateInput=document.getElementById("startDate");
@@ -3293,7 +3301,7 @@ const GUIDE_I18N={
     exampleLabel:"Ejemplo",
     searchExample:"Buscar “tutela” en Términos frecuentes para revisar las referencias que el catálogo tenga disponibles en la jurisdicción seleccionada.",
     calculateTitle:"¿Cómo calcular un término?",
-    calculateText:"Completa los campos y pulsa “Correr término” —o “Calcular plazo” según el idioma de la interfaz—. El sistema toma los parámetros visibles del formulario y genera la fecha resultante y la trazabilidad del cómputo.",
+    calculateText:"Completa los campos y pulsa “Calcular término” —o “Calcular plazo” según el idioma de la interfaz—. El sistema toma los parámetros visibles del formulario y genera la fecha resultante y la trazabilidad del cómputo.",
     exampleLabel2:"Ejemplo con horas",
     hoursExample:"28/09/2026 a las 02:02 + 36 horas = 29/09/2026 a las 14:02.",
     exampleLabel3:"Ejemplo con días calendario",
@@ -8210,8 +8218,47 @@ function renderCertification(termData){
 
 
 /* =========================================================
-   GUARDAR PDF
+   IMPRESIÓN / PDF
    ========================================================= */
+
+/* Construye siempre el área limpia que se imprimirá. Tanto el botón
+   “Guardar PDF” como Ctrl+P pasan por esta misma función. */
+function preparePrintArea(){
+
+  const printArea=document.getElementById("printArea");
+
+  if(!printArea)
+    return null;
+
+  if(!lastTermData){
+    printArea.innerHTML=`<div class="certification-document certification-print-empty">
+      <div class="certification-header">
+        <div class="certification-title">TÉRMINO LEGAL</div>
+        <div class="certification-subtitle">Realiza un cálculo para generar el documento imprimible.</div>
+      </div>
+    </div>`;
+    return {printArea,calendarImage:null};
+  }
+
+  printArea.innerHTML=
+    `<div class="certification-document">
+      ${buildCertificationHTML(lastTermData,true,false)}
+    </div>`;
+
+  const calendarImage=
+    printArea.querySelector("#certificationCalendarImage");
+
+  if(calendarImage){
+    try{
+      const canvas=buildCalendarCanvas(lastTermData);
+      calendarImage.src=canvas.toDataURL("image/jpeg",.95);
+    }catch(err){
+      console.error("No se pudo preparar el calendario para impresión:",err);
+    }
+  }
+
+  return {printArea,calendarImage};
+}
 
 exportPdfBtn.addEventListener(
   "click",
@@ -8222,56 +8269,34 @@ exportPdfBtn.addEventListener(
 
     trackEvent("pdf","",lastTermData);
 
-    const printArea=
-      document.getElementById(
-        "printArea"
-      );
+    const prepared=preparePrintArea();
+    if(!prepared) return;
 
-    printArea.innerHTML=
-      `<div class="certification-document">
-        ${buildCertificationHTML(lastTermData,true,false)}
-      </div>`;
-
-    const calendarImage=
-      printArea.querySelector(
-        "#certificationCalendarImage"
-      );
-
-    const canvas=
-      buildCalendarCanvas(
-        lastTermData
-      );
-
-    if(calendarImage){
-
-      calendarImage.src=
-        canvas.toDataURL(
-          "image/jpeg",
-          .95
-        );
-
-    }
-
-    const printNow=
-      ()=>window.print();
+    const printNow=()=>window.print();
 
     if(
-      calendarImage &&
-      !calendarImage.complete
+      prepared.calendarImage &&
+      !prepared.calendarImage.complete
     ){
-
-      calendarImage.addEventListener(
+      prepared.calendarImage.addEventListener(
         "load",
         printNow,
         {once:true}
       );
-
     }else{
-
       printNow();
-
     }
 
+  }
+);
+
+/* Ctrl+P / comando de impresión del navegador. Si ya existe un cálculo,
+   prepara el mismo documento limpio antes de que Chrome abra la vista de
+   impresión. Así nunca queda #printArea vacío. */
+window.addEventListener(
+  "beforeprint",
+  ()=>{
+    preparePrintArea();
   }
 );
 
@@ -8280,21 +8305,6 @@ exportPdfBtn.addEventListener(
    COMPARTIR
    ========================================================= */
 
-const SHARE_TITLE=
-  "Término Legal — resultado";
-
-/* Dominio centralizado para poder sustituirlo fácilmente cuando exista el
-   dominio definitivo de Término Legal. */
-const SHARE_URL=
-  "https://terminolegal.vercel.app/";
-
-/* Endpoint opcional de Google Apps Script para registrar cálculos.
-   Se deja vacío para que el documento siga funcionando sin backend.
-   Cuando se publique el Apps Script, pega aquí la URL /exec. */
-const CALCULATION_SHEET_ENDPOINT=
-  "https://script.google.com/macros/s/AKfycbxx6oWsJMDZvQVtf9arU2dBhk62v5TwWjsx1oAmXdVy1R4EZHGy2d3x_C6wwY2rtNwL/exec";
-
-const APP_VERSION="11.5";
 
 /* Mantiene el número de versión mostrado en el resultado
    sincronizado con APP_VERSION. */
@@ -8472,11 +8482,16 @@ function buildCalculationRecord(termData){
 
 function recordCalculation(termData){
 
-  if(!CALCULATION_SHEET_ENDPOINT)
-    return;
+  let endpoint="";
+  try{ endpoint=CALCULATION_SHEET_ENDPOINT||""; }catch{ endpoint=""; }
+  if(!endpoint) return;
 
-  const data=
-    buildCalculationRecord(termData);
+  let data;
+  try{
+    data=buildCalculationRecord(termData);
+  }catch{
+    return;
+  }
 
   const params=
     new URLSearchParams();
@@ -8491,7 +8506,7 @@ function recordCalculation(termData){
   );
 
   fetch(
-    CALCULATION_SHEET_ENDPOINT,
+    endpoint,
     {
       method:"POST",
       mode:"no-cors",
@@ -8604,8 +8619,9 @@ const TL_UTM=(()=>{
 
 function trackEvent(name,detail,termData,extra){
 
-  if(!CALCULATION_SHEET_ENDPOINT)
-    return;
+  let endpoint="";
+  try{ endpoint=CALCULATION_SHEET_ENDPOINT||""; }catch{ endpoint=""; }
+  if(!endpoint) return;
 
   try{
 
@@ -8715,9 +8731,6 @@ const feedbackThanks=
   );
 
 
-/* ⚠️ Reemplaza esta URL por la que te entregue Google al
-   implementar el Apps Script como aplicación web (termina en /exec) */
-const FEEDBACK_SHEET_ENDPOINT="https://script.google.com/macros/s/AKfycbxx6oWsJMDZvQVtf9arU2dBhk62v5TwWjsx1oAmXdVy1R4EZHGy2d3x_C6wwY2rtNwL/exec";
 
 
 function sendFeedback(value){
