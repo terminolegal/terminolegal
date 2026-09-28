@@ -522,6 +522,26 @@ small{
   padding:0 3px
 }
 
+.unit-select-wrap{position:relative}
+.unit-select{
+  width:100%;
+  height:48px;
+  border:1px solid var(--input-border);
+  border-radius:10px;
+  background:var(--input-bg);
+  color:var(--ink);
+  padding:0 38px 0 12px;
+  font:inherit;
+  font-size:.78rem;
+  cursor:pointer;
+  appearance:auto;
+}
+.unit-select:focus{outline:2px solid rgba(185,150,79,.25);border-color:var(--gold)}
+.legacy-unit-radios{display:none!important}
+#timeField[hidden]{display:none!important}
+#startTime{width:100%;height:48px;border:1px solid var(--input-border);border-radius:10px;background:var(--input-bg);color:var(--ink);padding:0 12px;font:inherit}
+#startTime:focus{outline:2px solid rgba(185,150,79,.25);border-color:var(--gold)}
+
 .field-note{
   font-size:.7rem;
   color:var(--muted);
@@ -2171,27 +2191,31 @@ footer{
 
       <label>Unidad</label>
 
-      <div class="segmented">
+      <div class="unit-select-wrap">
+        <select id="unitSelect" class="unit-select" aria-label="Unidad del término">
+          <option value="days" selected>Días</option>
+          <option value="hours">Horas</option>
+          <option value="months">Meses</option>
+          <option value="years">Años</option>
+        </select>
+      </div>
 
-        <label>
-          <input type="radio"
-                 name="unit"
-                 value="days"
-                 checked>
-          <span>Días</span>
-        </label>
-
-        <label>
-          <input type="radio"
-                 name="unit"
-                 value="months">
-          <span>Meses</span>
-        </label>
-
+      <!-- Compatibilidad interna con referencias jurídicas existentes -->
+      <div class="legacy-unit-radios" aria-hidden="true">
+        <label><input type="radio" name="unit" value="days" checked><span>Días</span></label>
+        <label><input type="radio" name="unit" value="hours"><span>Horas</span></label>
+        <label><input type="radio" name="unit" value="months"><span>Meses</span></label>
+        <label><input type="radio" name="unit" value="years"><span>Años</span></label>
       </div>
 
     </div>
 
+  </div>
+
+  <div class="field" id="timeField" hidden>
+    <label for="startTime">Hora de inicio</label>
+    <input type="time" id="startTime" value="00:00" step="60" aria-describedby="startHint">
+    <p class="field-note">Para términos en horas, el cálculo conserva la hora de inicio y obtiene la hora exacta de vencimiento.</p>
   </div>
 
   <!-- TIPO DE TIEMPO -->
@@ -2518,7 +2542,9 @@ const holidayListEl=document.getElementById("holidayList");
 const holidayCache=new Map();
 
 const MAX_DAYS=365;
+const MAX_HOURS=8760;
 const MAX_MONTHS=60;
+const MAX_YEARS=20;
 
 /*
    PRINCIPIO UNIVERSAL: el motor calcula el término; la jurisdicción
@@ -2564,6 +2590,8 @@ const I18N={
     month:"mes",
     months:"meses",
     unitDays:"días",
+    hours:"horas",
+    years:"años",
     businessDays:"días hábiles",
     calendarDays:"días calendario",
     typeBusiness:"Días hábiles",
@@ -2573,7 +2601,8 @@ const I18N={
     frequentTerm:"Término frecuente",
 
     seqStart:"Fecha de inicio — no contabilizada",
-    seqCounted:"Día contabilizado",
+    seqCounted:"Unidad contabilizada",
+    seqHourCounted:"Hora {n} contabilizada",
     seqBusinessHoliday:"Día hábil contabilizado — {name}",
     seqRest:"Día de descanso — excluido",
 
@@ -2594,14 +2623,17 @@ const I18N={
       ["Día feriado","Día festivo, especialmente el que no cae en domingo."],
       ["Fin de semana","Parte de la semana que comprende el sábado y el domingo."]
     ],
-    certLblAmount:"Número de días / unidad",
+    certLblAmount:"Cantidad / unidad",
     certLblMode:"Modalidad",
     certLblJurisdiction:"Jurisdicción de referencia",
     certLblLegalTerm:"Término jurídico seleccionado",
     certLblResult:"Fecha resultante",
     methodMonths:"La fecha de inicio es {start}. El sistema suma {amountLabel} mediante la regla de meses calendario definida por el motor y obtiene como fecha resultante {end}.",
     methodDays:"La fecha de inicio {start} no se contabiliza. El conteo comienza al día siguiente y continúa hasta completar {amountLabel}. En días hábiles se excluyen los días de descanso semanal y los festivos incorporados al calendario de referencia.",
+    methodHours:"La fecha de inicio es {start}. El sistema suma {amountLabel} de forma continua y obtiene como fecha y hora resultante {end}.",
+    methodYears:"La fecha de inicio es {start}. El sistema suma {amountLabel} mediante la regla de años calendario y obtiene como fecha resultante {end}.",
     certCalAlt:"Calendario de trazabilidad del término legal",
+    certCalAltHours:"Esquema de trazabilidad horaria del término",
     certTraceLabel:"Trazabilidad del cálculo",
     certTraceNote:"Código de trazabilidad: país · fecha de inicio · correlativo de uso en esta instalación. El registro analítico conserva además una huella técnica de los parámetros del cálculo.",
     certScope1:"El código anterior se genera a partir de los parámetros del cálculo y permite cotejar la consistencia de esta representación con dichos parámetros. No constituye firma electrónica, certificación de autoridad pública ni garantía de la procedencia jurídica del término.",
@@ -2627,6 +2659,8 @@ const I18N={
     month:"mês",
     months:"meses",
     unitDays:"dias",
+    hours:"horas",
+    years:"anos",
     businessDays:"dias úteis",
     calendarDays:"dias corridos",
     typeBusiness:"Dias úteis",
@@ -2636,7 +2670,8 @@ const I18N={
     frequentTerm:"Prazo frequente",
 
     seqStart:"Data de início — não contabilizada",
-    seqCounted:"Dia contabilizado",
+    seqCounted:"Unidade contabilizada",
+    seqHourCounted:"Hora {n} contabilizada",
     seqBusinessHoliday:"Dia útil contabilizado — {name}",
     seqRest:"Dia de descanso — excluído",
 
@@ -2657,13 +2692,15 @@ const I18N={
       ["Feriado","Dia festivo, especialmente o que não cai em domingo."],
       ["Fim de semana","Parte da semana que compreende o sábado e o domingo."]
     ],
-    certLblAmount:"Número de dias / unidade",
+    certLblAmount:"Quantidade / unidade",
     certLblMode:"Modalidade",
     certLblJurisdiction:"Jurisdição de referência",
     certLblLegalTerm:"Prazo jurídico selecionado",
     certLblResult:"Data resultante",
     methodMonths:"A data de início é {start}. O sistema soma {amountLabel} pela regra de meses de calendário definida pelo motor e obtém como data resultante {end}.",
     methodDays:"A data de início {start} não é contabilizada. A contagem começa no dia seguinte e continua até completar {amountLabel}. Em dias úteis, excluem-se os dias de descanso semanal e os feriados incorporados ao calendário de referência.",
+    methodHours:"A data e hora de início é {start}. O sistema soma {amountLabel} de forma contínua e obtém como data e hora resultante {end}.",
+    methodYears:"A data de início é {start}. O sistema soma {amountLabel} pela regra de anos corridos e obtém como data resultante {end}.",
     certCalAlt:"Calendário de rastreabilidade do prazo",
     certTraceLabel:"Rastreabilidade do cálculo",
     certTraceNote:"Código de rastreabilidade: país · data de início · sequencial de uso nesta instalação. O registro analítico conserva também uma impressão técnica dos parâmetros do cálculo.",
@@ -2702,21 +2739,16 @@ function tr(lang,key,vars){
 
 function amountText(amount,type,unit,lang){
 
-  if(unit==="months"){
+  if(unit==="hours")
+    return`${amount} ${tr(lang,"hours")}`;
 
-    return`${amount} ${
-      amount===1
-        ?tr(lang,"month")
-        :tr(lang,"months")
-    }`;
+  if(unit==="years")
+    return`${amount} ${tr(lang,"years")}`;
 
-  }
+  if(unit==="months")
+    return`${amount} ${amount===1?tr(lang,"month"):tr(lang,"months")}`;
 
-  return`${amount} ${
-    type==="business"
-      ?tr(lang,"businessDays")
-      :tr(lang,"calendarDays")
-  }`;
+  return`${amount} ${type==="business"?tr(lang,"businessDays"):tr(lang,"calendarDays")}`;
 }
 
 
@@ -2824,6 +2856,31 @@ function addDays(date,days){
   const r=new Date(date);
   r.setDate(r.getDate()+days);
   return r;
+}
+
+function addCalendarYears(date,years){
+  const r=new Date(date);
+  const month=r.getMonth();
+  r.setFullYear(r.getFullYear()+years);
+  // 29 de febrero: conserva una fecha válida en años no bisiestos.
+  if(r.getMonth()!==month){
+    r.setDate(0);
+  }
+  return r;
+}
+
+function formatDateTime(date,lang="es"){
+  return new Intl.DateTimeFormat(
+    LOCALES[lang]||LOCALES.es,
+    {day:"2-digit",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit"}
+  ).format(date);
+}
+
+function formatShortDateTime(date,lang="es"){
+  return new Intl.DateTimeFormat(
+    LOCALES[lang]||LOCALES.es,
+    {day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}
+  ).format(date);
 }
 
 
@@ -3809,30 +3866,25 @@ function getCountedDates(
 
   const holidaysEncountered=[];
 
-  if(unit==="months"){
+  if(unit==="hours"){
+    const dates=[];
+    for(let i=1;i<=amount;i++){
+      dates.push(new Date(start.getTime()+i*60*60*1000));
+    }
+    return{countedDates:dates,holidaysEncountered};
+  }
 
-    const end=
-      addCalendarMonths(
-        start,
-        amount
-      );
-
+  if(unit==="months" || unit==="years"){
+    const end=unit==="months"
+      ?addCalendarMonths(start,amount)
+      :addCalendarYears(start,amount);
     const dates=[];
     let cur=new Date(start);
-
-    while(
-      dateKey(cur)!==dateKey(end)
-    ){
-
+    while(dateKey(cur)!==dateKey(end)){
       cur=addDays(cur,1);
       dates.push(new Date(cur));
-
     }
-
-    return{
-      countedDates:dates,
-      holidaysEncountered
-    };
+    return{countedDates:dates,holidaysEncountered};
   }
 
   const current=new Date(start);
@@ -3840,47 +3892,22 @@ function getCountedDates(
   let counted=0;
 
   while(counted<amount){
-
-    current.setDate(
-      current.getDate()+1
-    );
-
+    current.setDate(current.getDate()+1);
     const holiday=getHoliday(current);
     const weekend=isWeekend(current);
-
-    const counts=
-      type==="business"
-        ?(!weekend&&!holiday)
-        :true;
+    const counts=type==="business" ? (!weekend&&!holiday) : true;
 
     if(counts){
-
       counted++;
-
-      countedDates.push(
-        new Date(current)
-      );
-
+      countedDates.push(new Date(current));
     }
 
-    if(
-      holiday &&
-      !weekend &&
-      type==="business"
-    ){
-
-      holidaysEncountered.push({
-        date:new Date(current),
-        name:holiday.name
-      });
-
+    if(holiday && !weekend && type==="business"){
+      holidaysEncountered.push({date:new Date(current),name:holiday.name});
     }
   }
 
-  return{
-    countedDates,
-    holidaysEncountered
-  };
+  return{countedDates,holidaysEncountered};
 }
 
 
@@ -3888,9 +3915,13 @@ function getCountedDates(
 function typeDisplayLabel(type,unit,lang="es",mode){
 
   const unitWord=
-    unit==="months"
-      ?tr(lang,"months")
-      :tr(lang,"unitDays");
+    unit==="hours"
+      ?tr(lang,"hours")
+      :unit==="years"
+        ?tr(lang,"years")
+        :unit==="months"
+          ?tr(lang,"months")
+          :tr(lang,"unitDays");
 
   if(type==="business")
     return tr(lang,"typeBusiness");
@@ -4540,10 +4571,7 @@ calculateBtn.addEventListener(
         'input[name="termType"]:checked'
       ).value;
 
-    const unit=
-      document.querySelector(
-        'input[name="unit"]:checked'
-      ).value;
+    const unit=getSelectedUnit();
 
     const amount=
       parseInt(
@@ -4556,13 +4584,8 @@ calculateBtn.addEventListener(
       amount<1
     ){
 
-      showError(
-        `Ingresa un número entero de ${
-          unit==="months"
-            ?"meses"
-            :"días"
-        } mayor o igual a 1.`
-      );
+      const unitName={days:"días",hours:"horas",months:"meses",years:"años"}[unit]||"unidades";
+      showError(`Ingresa un número entero de ${unitName} mayor o igual a 1.`);
 
       return;
     }
@@ -4583,27 +4606,23 @@ calculateBtn.addEventListener(
       return;
     }
 
-    if(
-      unit==="months" &&
-      amount>MAX_MONTHS
-    ){
-
-      showError(
-        `El número máximo de meses es ${MAX_MONTHS} (5 años).`
-      );
-
+    if(unit==="months" && amount>MAX_MONTHS){
+      showError(`El número máximo de meses es ${MAX_MONTHS} (5 años).`);
       return;
     }
 
-    if(
-      unit==="days" &&
-      amount>MAX_DAYS
-    ){
+    if(unit==="years" && amount>MAX_YEARS){
+      showError(`El número máximo de años es ${MAX_YEARS}.`);
+      return;
+    }
 
-      showError(
-        `El número máximo de días es ${MAX_DAYS}.`
-      );
+    if(unit==="hours" && amount>MAX_HOURS){
+      showError(`El número máximo de horas es ${MAX_HOURS} (1 año).`);
+      return;
+    }
 
+    if(unit==="days" && amount>MAX_DAYS){
+      showError(`El número máximo de días es ${MAX_DAYS}.`);
       return;
     }
 
@@ -4611,10 +4630,15 @@ calculateBtn.addEventListener(
 
     try{
 
-      start=
-        parseLocalDate(
-          startDateInput.value
-        );
+      start=parseLocalDate(startDateInput.value);
+
+      if(unit==="hours"){
+        const time=(startTime.value||"00:00").split(":").map(Number);
+        if(time.length<2 || !Number.isInteger(time[0]) || !Number.isInteger(time[1]) || time[0]<0 || time[0]>23 || time[1]<0 || time[1]>59){
+          throw new Error("Hora inválida");
+        }
+        start.setHours(time[0],time[1],0,0);
+      }
 
     }catch{
 
@@ -4644,14 +4668,13 @@ calculateBtn.addEventListener(
       );
 
     const end=
-      unit==="months"
-        ?addCalendarMonths(
-          start,
-          amount
-        )
-        :countedDates[
-          countedDates.length-1
-        ];
+      unit==="hours"
+        ?new Date(start.getTime()+amount*60*60*1000)
+        :unit==="months"
+          ?addCalendarMonths(start,amount)
+          :unit==="years"
+            ?addCalendarYears(start,amount)
+            :countedDates[countedDates.length-1];
 
     const lang=outputLang(currentCountry);
 
@@ -4659,16 +4682,16 @@ calculateBtn.addEventListener(
       amountText(amount,mode,unit,lang);
 
     resultDate.textContent=
-      formatDate(end,lang).toLowerCase();
+      (unit==="hours" ? formatDateTime(end,lang) : formatDate(end,lang)).toLowerCase();
 
     resultSummary.textContent=
       amountLabel;
 
     detailStart.textContent=
-      formatShortDate(start,lang);
+      unit==="hours" ? formatShortDateTime(start,lang) : formatShortDate(start,lang);
 
     detailEnd.textContent=
-      formatShortDate(end,lang);
+      unit==="hours" ? formatShortDateTime(end,lang) : formatShortDate(end,lang);
 
     detailType.textContent=
       typeDisplayLabel(
@@ -4809,6 +4832,10 @@ const daysLabel=
 const startHint=
   document.getElementById("startHint");
 
+const unitSelect=document.getElementById("unitSelect");
+const timeField=document.getElementById("timeField");
+const startTime=document.getElementById("startTime");
+
 const monthsRadio=
   document.querySelector(
     'input[name="unit"][value="months"]'
@@ -4818,6 +4845,15 @@ const daysRadio=
   document.querySelector(
     'input[name="unit"][value="days"]'
   );
+
+function getSelectedUnit(){
+  return unitSelect ? unitSelect.value : (document.querySelector('input[name="unit"]:checked')?.value||"days");
+}
+
+function syncLegacyUnitRadios(unit){
+  document.querySelectorAll('input[name="unit"]').forEach(r=>{r.checked=r.value===unit;});
+}
+
 
 
 /* =========================================================
@@ -5259,6 +5295,7 @@ function applyLegalReference(ref){
 
   if(unitRadio){
     unitRadio.checked=true;
+    unitSelect.value=ref.unit;
     updateDaysLabel();
   }
 
@@ -5463,26 +5500,19 @@ function syncUnitAvailability(){
   const monthsLabel=
     monthsRadio.closest("label");
 
+  let unit=getSelectedUnit();
+
   const effectiveMode=
     type==="legal"
       ?selectedLegalMode
       :type;
 
   if(effectiveMode==="business"){
-
-    if(monthsRadio.checked)
-      daysRadio.checked=true;
-
     monthsRadio.disabled=true;
-
-    monthsLabel.title=
-      "Los días hábiles solo se cuentan en días.";
-
+    monthsLabel.title="Los días hábiles se cuentan en días. Para horas, meses o años se usa el conteo calendario.";
   }else{
-
     monthsRadio.disabled=false;
     monthsLabel.title="";
-
   }
 
   termTypeNote.textContent=
@@ -5494,6 +5524,11 @@ function syncUnitAvailability(){
       currentCountry==="CO"
     );
 
+  if(getSelectedUnit()!=="days" && type==="business"){
+    const calendarRadio=document.querySelector('input[name="termType"][value="calendar"]');
+    if(calendarRadio) calendarRadio.checked=true;
+  }
+
   updateDaysLabel();
 
 }
@@ -5501,20 +5536,23 @@ function syncUnitAvailability(){
 
 function updateDaysLabel(){
 
-  const unit=
-    document.querySelector(
-      'input[name="unit"]:checked'
-    ).value;
+  const unit=getSelectedUnit();
+  syncLegacyUnitRadios(unit);
 
   daysInput.placeholder=
-    unit==="months"
-      ?"Ej. 6"
-      :"Ej. 10";
+    unit==="hours" ? "Ej. 48" :
+    unit==="months" ? "Ej. 6" :
+    unit==="years" ? "Ej. 2" :
+    "Ej. 10";
+
+  timeField.hidden=unit!=="hours";
 
   startHint.textContent=
-    unit==="months"
-      ?"El plazo se cuenta de fecha a fecha desde el día indicado (p. ej., el acta de inicio)."
-      :"El conteo inicia el día siguiente a la fecha indicada.";
+    unit==="hours"
+      ?"Selecciona la fecha y la hora de inicio. El vencimiento se obtiene conservando el conteo horario."
+      :unit==="months" || unit==="years"
+        ?"El plazo se cuenta de fecha a fecha desde el día indicado."
+        :"El conteo inicia el día siguiente a la fecha indicada.";
 
 }
 
@@ -5531,16 +5569,30 @@ document
   );
 
 
+unitSelect.addEventListener("change",()=>{
+  const selectedUnit=unitSelect.value;
+  const termType=document.querySelector('input[name="termType"]:checked');
+  if(selectedUnit!=="days" && termType?.value==="business"){
+    const calendarRadio=document.querySelector('input[name="termType"][value="calendar"]');
+    if(calendarRadio){
+      calendarRadio.checked=true;
+      termTypeNote.textContent=getTermTypeNotes().calendar||"";
+    }
+  }
+  syncLegacyUnitRadios(selectedUnit);
+  updateDaysLabel();
+  resetResultView();
+});
+
 document
-  .querySelectorAll(
-    'input[name="unit"]'
-  )
-  .forEach(
-    r=>r.addEventListener(
-      "change",
-      updateDaysLabel
-    )
-  );
+  .querySelectorAll('input[name="unit"]')
+  .forEach(r=>r.addEventListener("change",()=>{
+    unitSelect.value=r.value;
+    updateDaysLabel();
+  }));
+
+unitSelect.value="days";
+syncLegacyUnitRadios("days");
 
 
 /* =========================================================
@@ -6268,6 +6320,33 @@ function buildCalendarCanvas(termData){
     unit
   }=termData;
 
+  if(unit==="hours"){
+    const lang=outputLang(termData.country||currentCountry);
+    const cols=Math.min(12,Math.max(1,countedDates.length));
+    const rows=Math.max(1,Math.ceil(countedDates.length/cols));
+    const W=960,H=170+rows*64;
+    const canvas=document.createElement("canvas");
+    const scale=2;
+    canvas.width=W*scale; canvas.height=H*scale;
+    const ctx=canvas.getContext("2d"); ctx.scale(scale,scale);
+    ctx.fillStyle="#ffffff"; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle="#17202b"; ctx.font="700 18px Arial,sans-serif";
+    ctx.fillText(`Trazabilidad horaria · ${amountText(amount,type,unit,lang)}`,32,34);
+    ctx.fillStyle="#687383"; ctx.font="12px Arial,sans-serif";
+    ctx.fillText(`${formatShortDateTime(start,lang)} → ${formatShortDateTime(end,lang)}`,32,55);
+    countedDates.forEach((d,i)=>{
+      const col=i%cols,row=Math.floor(i/cols);
+      const x=32+col*((W-64)/cols), y=78+row*64, w=(W-64)/cols-8;
+      ctx.fillStyle="#10243e"; ctx.fillRect(x,y,w,38);
+      ctx.fillStyle="#ffffff"; ctx.font="700 12px Arial,sans-serif"; ctx.textAlign="center";
+      ctx.fillText(`H${i+1}`,x+w/2,y+15);
+      ctx.font="10px Arial,sans-serif";
+      ctx.fillText(formatShortDateTime(d,lang),x+w/2,y+30);
+    });
+    ctx.textAlign="left";
+    return canvas;
+  }
+
   const countedKeys=
     new Set(
       countedDates.map(
@@ -6681,8 +6760,8 @@ function ensureTraceData(termData){
     getNextCountrySequence(countryCode);
 
   const canonical=[
-    dateKey(termData.start),
-    dateKey(termData.end),
+    termData.unit==="hours" ? termData.start.toISOString() : dateKey(termData.start),
+    termData.unit==="hours" ? termData.end.toISOString() : dateKey(termData.end),
     termData.amount,
     termData.type,
     termData.unit,
@@ -6706,8 +6785,8 @@ function buildVerificationData(termData){
   ensureTraceData(termData);
 
   const canonical=[
-    dateKey(termData.start),
-    dateKey(termData.end),
+    termData.unit==="hours" ? termData.start.toISOString() : dateKey(termData.start),
+    termData.unit==="hours" ? termData.end.toISOString() : dateKey(termData.end),
     termData.amount,
     termData.type,
     termData.unit,
@@ -6729,58 +6808,38 @@ function buildVerificationData(termData){
 
 function buildCertificationSequence(termData){
 
-  const{
-    start,
-    countedDates
-  }=termData;
-
-  const type=
-    termData.countMode||
-    termData.type;
-
-  const lang=
-    outputLang(
-      termData.country||currentCountry
-    );
-
+  const{start,countedDates,unit}=termData;
+  const type=termData.countMode||termData.type;
+  const lang=outputLang(termData.country||currentCountry);
   const rows=[];
+  const startLabel=unit==="hours" ? formatShortDateTime(start,lang) : formatShortDate(start,lang);
 
   rows.push(`
     <div class="certification-sequence-row start-row">
       <span class="n">—</span>
-      <span class="date">${escapeHtml(formatShortDate(start,lang))}</span>
+      <span class="date">${escapeHtml(startLabel)}</span>
       <span class="status">${escapeHtml(tr(lang,"seqStart"))}</span>
     </div>
   `);
 
-  countedDates.forEach(
-    (date,index)=>{
-
+  countedDates.forEach((date,index)=>{
+    let status=tr(lang,"seqCounted");
+    if(unit==="hours") status=tr(lang,"seqHourCounted",{n:index+1});
+    else if(type==="business"){
       const holiday=getHoliday(date);
       const weekend=isWeekend(date);
-
-      let status=tr(lang,"seqCounted");
-
-      if(type==="business"){
-
-        if(holiday)
-          status=tr(lang,"seqBusinessHoliday",{name:holiday.name});
-
-        else if(weekend)
-          status=tr(lang,"seqRest");
-
-      }
-
-      rows.push(`
-        <div class="certification-sequence-row">
-          <span class="n">${index+1}</span>
-          <span class="date">${escapeHtml(formatShortDate(date,lang))}</span>
-          <span class="status">${escapeHtml(status)}</span>
-        </div>
-      `);
-
+      if(holiday) status=tr(lang,"seqBusinessHoliday",{name:holiday.name});
+      else if(weekend) status=tr(lang,"seqRest");
     }
-  );
+    const label=unit==="hours" ? formatShortDateTime(date,lang) : formatShortDate(date,lang);
+    rows.push(`
+      <div class="certification-sequence-row">
+        <span class="n">${index+1}</span>
+        <span class="date">${escapeHtml(label)}</span>
+        <span class="status">${escapeHtml(status)}</span>
+      </div>
+    `);
+  });
 
   return rows.join("");
 }
@@ -6876,10 +6935,10 @@ function buildCertificationHTML(termData,includeCalendar=true,collapsible=false)
     buildVerificationData(termData);
 
   const startText=
-    formatShortDate(start,lang);
+    unit==="hours" ? formatShortDateTime(start,lang) : formatShortDate(start,lang);
 
   const endText=
-    formatShortDate(end,lang);
+    unit==="hours" ? formatShortDateTime(end,lang) : formatShortDate(end,lang);
 
   const amountLabel=
     amountText(amount,mode,unit,lang);
@@ -6898,9 +6957,13 @@ function buildCertificationHTML(termData,includeCalendar=true,collapsible=false)
   const methodText=
     tr(
       lang,
-      unit==="months"
-        ?"methodMonths"
-        :"methodDays",
+      unit==="hours"
+        ?"methodHours"
+        :unit==="years"
+          ?"methodYears"
+          :unit==="months"
+            ?"methodMonths"
+            :"methodDays",
       {
         start:startText,
         end:endText,
@@ -6913,7 +6976,7 @@ function buildCertificationHTML(termData,includeCalendar=true,collapsible=false)
       ?`
         <div class="certification-calendar">
           <img id="certificationCalendarImage"
-               alt="${escapeHtml(tr(lang,"certCalAlt"))}">
+               alt="${escapeHtml(tr(lang,unit==="hours"?"certCalAltHours":"certCalAlt"))}">
         </div>
       `
       :"";
