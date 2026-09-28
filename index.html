@@ -7140,7 +7140,9 @@ const COUNTRY_STORAGE_KEY=
 function countryOptionLabel(code){
   const info=COUNTRIES[code];
   if(!info) return String(code||"");
-  return `${info.flag} ${info.name}`;
+  /* La bandera se muestra por separado junto al selector.
+     Evitamos repetirla dentro de la opción del calendario. */
+  return info.name;
 }
 
 function populateCountrySelect(){
