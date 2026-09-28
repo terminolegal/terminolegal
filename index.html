@@ -1939,7 +1939,7 @@ footer{
 }
 
 /* =========================================================
-   AJUSTES CERTIFICACIÓN — v11.2
+   AJUSTES CERTIFICACIÓN — v11.4
    ========================================================= */
 
 /* Rejilla: bordes que funcionan con 4 o 5 elementos */
@@ -2230,7 +2230,7 @@ footer{
   <!-- TIPO DE TIEMPO -->
   <div class="field">
 
-    <label>Tipo de término</label>
+    <label id="termTypeLabel">Tipo de término</label>
 
     <div class="segmented segmented-3">
 
@@ -2510,7 +2510,7 @@ footer{
     Las reglas especiales pueden variar según la materia, autoridad o territorio aplicable.
   </p>
   <p id="versionNotice">
-    Versión <span id="appVersionLabel">11.2</span> — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.
+    Versión <span id="appVersionLabel">11.4</span> — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.
   </p>
 </div>
 
@@ -2579,15 +2579,17 @@ const pad=n=>String(n).padStart(2,"0");
 /* =========================================================
    IDIOMA DE SALIDA
    El resultado, la certificación, el PDF y el texto para compartir
-   se presentan en portugués cuando la jurisdicción es Brasil (BR);
-   en las demás jurisdicciones se mantienen en español.
+   se presentan en portugués cuando la jurisdicción es Brasil (BR) o Portugal (PT);
+   en Canadá y Estados Unidos se presentan en inglés; en las demás jurisdicciones se mantienen en español.
    ========================================================= */
 
-const LOCALES={es:"es-CO",pt:"pt-BR"};
+const LOCALES={es:"es-CO",pt:"pt-BR",en:"en-US"};
 
 function outputLang(countryCode){
 
-  return countryCode==="BR"?"pt":"es";
+  if(countryCode==="BR" || countryCode==="PT") return "pt";
+  if(countryCode==="CA" || countryCode==="US") return "en";
+  return "es";
 }
 
 const I18N={
@@ -2728,7 +2730,76 @@ const I18N={
 
     shareText:"Contando a partir de {start}, {amount} {label}{suffix}, vence em {end}.\n\nCalcule ou verifique o seu prazo: {url}"
   }
+,
 
+  en:{
+    lblStart:"Start date",
+    lblEnd:"Expiry date",
+    lblType:"Day type",
+    btnPdf:"SAVE PDF",
+    btnShare:"SHARE",
+    btnAdvice:"Find legal advice",
+    notice:"Version {version} — calculation engine with a reference calendar by jurisdiction, date validation and range limits. Holidays affect business-day calculations only.",
+    postNote:"The calculation follows the selected term type and reference jurisdiction. Business days exclude weekly rest days and holidays available for that jurisdiction. Special rules may vary by subject matter, authority, or territory.",
+    feedbackLabel:"Was this helpful?",
+    thanks:"Thank you!",
+    holidaysExcluded:"Holidays excluded from the count: {names}.",
+
+    month:"month",
+    months:"months",
+    unitDays:"days",
+    hours:"hours",
+    years:"years",
+    businessDays:"business days",
+    calendarDays:"calendar days",
+    typeBusiness:"Business days",
+    typeCalendar:"Calendar days ({unit})",
+    typeLegal:"Frequent term: {term} — {unit} calendar",
+    typeLegalBusiness:"Frequent term: {term} — business days",
+    frequentTerm:"Frequent term",
+
+    seqStart:"Start date",
+    seqCounted:"Unit counted",
+    seqHourCounted:"Hour {n} counted",
+    seqBusinessHoliday:"Business day counted — {name}",
+    seqRest:"Rest day — excluded",
+
+    legalBase:"CALCULATION BASIS: The result is obtained by applying the selected counting rule to the start date and the reference calendar of {name}. Business-day calculations exclude weekly rest days and holidays included in the available calendar; calendar days are counted consecutively. Territorial reference: {note} Special rules may apply depending on the subject matter, body, territorial level, agreement, contract, or procedure. This document is a reference tool and does not replace verification of the specific applicable rule.",
+
+    certTitle:"TERM CALCULATION CERTIFICATION",
+    certSubtitle:"Technical record of the calculation performed by the system. This document identifies the parameters used and the calculation sequence.",
+    certSec1:"1. CALCULATION IDENTIFICATION",
+    certSec2:"2. COUNT TRACEABILITY",
+    certSec3:"3. CALCULATION SEQUENCE",
+    certSec4:"4. METHOD USED",
+    certSec5:"5. CALCULATION BASIS",
+    certGlossaryTitle:"Glossary of terms and concepts",
+    glossary:[
+      ["Term","The final moment of the duration or existence of something. Proc.: the limit within which a procedural act must be carried out."],
+      ["Business day","A day on which procedural acts may be carried out."],
+      ["Calendar day","A natural day."],
+      ["Holiday","A public or festive holiday."],
+      ["Weekend","Saturday and Sunday."]
+    ],
+    certLblAmount:"Amount / unit",
+    certLblMode:"Mode",
+    certLblJurisdiction:"Reference jurisdiction",
+    certLblLegalTerm:"Selected legal term",
+    certLblResult:"Resulting date",
+    methodMonths:"The start date is {start}. The system adds {amountLabel} using the calendar-month rule defined by the engine and obtains {end} as the resulting date.",
+    methodDays:"The start date {start} is not counted. Counting begins on the following day and continues until {amountLabel} is completed. Business-day calculations exclude weekly rest days and holidays included in the reference calendar.",
+    methodHours:"The start date and time is {start}. The system adds {amountLabel} continuously and obtains {end} as the resulting date and time.",
+    methodYears:"The start date is {start}. The system adds {amountLabel} using the calendar-year rule and obtains {end} as the resulting date.",
+    certCalAlt:"Term traceability calendar",
+    certCalAltHours:"Hourly term traceability scheme",
+    certTraceLabel:"Calculation traceability",
+    certTraceNote:"Traceability code: country · start date · installation usage sequence. The analytical record also keeps a technical fingerprint of the calculation parameters.",
+    certScope1:"The code above is generated from the calculation parameters and allows this representation to be checked against them. It is not an electronic signature, a public-authority certification, or a guarantee of the legal basis of the term.",
+    certScope2:"The legal basis, duration, suspension, interruption, extension, or expiry of a specific term depend on the applicable special rule, subject matter, authority, procedural act, contract, or territorial circumstance. This document certifies the calculation performed by Término Legal under the stated parameters, not the legal interpretation of the term.",
+    certFooter:"Término Legal · Certification generated automatically from the calculation engine result. Generation date: {date}.",
+
+    shareText:"Counting from {start}, {amount} {label}{suffix}, expires on {end}.\n\nCalculate or verify your legal term: {url}"
+  }
 };
 
 
@@ -2770,8 +2841,55 @@ function amountText(amount,type,unit,lang){
 }
 
 
+const FORM_LABELS={
+  es:{start:"Fecha de inicio",jurisdiction:"Jurisdicción de referencia (calendario aplicado)",term:"Término",unit:"Unidad",days:"Días",hours:"Horas",months:"Meses",years:"Años",time:"Hora de inicio",timeAria:"Hora de inicio en formato de 24 horas",timeUnit:"horas",type:"Tipo de término",business:"Días hábiles",calendar:"Días calendario",frequent:"Términos frecuentes",panel:"Selecciona un término frecuente",panelDesc:"Consulta referencias organizadas por jurisdicción.",hourTitle:"Referencias horarias frecuentes",hourNote:"Selecciona la referencia por su duración y actuación.",catalog:"Términos jurídicos frecuentes",search:"Ej.: tutela, despido, liquidación...",searchAria:"Buscar término jurídico",clear:"Limpiar búsqueda",selected:"Término seleccionado",change:"Cambiar",hint:"Selecciona un término para usarlo como contexto de la consulta.",run:"CORRER TÉRMINO"},
+  pt:{start:"Data de início",jurisdiction:"Jurisdição de referência (calendário aplicado)",term:"Prazo",unit:"Unidade",days:"Dias",hours:"Horas",months:"Meses",years:"Anos",time:"Hora de início",timeAria:"Hora de início em formato de 24 horas",timeUnit:"horas",type:"Tipo de prazo",business:"Dias úteis",calendar:"Dias corridos",frequent:"Prazos frequentes",panel:"Selecione um prazo frequente",panelDesc:"Consulte referências organizadas por jurisdição.",hourTitle:"Referências horárias frequentes",hourNote:"Selecione a referência pela duração e atuação.",catalog:"Prazos jurídicos frequentes",search:"Ex.: tutela, demissão, liquidação...",searchAria:"Buscar prazo jurídico",clear:"Limpar busca",selected:"Prazo selecionado",change:"Alterar",hint:"Selecione um prazo para usá-lo como contexto da consulta.",run:"CALCULAR PRAZO"},
+  en:{start:"Start date",jurisdiction:"Reference jurisdiction (calendar applied)",term:"Term",unit:"Unit",days:"Days",hours:"Hours",months:"Months",years:"Years",time:"Start time",timeAria:"Start time in 24-hour format",timeUnit:"hours",type:"Term type",business:"Business days",calendar:"Calendar days",frequent:"Frequent terms",panel:"Select a frequent term",panelDesc:"Browse references organized by jurisdiction.",hourTitle:"Frequent hourly references",hourNote:"Select a reference by duration and legal action.",catalog:"Frequent legal terms",search:"E.g.: detention, appeal, filing...",searchAria:"Search legal term",clear:"Clear search",selected:"Selected term",change:"Change",hint:"Select a term to use it as the context for the query.",run:"CALCULATE TERM"}
+};
+
+function applyFormLanguage(lang){
+  const f=FORM_LABELS[lang]||FORM_LABELS.es;
+  const setText=(sel,text)=>{const el=document.querySelector(sel);if(el)el.textContent=text;};
+  const setAttr=(sel,attr,text)=>{const el=document.querySelector(sel);if(el)el.setAttribute(attr,text);};
+  setText('label[for="startDateDisplay"]',f.start);
+  setAttr("#countrySelect","aria-label",f.jurisdiction);
+  setText('label[for="days"]',f.term);
+  const unitLabel=document.querySelector('#unitSelect')?.closest('.field')?.querySelector('label');
+  if(unitLabel) unitLabel.textContent=f.unit;
+  const us=document.getElementById("unitSelect");
+  if(us){
+    us.querySelector('option[value="days"]').textContent=f.days;
+    us.querySelector('option[value="hours"]').textContent=f.hours;
+    us.querySelector('option[value="months"]').textContent=f.months;
+    us.querySelector('option[value="years"]').textContent=f.years;
+    us.setAttribute("aria-label",f.unit);
+  }
+  setText('label[for="startTime"]',f.time);
+  setAttr("#startTime","aria-label",f.timeAria);
+  setText("#start-time-unit",f.timeUnit);
+  setText("#termTypeLabel",f.type);
+  const typeSpans=document.querySelectorAll('input[name="termType"] + span');
+  if(typeSpans[0])typeSpans[0].textContent=f.business;
+  if(typeSpans[1])typeSpans[1].textContent=f.calendar;
+  if(typeSpans[2])typeSpans[2].textContent=f.frequent;
+  setText('#legalTermsPanel .legal-terms-header strong',f.panel);
+  setText('#legalTermsPanel .legal-terms-header span',f.panelDesc);
+  setText("#hourPresetsTitle",f.hourTitle);
+  setText("#hourPresetsNote",f.hourNote);
+  setText("#legalCatalogHeading",f.catalog);
+  setAttr("#legalTermSearch","placeholder",f.search);
+  setAttr("#legalTermSearch","aria-label",f.searchAria);
+  setAttr("#legalTermSearchClear","aria-label",f.clear);
+  setText("#legalSelectedTerm > span",f.selected);
+  setText("#legalSelectedTermClear",f.change);
+  setText("#legalTermHint",f.hint);
+  setText("#calculateBtn",f.run);
+}
+
 /* Traduce los elementos estáticos del bloque de resultado. */
 function applyOutputLanguage(lang){
+
+  applyFormLanguage(lang);
 
   const htmlLang=
     lang==="pt"
@@ -2917,7 +3035,7 @@ function formatShortDateTime(date,lang="es"){
 
 function formatResultDateTime(date,lang="es"){
   const base=formatDateTime(date,lang);
-  return `${base} ${lang==="pt"?"horas":"Horas"}`;
+  return `${base} ${tr(lang,"hours").replace(/^./,c=>c.toUpperCase())}`;
 }
 
 
@@ -3604,6 +3722,36 @@ function getEspanaHolidays(year){
 }
 
 
+/* PORTUGAL — FERIADOS OBRIGATÓRIOS NACIONAIS */
+function getPortugalHolidays(year){
+
+  const holidays=new Map();
+
+  addHoliday(holidays,new Date(year,0,1),"Ano Novo","Código do Trabalho, art. 234.º");
+  addHoliday(holidays,new Date(year,3,25),"Dia da Liberdade","Código do Trabalho, art. 234.º");
+  addHoliday(holidays,new Date(year,4,1),"Dia do Trabalhador","Código do Trabalho, art. 234.º");
+  addHoliday(holidays,new Date(year,5,10),"Dia de Portugal, de Camões e das Comunidades Portuguesas","Código do Trabalho, art. 234.º");
+  addHoliday(holidays,new Date(year,7,15),"Assunção de Nossa Senhora","Código do Trabalho, art. 234.º");
+  addHoliday(holidays,new Date(year,9,5),"Implantação da República","Código do Trabalho, art. 234.º");
+  addHoliday(holidays,new Date(year,10,1),"Dia de Todos os Santos","Código do Trabalho, art. 234.º");
+  addHoliday(holidays,new Date(year,11,1),"Restauração da Independência","Código do Trabalho, art. 234.º");
+  addHoliday(holidays,new Date(year,11,8),"Imaculada Conceição","Código do Trabalho, art. 234.º");
+  addHoliday(holidays,new Date(year,11,25),"Natal","Código do Trabalho, art. 234.º");
+
+  const easter=easterSunday(year);
+
+  addHoliday(holidays,addDays(easter,-2),"Sexta-Feira Santa","Código do Trabalho, art. 234.º");
+  addHoliday(holidays,easter,"Domingo de Páscoa","Código do Trabalho, art. 234.º");
+  addHoliday(holidays,addDays(easter,60),"Corpo de Deus","Código do Trabalho, art. 234.º");
+
+  /* A terça-feira de Carnaval e o feriado municipal são facultativos
+     e dependem de regulamentação coletiva ou contrato, por isso não
+     entram no calendário nacional padrão. */
+
+  return holidays;
+}
+
+
 /* OTRO PAÍS / NO LISTADO — modo genérico sin base de festivos */
 function getOtherCountryHolidays(year){
 
@@ -3673,6 +3821,13 @@ const COUNTRIES={
     flag:"🇪🇸",
     getHolidays:getEspanaHolidays,
     note:"Fiestas laborales de ámbito nacional; cada comunidad autónoma añade las suyas."
+  },
+  PT:{
+    name:"Portugal",
+    flag:"🇵🇹",
+    getHolidays:getPortugalHolidays,
+    note:"Feriados obrigatórios de âmbito nacional. O Carnaval e o feriado municipal podem ser facultativos conforme a lei e a regulamentação aplicável.",
+    notePt:"Feriados obrigatórios de âmbito nacional. A terça-feira de Carnaval e o feriado municipal podem ser observados como feriados facultativos nas condições previstas na lei."
   },
   US:{
     name:"Estados Unidos",
@@ -3812,7 +3967,10 @@ const TIMEZONE_COUNTRY_MAP={
   "America/El_Salvador":"SV",
   "America/Managua":"NI",
   "America/Santo_Domingo":"DO",
-  "Europe/Madrid":"ES"
+  "Europe/Madrid":"ES",
+  "Europe/Lisbon":"PT",
+  "Atlantic/Madeira":"PT",
+  "Atlantic/Azores":"PT"
 };
 
 
@@ -3954,6 +4112,55 @@ function getCountedDates(
 
 
 /* ETIQUETAS */
+/* Terminología jurisdiccional: en Argentina, Chile, Uruguay, Paraguay,
+   Bolivia, Ecuador y Perú se prioriza "plazo" en la interfaz procesal.
+   Colombia y las demás jurisdicciones conservan "término". */
+const PLAZO_COUNTRIES=new Set([
+  "AR","CL","UY","PY","BO","EC","PE"
+]);
+
+function usesPlazoTerminology(countryCode=currentCountry){
+  return PLAZO_COUNTRIES.has(
+    String(countryCode||"").toUpperCase()
+  );
+}
+
+function applyTerminologyLabels(){
+
+  const lang=outputLang(currentCountry);
+  const usePlazo=usesPlazoTerminology();
+
+  let termWord;
+  let typeWord;
+  let unitAria;
+
+  if(lang==="en") {
+    termWord="Term";
+    typeWord="Term type";
+    unitAria="Term unit";
+  }else if(lang==="pt") {
+    termWord="Prazo";
+    typeWord="Tipo de prazo";
+    unitAria="Unidade do prazo";
+  }else{
+    termWord=usePlazo ? "Plazo" : "Término";
+    typeWord=usePlazo ? "Tipo de plazo" : "Tipo de término";
+    unitAria=`Unidad del ${termWord.toLowerCase()}`;
+  }
+
+  const daysLabelEl=document.getElementById("daysLabel");
+  if(daysLabelEl) daysLabelEl.textContent=termWord;
+
+  const termTypeLabelEl=document.getElementById("termTypeLabel");
+  if(termTypeLabelEl) termTypeLabelEl.textContent=typeWord;
+
+  const unitSelectEl=document.getElementById("unitSelect");
+  if(unitSelectEl){
+    unitSelectEl.setAttribute("aria-label",unitAria);
+  }
+}
+
+
 function typeDisplayLabel(type,unit,lang="es",mode){
 
   const unitWord=
@@ -3970,6 +4177,17 @@ function typeDisplayLabel(type,unit,lang="es",mode){
 
   if(type==="legal"){
     const term=selectedLegalTerm||tr(lang,"frequentTerm");
+
+    if(usesPlazoTerminology()){
+      const label=
+        mode==="business"
+          ?tr(lang,"typeLegalBusiness",{term})
+          :tr(lang,"typeLegal",{term,unit:unitWord});
+
+      return lang==="es"
+        ?label.replace(/Término frecuente/g,"Plazo frecuente")
+        :label;
+    }
 
     if(mode==="business")
       return tr(lang,"typeLegalBusiness",{term});
@@ -5781,14 +5999,16 @@ function renderHourPresets(){
 
   const country=COUNTRIES[currentCountry];
   const presets=getHourPresetsForCountry();
-  if(jur)jur.textContent=country?.name||"Jurisdicción seleccionada";
+  if(jur)jur.textContent=country?.name||((FORM_LABELS[outputLang(currentCountry)]||FORM_LABELS.es).jurisdiction);
 
   if(!presets.length){
     list.innerHTML='<div class="legal-catalog-empty">Aún no hay una referencia horaria jurídica precargada para esta jurisdicción. El campo de horas sigue disponible para ingresar manualmente la duración.</div>';
     return;
   }
 
-  list.innerHTML=presets.map(p=>`<button type="button" class="hour-preset${Number(daysInput.value)===p.hours?" active":""}" data-hours="${p.hours}" title="${escapeHtml(p.detail)}"><strong>${escapeHtml(p.hours+" horas")}</strong><span>${escapeHtml(p.name||p.label||"")}</span><small>${escapeHtml(p.reference||"")}</small></button>`).join("");
+  const lang=outputLang(currentCountry);
+  const hourWord=tr(lang,"hours");
+  list.innerHTML=presets.map(p=>`<button type="button" class="hour-preset${Number(daysInput.value)===p.hours?" active":""}" data-hours="${p.hours}" title="${escapeHtml(p.detail)}"><strong>${escapeHtml(p.hours+" "+hourWord)}</strong><span>${escapeHtml(p.name||p.label||"")}</span><small>${escapeHtml(p.reference||"")}</small></button>`).join("");
   list.querySelectorAll(".hour-preset").forEach(btn=>btn.addEventListener("click",()=>{
     daysInput.value=btn.dataset.hours;
     const ref=getHourPresetsForCountry().find(p=>String(p.hours)===String(btn.dataset.hours));
@@ -5812,6 +6032,8 @@ function applyDefaultHourPreset(force=false){
 }
 
 function updateDaysLabel(){
+
+  applyTerminologyLabels();
 
   const unit=getSelectedUnit();
   syncLegacyUnitRadios(unit);
@@ -5949,6 +6171,7 @@ function applyCountryUI(){
      utilizan el mismo espacio para referencias ya verificadas,
      comenzando por las horarias. */
   legalTermTypeLabel.style.display="";
+  applyTerminologyLabels();
   renderLegalCatalogForCountry();
   renderHourPresets();
 
@@ -6525,7 +6748,7 @@ function buildColombiaLegalReference(term){
 
 function buildLegalText(type,lang="es",mode){
 
-  if(lang==="pt"){
+  if(lang==="pt" || lang==="en"){
 
     const info=COUNTRIES[currentCountry];
 
@@ -6534,7 +6757,7 @@ function buildLegalText(type,lang="es",mode){
       "legalBase",
       {
         name:info.name,
-        note:info.notePt||info.note
+        note:lang==="pt" ? (info.notePt||info.note) : (info.noteEn||info.note)
       }
     );
 
@@ -7557,7 +7780,7 @@ const SHARE_URL=
 const CALCULATION_SHEET_ENDPOINT=
   "https://script.google.com/macros/s/AKfycbxx6oWsJMDZvQVtf9arU2dBhk62v5TwWjsx1oAmXdVy1R4EZHGy2d3x_C6wwY2rtNwL/exec";
 
-const APP_VERSION="11.3";
+const APP_VERSION="11.5";
 
 /* Mantiene el número de versión mostrado en el resultado
    sincronizado con APP_VERSION. */
