@@ -1665,9 +1665,17 @@ footer{
 
 .certification-collapsible-chevron{
   flex:0 0 auto;
-  color:#687383;
-  font-size:12px;
+  width:0;
+  height:0;
+  border-top:6px solid transparent;
+  border-bottom:6px solid transparent;
+  border-left:9px solid #b9964f;
+  font-size:0;
   transition:transform .15s
+}
+
+.certification-collapsible>summary:hover .certification-collapsible-chevron{
+  border-left-color:#10243e
 }
 
 .certification-collapsible[open] .certification-collapsible-chevron{
@@ -6720,7 +6728,7 @@ function buildCertificationSectionHTML(titleText,bodyHtml,sectionClass,collapsib
       <details class="certification-collapsible">
         <summary class="certification-collapsible-summary">
           <span>${escapeHtml(titleText)}</span>
-          <span class="certification-collapsible-chevron" aria-hidden="true">›</span>
+          <span class="certification-collapsible-chevron" aria-hidden="true"></span>
         </summary>
         <div class="certification-collapsible-body">
           ${bodyHtml}
