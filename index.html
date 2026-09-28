@@ -112,7 +112,14 @@ body{
   letter-spacing:.14em;
   font-size:1.1rem;
   color:var(--navy);
-  margin:0
+  margin:0;
+  text-decoration:none
+}
+
+.brand-name:hover,
+.brand-name:focus,
+.brand-name:active{
+  text-decoration:none
 }
 
 .brand-name span{color:var(--gold)}
@@ -260,6 +267,294 @@ small{
   color:var(--muted);
   font-size:.7rem;
   margin-top:6px
+}
+
+/* NAVEGACIÓN INTERNA */
+.brand-nav{
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  margin-top:6px;
+  font-size:.65rem;
+}
+
+.brand-nav a{
+  color:var(--muted);
+  text-decoration:none;
+  padding:1px 0;
+  transition:color .15s ease;
+}
+
+.brand-nav a:hover,
+.brand-nav a[aria-current="page"]{
+  color:var(--navy);
+}
+
+/* CALENDARIO ANUAL — vista interna, minimalista y reutilizando el mismo motor */
+.annual-calendar-view{
+  margin:34px auto 0;
+  width:min(1100px,100%);
+}
+
+.annual-calendar-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.annual-calendar-back{
+  color:var(--muted);
+  text-decoration:none;
+  font-size:.68rem;
+}
+
+.annual-calendar-back:hover{
+  color:var(--navy);
+}
+
+.annual-calendar-jurisdiction{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+.annual-calendar-jurisdiction span{
+  font-size:.88rem;
+}
+
+.annual-country-select{
+  appearance:none;
+  border:0;
+  background:transparent;
+  color:var(--ink);
+  font:inherit;
+  font-size:.68rem;
+  font-weight:600;
+  padding:2px 17px 2px 0;
+  cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 6px) 50%,calc(100% - 2px) 50%;
+  background-size:4px 4px,4px 4px;
+  background-repeat:no-repeat;
+}
+
+.annual-calendar-heading{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:18px;
+}
+
+.annual-calendar-eyebrow{
+  color:var(--gold);
+  font-size:.61rem;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  margin-bottom:5px;
+}
+
+.annual-calendar-heading h1{
+  margin:0;
+  color:var(--navy);
+  font-size:1.45rem;
+  line-height:1.2;
+  font-weight:650;
+  letter-spacing:-.02em;
+}
+
+.annual-calendar-heading p{
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:.68rem;
+}
+
+.annual-year-controls{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex:0 0 auto;
+}
+
+.annual-year-controls button{
+  width:28px;
+  height:28px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:var(--navy);
+  border-radius:7px;
+  font-size:1rem;
+  cursor:pointer;
+}
+
+.annual-year-controls button:hover{
+  background:var(--surface-alt);
+}
+
+.annual-year-controls strong{
+  min-width:46px;
+  text-align:center;
+  color:var(--navy);
+  font-size:.77rem;
+  font-weight:700;
+}
+
+.annual-calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+
+.annual-month{
+  border:1px solid color-mix(in srgb,var(--line) 88%,transparent);
+  border-radius:12px;
+  background:var(--surface);
+  padding:11px 11px 10px;
+}
+
+.annual-month-head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+.annual-month-name{
+  color:var(--navy);
+  font-size:.73rem;
+  font-weight:700;
+}
+
+.annual-month-stats{
+  color:var(--muted);
+  font-size:.56rem;
+}
+
+.annual-weekdays,
+.annual-month-days{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+}
+
+.annual-weekdays{
+  margin-bottom:3px;
+}
+
+.annual-weekdays span{
+  text-align:center;
+  color:var(--muted);
+  font-size:.52rem;
+  font-weight:650;
+  line-height:1.4;
+}
+
+.annual-month-days{
+  row-gap:1px;
+}
+
+.annual-day{
+  position:relative;
+  min-height:23px;
+  border:0;
+  background:transparent;
+  color:var(--ink);
+  border-radius:6px;
+  font:inherit;
+  font-size:.61rem;
+  cursor:default;
+  padding:0;
+}
+
+.annual-day.weekend{
+  color:color-mix(in srgb,var(--muted) 88%,var(--line));
+}
+
+.annual-day.holiday{
+  color:var(--navy);
+  font-weight:700;
+}
+
+.annual-day.holiday::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:1px;
+  width:3px;
+  height:3px;
+  border-radius:50%;
+  background:var(--gold);
+  transform:translateX(-50%);
+}
+
+.annual-day.today{
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold) 70%,transparent);
+}
+
+.annual-day.empty{
+  pointer-events:none;
+}
+
+.annual-calendar-legend{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:14px;
+  margin:14px 0 6px;
+  color:var(--muted);
+  font-size:.58rem;
+}
+
+.annual-calendar-legend span{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+}
+
+.legend-dot{
+  display:inline-block;
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  border:1px solid var(--line);
+}
+
+.legend-dot.holiday{
+  background:var(--gold);
+  border-color:var(--gold);
+}
+
+.legend-dot.weekend{
+  background:var(--muted);
+  border-color:var(--muted);
+}
+
+.legend-dot.today{
+  background:transparent;
+  box-shadow:inset 0 0 0 1px var(--gold);
+}
+
+@media(max-width:760px){
+  .annual-calendar-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+@media(max-width:520px){
+  .brand-nav{gap:12px}
+  .annual-calendar-view{margin-top:26px}
+  .annual-calendar-heading{align-items:flex-start}
+  .annual-calendar-heading h1{font-size:1.18rem}
+  .annual-calendar-heading p{font-size:.64rem}
+  .annual-calendar-grid{
+    grid-template-columns:1fr;
+    gap:9px;
+  }
+  .annual-calendar-toolbar{margin-bottom:13px}
 }
 
 /* CALENDARIO */
@@ -581,12 +876,14 @@ button:hover{
 
 .error{
   color:#a12a2a;
-  background:var(--surface-alt);
-  border:1px solid #b23a3a;
-  border-radius:8px;
-  padding:10px;
-  margin:14px 0 0;
-  font-size:.8rem
+  background:transparent;
+  border:0;
+  border-radius:0;
+  padding:0;
+  margin:10px 0 0;
+  font-size:.76rem;
+  line-height:1.45;
+  text-align:center
 }
 
 body.dark .error{
@@ -2323,6 +2620,39 @@ body.dark .usage-guide-panel{
     page-break-inside:avoid
   }
 }
+@media print{
+  body.calendar-route .a11y-bar,
+  body.calendar-route .brand-nav,
+  body.calendar-route .hero,
+  body.calendar-route > .app > .card,
+  body.calendar-route #result,
+  body.calendar-route #resultActions,
+  body.calendar-route #feedbackCard,
+  body.calendar-route #postResultNote,
+  body.calendar-route #siteFooter{display:none!important}
+
+  body.calendar-route .app{
+    width:100%;
+    padding:0;
+  }
+
+  body.calendar-route .annual-calendar-view{
+    display:block!important;
+    margin:0;
+    width:100%;
+  }
+
+  body.calendar-route .annual-calendar-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:7px;
+  }
+
+  body.calendar-route .annual-month{
+    border:1px solid #dfe4e9;
+    box-shadow:none;
+  }
+}
+
 </style>
 </head>
 
@@ -2373,12 +2703,50 @@ body.dark .usage-guide-panel{
 <div class="app">
 
 <header class="brand">
-  <div class="brand-name">
+  <a href="#calcular" id="brandHomeLink" class="brand-name" aria-label="Término Legal — volver al calculador">
     TÉRMINO <span>LEGAL</span>
-  </div>
+  </a>
+  <nav class="brand-nav" aria-label="Navegación principal">
+    <a href="#calendario" id="viewCalendarLink" data-view-link="calendar">Calendario</a>
+  </nav>
 </header>
 
 <main class="hero"></main>
+
+<section id="annualCalendarView" class="annual-calendar-view" hidden aria-labelledby="annualCalendarTitle">
+
+  <div class="annual-calendar-toolbar">
+    <a href="#calcular" id="annualCalendarBack" class="annual-calendar-back">‹ <span data-calendar="back">Calcular término</span></a>
+
+    <div class="annual-calendar-jurisdiction">
+      <span id="annualCalendarFlag" aria-hidden="true">🌎</span>
+      <select id="annualCountrySelect" class="annual-country-select" aria-label="Jurisdicción del calendario anual"></select>
+    </div>
+  </div>
+
+  <div class="annual-calendar-heading">
+    <div>
+      <div class="annual-calendar-eyebrow" data-calendar="eyebrow">Calendario anual</div>
+      <h1 id="annualCalendarTitle">Colombia · 2026</h1>
+      <p id="annualCalendarSubtitle" data-calendar="subtitle">Consulta el calendario de la jurisdicción seleccionada.</p>
+    </div>
+
+    <div class="annual-year-controls" aria-label="Navegación por año">
+      <button type="button" id="annualPrevYear" aria-label="Año anterior">‹</button>
+      <strong id="annualYearValue">2026</strong>
+      <button type="button" id="annualNextYear" aria-label="Año siguiente">›</button>
+    </div>
+  </div>
+
+  <div id="annualCalendarGrid" class="annual-calendar-grid"></div>
+
+  <div class="annual-calendar-legend" id="annualCalendarLegend">
+    <span><i class="legend-dot holiday" aria-hidden="true"></i><span data-calendar="holiday">Festivo</span></span>
+    <span><i class="legend-dot weekend" aria-hidden="true"></i><span data-calendar="weekend">Fin de semana</span></span>
+    <span><i class="legend-dot today" aria-hidden="true"></i><span data-calendar="today">Hoy</span></span>
+  </div>
+
+</section>
 
 <div class="card">
 
@@ -2494,7 +2862,7 @@ body.dark .usage-guide-panel{
 
       <input type="number"
              id="days"
-             placeholder="Ej. 10"
+             placeholder="10"
              min="1"
              value="10">
 
@@ -2816,7 +3184,7 @@ body.dark .usage-guide-panel{
     Las reglas especiales pueden variar según la materia, autoridad o territorio aplicable.
   </p>
   <p id="versionNotice">
-    Versión <span id="appVersionLabel">11.6</span> — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.
+    Versión <span id="appVersionLabel">11.7</span> — motor de cómputo con calendario de referencia por jurisdicción, validación de fechas y límites de rango. Los festivos solo afectan el conteo de días hábiles.
   </p>
 </div>
 
@@ -2921,7 +3289,7 @@ body.dark .usage-guide-panel{
 
 /* CONFIGURACIÓN GLOBAL — debe inicializarse antes de registrar o ejecutar
    cualquier interacción del usuario. */
-const APP_VERSION="11.6";
+const APP_VERSION="11.7";
 const SHARE_TITLE="Término Legal — resultado";
 const SHARE_URL="https://terminolegal.vercel.app/";
 const CALCULATION_SHEET_ENDPOINT="https://script.google.com/macros/s/AKfycbxx6oWsJMDZvQVtf9arU2dBhk62v5TwWjsx1oAmXdVy1R4EZHGy2d3x_C6wwY2rtNwL/exec";
@@ -2956,6 +3324,19 @@ const certificationView=document.getElementById("certificationView");
 const certificationDocument=document.getElementById("certificationDocument");
 const exportShareBtn=document.getElementById("exportShareBtn");
 const holidayListEl=document.getElementById("holidayList");
+
+const annualCalendarView=document.getElementById("annualCalendarView");
+const annualCalendarGrid=document.getElementById("annualCalendarGrid");
+const annualCalendarTitle=document.getElementById("annualCalendarTitle");
+const annualCalendarSubtitle=document.getElementById("annualCalendarSubtitle");
+const annualCalendarFlag=document.getElementById("annualCalendarFlag");
+const annualCountrySelect=document.getElementById("annualCountrySelect");
+const annualCalendarBack=document.getElementById("annualCalendarBack");
+const annualYearValue=document.getElementById("annualYearValue");
+const annualPrevYear=document.getElementById("annualPrevYear");
+const annualNextYear=document.getElementById("annualNextYear");
+
+let annualCalendarYear=new Date().getFullYear();
 
 const holidayCache=new Map();
 
@@ -3201,6 +3582,66 @@ const I18N={
     shareText:"Counting from {start}, {amount} {label}{suffix}, expires on {end}.\n\nCalculate or verify your legal term: {url}"
   }
 };
+
+
+const ANNUAL_CALENDAR_I18N={
+  es:{
+    back:"Calcular término",
+    eyebrow:"Calendario anual",
+    subtitle:"Consulta el calendario de la jurisdicción seleccionada.",
+    holiday:"Festivo",
+    weekend:"Fin de semana",
+    today:"Hoy",
+    noHolidays:"Sin festivos incorporados",
+    holidaysOne:"1 festivo",
+    holidaysMany:"{n} festivos",
+    businessOne:"1 día hábil",
+    businessMany:"{n} días hábiles",
+    prevYear:"Año anterior",
+    nextYear:"Año siguiente",
+    jurisdiction:"Jurisdicción del calendario anual"
+  },
+  pt:{
+    back:"Calcular prazo",
+    eyebrow:"Calendário anual",
+    subtitle:"Consulte o calendário da jurisdição selecionada.",
+    holiday:"Feriado",
+    weekend:"Fim de semana",
+    today:"Hoje",
+    noHolidays:"Sem feriados incorporados",
+    holidaysOne:"1 feriado",
+    holidaysMany:"{n} feriados",
+    businessOne:"1 dia útil",
+    businessMany:"{n} dias úteis",
+    prevYear:"Ano anterior",
+    nextYear:"Próximo ano",
+    jurisdiction:"Jurisdição do calendário anual"
+  },
+  en:{
+    back:"Calculate term",
+    eyebrow:"Annual calendar",
+    subtitle:"View the calendar for the selected jurisdiction.",
+    holiday:"Holiday",
+    weekend:"Weekend",
+    today:"Today",
+    noHolidays:"No holidays included",
+    holidaysOne:"1 holiday",
+    holidaysMany:"{n} holidays",
+    businessOne:"1 business day",
+    businessMany:"{n} business days",
+    prevYear:"Previous year",
+    nextYear:"Next year",
+    jurisdiction:"Annual calendar jurisdiction"
+  }
+};
+
+function annualCalendarText(lang,key,vars){
+  let value=(ANNUAL_CALENDAR_I18N[lang]||ANNUAL_CALENDAR_I18N.es)[key] || ANNUAL_CALENDAR_I18N.es[key] || "";
+  if(vars){
+    Object.keys(vars).forEach(k=>{ value=value.split("{"+k+"}").join(String(vars[k])); });
+  }
+  return value;
+}
 
 
 function tr(lang,key,vars){
@@ -4755,17 +5196,72 @@ function resetResultView(){
   certificationView.hidden=true;
   certificationDocument.innerHTML="";
 
-  document.getElementById(
-    "postResultNote"
-  ).hidden=true;
-
-  document.getElementById(
-    "feedbackCard"
-  ).hidden=true;
+  document.getElementById("postResultNote").hidden=true;
+  document.getElementById("feedbackCard").hidden=true;
 
   holidayListEl.style.display="none";
+
+  clearError();
 }
 
+/* Vuelve el calculador a su estado inicial, como una nueva visita a
+   "Calcular": sin resultado, sin selección jurídica y sin mensajes.
+   La jurisdicción se conserva porque forma parte de la preferencia del usuario. */
+function resetCalculatorForm(){
+
+  resetResultView();
+
+  /* Cierra cualquier selector o calendario abierto. */
+  closeCalendar();
+
+  /* Fecha inicial: la misma fecha de referencia que usa la carga inicial. */
+  const todayReset=new Date();
+  startDateInput.value=dateKey(todayReset);
+  startDateDisplay.value=formatShortDate(todayReset);
+  calendarCursor=new Date(
+    todayReset.getFullYear(),
+    todayReset.getMonth(),
+    1
+  );
+
+  /* Valores limpios/default del formulario. */
+  daysInput.value="10";
+  daysInput.dataset.hourPresetCountry="";
+
+  unitSelect.value="days";
+  syncLegacyUnitRadios("days");
+
+  const businessRadio=document.querySelector('input[name="termType"][value="business"]');
+  if(businessRadio) businessRadio.checked=true;
+
+  if(startTime){
+    startTime.value="00:00";
+  }
+
+  clearLegalTerm();
+  legalTermsPanel.hidden=true;
+  legalSelectedTermName.textContent="—";
+
+  updateDaysLabel();
+  syncUnitAvailability();
+  renderLegalCatalogForCountry();
+  renderHourPresets();
+
+  /* Cerrar la guía/áreas auxiliares para que la vista vuelva a quedar limpia. */
+  document.querySelectorAll("#usageGuide, .guide-section").forEach(el=>{
+    if("open" in el) el.open=false;
+  });
+
+  /* Deja la navegación explícitamente en la vista de cálculo. */
+  if(location.hash!=="#calcular") history.replaceState(null,"",`${location.pathname}${location.search}#calcular`);
+  showAppRoute("calcular");
+
+  /* Vuelve al comienzo del formulario sin animación acumulada. */
+  const card=document.querySelector(".app > .card");
+  if(card){
+    window.scrollTo({top:0,behavior:"auto"});
+  }
+}
 
 /* =========================================================
    CALENDARIO DESPLEGABLE
@@ -6641,33 +7137,29 @@ const COUNTRY_STORAGE_KEY=
   "terminoLegalJurisdiction";
 
 
+function countryOptionLabel(code){
+  const info=COUNTRIES[code];
+  if(!info) return String(code||"");
+  return `${info.flag} ${info.name}`;
+}
+
 function populateCountrySelect(){
 
   if(!countrySelect) return;
 
-  /* Reconstruye el listado desde la fuente única de jurisdicciones.
-     Esto evita que un cambio anterior deje el selector vacío o duplicado. */
+  /* La lista nace siempre de COUNTRIES y se deduplica por código. */
   countrySelect.innerHTML="";
+  const seen=new Set();
 
-  Object.keys(COUNTRIES).forEach(
-    code=>{
+  Object.keys(COUNTRIES).forEach(code=>{
+    if(seen.has(code)) return;
+    seen.add(code);
 
-      const opt=
-        document.createElement(
-          "option"
-        );
-
-      opt.value=code;
-
-      opt.textContent=
-        `${COUNTRIES[code].flag} ${COUNTRIES[code].name}`;
-
-      countrySelect.appendChild(
-        opt
-      );
-
-    }
-  );
+    const opt=document.createElement("option");
+    opt.value=code;
+    opt.textContent=countryOptionLabel(code);
+    countrySelect.appendChild(opt);
+  });
 
 }
 
@@ -6696,6 +7188,12 @@ function applyCountryUI(){
   applyTerminologyLabels();
   renderLegalCatalogForCountry();
   renderHourPresets();
+
+  if(annualCountrySelect) annualCountrySelect.value=currentCountry;
+  if(!annualCalendarView?.hidden) {
+    updateAnnualCalendarLanguage();
+    renderAnnualCalendar();
+  }
 
   updateGxWidgetVisibility();
 
@@ -6927,6 +7425,209 @@ gxDetectBtn?.addEventListener(
 );
 
 
+function populateAnnualCountrySelect(){
+  if(!annualCountrySelect) return;
+  annualCountrySelect.innerHTML="";
+  const seen=new Set();
+
+  Object.keys(COUNTRIES).forEach(code=>{
+    if(seen.has(code)) return;
+    seen.add(code);
+
+    const opt=document.createElement("option");
+    opt.value=code;
+    opt.textContent=countryOptionLabel(code);
+    annualCountrySelect.appendChild(opt);
+  });
+}
+
+function updateAnnualCalendarLanguage(){
+  const lang=outputLang(currentCountry);
+  const dict=ANNUAL_CALENDAR_I18N[lang]||ANNUAL_CALENDAR_I18N.es;
+  document.querySelectorAll("[data-calendar]").forEach(el=>{
+    const key=el.dataset.calendar;
+    if(dict[key]!==undefined) el.textContent=dict[key];
+  });
+  if(annualCalendarBack) annualCalendarBack.setAttribute("aria-label",dict.back);
+  if(annualCountrySelect) annualCountrySelect.setAttribute("aria-label",dict.jurisdiction);
+  if(annualPrevYear) annualPrevYear.setAttribute("aria-label",dict.prevYear);
+  if(annualNextYear) annualNextYear.setAttribute("aria-label",dict.nextYear);
+}
+
+function annualWeekdayLabels(lang){
+  const ref=new Date(2023,0,2);
+  return Array.from({length:7},(_,i)=>{
+    const d=new Date(ref);
+    d.setDate(ref.getDate()+i);
+    return new Intl.DateTimeFormat(LOCALES[lang]||LOCALES.es,{weekday:"short"}).format(d).replace(".","").slice(0,2);
+  });
+}
+
+function renderAnnualCalendar(){
+  if(!annualCalendarGrid) return;
+  const lang=outputLang(currentCountry);
+  const info=COUNTRIES[currentCountry]||COUNTRIES[DEFAULT_COUNTRY];
+  const weekdays=annualWeekdayLabels(lang);
+  const todayKey=dateKey(new Date());
+  let totalHolidays=0;
+
+  annualCalendarYear=Math.max(1900,Math.min(2200,Number(annualCalendarYear)||new Date().getFullYear()));
+  annualYearValue.textContent=String(annualCalendarYear);
+  annualCalendarTitle.textContent=`${info.name} · ${annualCalendarYear}`;
+  annualCalendarSubtitle.textContent=info.note||annualCalendarText(lang,"subtitle");
+  annualCalendarFlag.textContent=info.flag;
+  annualCountrySelect.value=currentCountry;
+
+  annualCalendarGrid.innerHTML="";
+
+  for(let month=0;month<12;month++){
+    const monthEl=document.createElement("section");
+    monthEl.className="annual-month";
+
+    const head=document.createElement("div");
+    head.className="annual-month-head";
+
+    const monthNameEl=document.createElement("div");
+    monthNameEl.className="annual-month-name";
+    monthNameEl.textContent=monthName(month,lang);
+
+    const statsEl=document.createElement("div");
+    statsEl.className="annual-month-stats";
+
+    const first=new Date(annualCalendarYear,month,1);
+    const total=new Date(annualCalendarYear,month+1,0).getDate();
+    let monthHolidays=0;
+    let monthBusiness=0;
+    const firstMondayOffset=(first.getDay()+6)%7;
+
+    const weekdaysEl=document.createElement("div");
+    weekdaysEl.className="annual-weekdays";
+    weekdays.forEach(label=>{
+      const el=document.createElement("span");
+      el.textContent=label;
+      weekdaysEl.appendChild(el);
+    });
+
+    const daysEl=document.createElement("div");
+    daysEl.className="annual-month-days";
+
+    for(let i=0;i<firstMondayOffset;i++){
+      const empty=document.createElement("span");
+      empty.className="annual-day empty";
+      daysEl.appendChild(empty);
+    }
+
+    for(let day=1;day<=total;day++){
+      const date=new Date(annualCalendarYear,month,day);
+      const holiday=getHoliday(date);
+      const weekend=isWeekend(date);
+      if(holiday) monthHolidays++;
+      if(!weekend && !holiday) monthBusiness++;
+
+      const el=document.createElement("button");
+      el.type="button";
+      el.className="annual-day";
+      if(weekend) el.classList.add("weekend");
+      if(holiday) el.classList.add("holiday");
+      if(dateKey(date)===todayKey) el.classList.add("today");
+      if(dateKey(date)===startDateInput.value) el.classList.add("selected");
+      el.textContent=String(day);
+
+      const dateLabel=new Intl.DateTimeFormat(LOCALES[lang]||LOCALES.es,{day:"numeric",month:"long",year:"numeric"}).format(date);
+      const parts=[dateLabel];
+      if(weekend) parts.push(annualCalendarText(lang,"weekend"));
+      if(holiday) parts.push(`${annualCalendarText(lang,"holiday")}: ${holiday.name}`);
+      el.setAttribute("aria-label",parts.join(" — "));
+      el.title=parts.join(" · ");
+
+      el.addEventListener("click",()=>{
+        resetResultView();
+        startDateInput.value=dateKey(date);
+        startDateDisplay.value=formatShortDate(date,lang);
+        startDateDisplay.classList.remove("invalid");
+        calendarCursor=new Date(annualCalendarYear,month,1);
+        closeCalendar();
+        history.replaceState(null,"",`${location.pathname}${location.search}#calcular`);
+        showAppRoute("calcular");
+        window.scrollTo({top:0,behavior:"auto"});
+      });
+
+      daysEl.appendChild(el);
+    }
+
+    totalHolidays+=monthHolidays;
+    const holidayText=monthHolidays===0?annualCalendarText(lang,"noHolidays"):(monthHolidays===1?annualCalendarText(lang,"holidaysOne"):annualCalendarText(lang,"holidaysMany",{n:monthHolidays}));
+    const businessText=monthBusiness===1?annualCalendarText(lang,"businessOne"):annualCalendarText(lang,"businessMany",{n:monthBusiness});
+    statsEl.textContent=`${businessText} · ${holidayText}`;
+
+    head.append(monthNameEl,statsEl);
+    monthEl.append(head,weekdaysEl,daysEl);
+    annualCalendarGrid.appendChild(monthEl);
+  }
+}
+
+function showAppRoute(route){
+  const isCalendar=route==="calendario";
+  document.body.classList.toggle("calendar-route",isCalendar);
+
+  /* La ruta de cálculo solo controla el formulario principal.
+     El resultado debe conservar su propio estado hidden: al cargar la
+     aplicación no debe aparecer una tarjeta vacía con guiones. */
+  const calculatorMainEls=[
+    document.querySelector(".hero"),
+    document.querySelector(".app > .card")
+  ];
+
+  calculatorMainEls.forEach(el=>{
+    if(el) el.hidden=isCalendar;
+  });
+
+  /* Al entrar al calendario se limpian las capas propias del cálculo.
+     Al volver a Calcular no se fuerzan a visibles: resetCalculatorForm()
+     las deja ocultas hasta que exista un cálculo real. */
+  if(isCalendar){
+    const resultEl=document.getElementById("result");
+    const actionsEl=document.getElementById("resultActions");
+    const feedbackEl=document.getElementById("feedbackCard");
+    const noteEl=document.getElementById("postResultNote");
+    if(resultEl) resultEl.hidden=true;
+    if(actionsEl) actionsEl.hidden=true;
+    if(feedbackEl) feedbackEl.hidden=true;
+    if(noteEl) noteEl.hidden=true;
+  }
+
+  if(annualCalendarView) annualCalendarView.hidden=!isCalendar;
+
+  document.getElementById("viewCalcLink")?.setAttribute("aria-current",isCalendar?"false":"page");
+  document.getElementById("viewCalendarLink")?.setAttribute("aria-current",isCalendar?"page":"false");
+
+  if(isCalendar){
+    annualCalendarYear=annualCalendarYear||new Date().getFullYear();
+    updateAnnualCalendarLanguage();
+    renderAnnualCalendar();
+    document.title=`Término Legal — ${annualCalendarText(outputLang(currentCountry),"eyebrow")} ${annualCalendarYear}`;
+  }else{
+    document.title="Término Legal";
+  }
+}
+
+function initAppRoute(){
+  const route=(location.hash||"").replace(/^#/ ,"").toLowerCase();
+  showAppRoute(route==="calendario"?"calendario":"calcular");
+}
+
+/* "Calcular" funciona también como botón de inicio: cada pulsación
+   devuelve el formulario a un estado limpio, incluso si el hash no cambia. */
+document.getElementById("viewCalcLink")?.addEventListener("click",e=>{
+  e.preventDefault();
+  resetCalculatorForm();
+});
+
+document.getElementById("brandHomeLink")?.addEventListener("click",e=>{
+  e.preventDefault();
+  resetCalculatorForm();
+});
+
 function setCountry(code,persist){
 
   if(!COUNTRIES[code])
@@ -6996,6 +7697,27 @@ function initCountry(){
 }
 
 
+populateAnnualCountrySelect();
+
+annualPrevYear?.addEventListener("click",()=>{
+  annualCalendarYear--;
+  renderAnnualCalendar();
+});
+
+annualNextYear?.addEventListener("click",()=>{
+  annualCalendarYear++;
+  renderAnnualCalendar();
+});
+
+annualCountrySelect?.addEventListener("change",()=>{
+  setCountry(annualCountrySelect.value,true);
+  if(annualCalendarView && !annualCalendarView.hidden){
+    renderAnnualCalendar();
+  }
+});
+
+window.addEventListener("hashchange",initAppRoute);
+
 countrySelect.addEventListener(
   "change",
   ()=>{
@@ -7015,6 +7737,7 @@ countrySelect.addEventListener(
 
 
 initCountry();
+initAppRoute();
 
 
 /* =========================================================
