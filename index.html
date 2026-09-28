@@ -4316,10 +4316,18 @@ calendarYearBtn.addEventListener(
 );
 
 
-/* ABRIR CALENDARIO (solo desde el ícono) */
+/* ABRIR / CERRAR CALENDARIO (desde el ícono) */
 dateIconBadge.addEventListener(
   "click",
-  openCalendar
+  ()=>{
+
+    if(calendarPicker.hidden){
+      openCalendar();
+    }else{
+      closeCalendar();
+    }
+
+  }
 );
 
 
