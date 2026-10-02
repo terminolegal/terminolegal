@@ -572,7 +572,7 @@ const ERRORS={
   duplicate:"Ese correo ya está registrado desde otro dispositivo.",
   unauthorized:"No reconocemos tu perfil en este dispositivo.",
   not_found:"Esa gestión u oferta ya no está disponible.",
-  not_verified:"Tu perfil aún está en verificación. Cuando lo aprobemos podrás ver solicitudes.",
+  not_verified:"Tu perfil está pendiente de una revisión adicional. Cuando quede habilitado podrás ver solicitudes.",
   rate_limited:"Demasiadas solicitudes seguidas. Espera un momento.",
   country:"Todavía no operamos en ese país.",
   limit:"Ya tienes 10 solicitudes abiertas. Cierra alguna antes de publicar otra.",
@@ -1356,8 +1356,9 @@ function renderTakeShell(){
           <strong style="color:var(--navy)">${esc(p.name)}</strong>
           <span class="chip">${esc(ROLES[p.role]||p.role)}</span>
           ${p.provider_gender?`<span class="chip">${p.provider_gender==="mujer"?"Mujer":p.provider_gender==="hombre"?"Hombre":"Otro"}</span>`:""}
-          ${p.verified?`<span class="chip ok">Verificado</span>`:`<span class="chip warn">En verificación</span>`}
+          ${p.verified?`<span class="chip ok">Verificado</span>`:`<span class="chip warn">Revisión adicional</span>`}
           <p class="muted">Cubres ${p.radius_km} km alrededor de ${esc(p.city)}${p.dept?`, ${esc(p.dept)}`:""}</p>
+          ${p.verified?`<p class="muted" style="margin-top:4px">Verificación inicial automática completada.</p>`:""}
         </div>
         <button type="button" class="secondary" id="editProfile">Editar perfil</button>
       </div>
@@ -1693,8 +1694,12 @@ async function submitProvider(e){
 
   toast(
     lat
-      ? "Perfil guardado."
-      : "Perfil guardado. No pudimos ubicar tu municipio en el mapa; te mostraremos solicitudes de ese mismo nombre."
+      ? (res.verification?.type === "automatic"
+          ? "Perfil guardado y verificado automáticamente."
+          : "Perfil guardado.")
+      : (res.verification?.type === "automatic"
+          ? "Perfil guardado y verificado automáticamente. No pudimos ubicar tu municipio en el mapa; te mostraremos solicitudes de ese mismo nombre."
+          : "Perfil guardado. No pudimos ubicar tu municipio en el mapa; te mostraremos solicitudes de ese mismo nombre.")
   );
 
   S.takeSub="near";
