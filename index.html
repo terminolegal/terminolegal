@@ -76,7 +76,7 @@ h3{font-family:Georgia,"Times New Roman",serif;font-size:1.08rem;color:var(--nav
 
 /* Formularios */
 label{display:block;font-size:.84rem;font-weight:600;color:var(--navy);margin:14px 0 6px}
-input[type=text],input[type=email],input[type=tel],input[type=number],input[type=datetime-local],select,textarea{
+input[type=text],input[type=email],input[type=url],input[type=tel],input[type=number],input[type=datetime-local],select,textarea{
   width:100%;min-height:46px;border:1px solid var(--input-border);border-radius:10px;padding:0 12px;
   font:inherit;font-size:1rem;color:var(--ink);background:var(--input-bg)}
 textarea{padding:10px 12px;min-height:84px;resize:vertical}
@@ -88,6 +88,11 @@ input:focus,select:focus,textarea:focus{outline:2px solid rgba(185,150,79,.3);bo
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:520px){.grid2{grid-template-columns:1fr}}
 .hint{font-size:.72rem;color:var(--muted);margin:5px 0 0}
+
+.public-check{margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-alt);font-size:.76rem;color:var(--muted)}
+.public-check.ok{color:var(--ok);background:var(--ok-bg)}
+.public-check.warn{color:var(--warn);background:var(--warn-bg)}
+.public-check.bad{color:var(--bad);background:var(--bad-bg)}
 .check{display:flex;gap:9px;align-items:flex-start;font-weight:500;font-size:.75rem;color:var(--muted);margin-top:14px}
 .check input{margin-top:3px;flex:0 0 auto}
 .tipos{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}
@@ -1468,7 +1473,7 @@ function renderProviderForm(p){
   $("#view").innerHTML=`
   <form id="provForm" class="card" novalidate>
     <h2>${editing?"Editar mi perfil":"Regístrate para tomar gestiones"}</h2>
-    <p class="muted">Cuéntanos quién eres y qué zona cubres. Revisamos cada perfil antes de marcarlo como verificado.</p>
+    <p class="muted">Cuéntanos quién eres y qué zona cubres. Hacemos una verificación automática de los datos y, si aportas una fuente pública, también la consultamos.</p>
 
     <label for="prole">Soy</label>
     <select id="prole" name="role">${Object.entries(ROLES).map(([k,v])=>`<option value="${k}" ${k===role?"selected":""}>${v}</option>`).join("")}</select>
@@ -1496,6 +1501,11 @@ function renderProviderForm(p){
     <label for="cred" id="credLabel">Número de tarjeta profesional</label>
     <input id="cred" name="credential" type="text" maxlength="80" value="${esc(p?p.credential:"")}">
     <p class="hint" id="credHint"></p>
+
+    <label for="public_url">Fuente pública para verificación <span class="muted">(opcional)</span></label>
+    <input id="public_url" name="public_url" type="url" maxlength="500" value="${esc(p?p.public_url||"":"")}"
+      placeholder="https://...">
+    <p class="hint">Si tienes una consulta o certificado público en internet, pega aquí su enlace. Término Legal lo consultará automáticamente y comparará el nombre y, cuando sea posible, la acreditación. No uses enlaces que exijan iniciar sesión.</p>
 
     ${ENABLED.length>1?`<label for="pcountry">País</label>
     <select id="pcountry" name="country">${ENABLED.map(c=>`<option value="${c}" ${c===country?"selected":""}>${COUNTRIES[c].name}</option>`).join("")}</select>`
@@ -1681,6 +1691,7 @@ async function submitProvider(e){
     phone:toE164(v("phone_country"),v("phone")),
     email:v("email").trim(),
     bio:v("bio").trim(),
+    public_url:v("public_url").trim(),
     offers_gestiones:true,
     offers_advice:false,
     consent:true,
@@ -1692,15 +1703,17 @@ async function submitProvider(e){
   if(!res.ok)
     return toast(errText(res.error),true);
 
-  toast(
-    lat
-      ? (res.verification?.type === "automatic"
-          ? "Perfil guardado y verificado automáticamente."
-          : "Perfil guardado.")
-      : (res.verification?.type === "automatic"
-          ? "Perfil guardado y verificado automáticamente. No pudimos ubicar tu municipio en el mapa; te mostraremos solicitudes de ese mismo nombre."
-          : "Perfil guardado. No pudimos ubicar tu municipio en el mapa; te mostraremos solicitudes de ese mismo nombre.")
-  );
+  const pub=res.verification&&res.verification.public;
+  let verificationMsg="Perfil guardado y verificado automáticamente.";
+  if(pub){
+    if(pub.status==="official_match") verificationMsg+=" Además, encontramos coincidencia en una fuente pública oficial.";
+    else if(pub.status==="public_match") verificationMsg+=" También encontramos coincidencia en la fuente pública indicada; por no ser una fuente oficial, queda como evidencia pública.";
+    else if(pub.status==="mismatch") verificationMsg+=" La fuente pública indicada no coincidió de forma suficiente; revisaremos ese dato.";
+    else if(pub.status==="unavailable") verificationMsg+=" La fuente pública no pudo consultarse ahora; el perfil queda con verificación inicial.";
+    else if(pub.status==="not_checked") verificationMsg+=" No se aportó una fuente pública, por lo que solo se hizo la verificación inicial.";
+  }
+  if(!lat) verificationMsg+=" No pudimos ubicar tu municipio en el mapa; te mostraremos solicitudes de ese mismo nombre.";
+  toast(verificationMsg);
 
   S.takeSub="near";
   renderTake();
