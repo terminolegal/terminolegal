@@ -1581,39 +1581,122 @@ function renderProviderForm(p){
 
 async function submitProvider(e){
   e.preventDefault();
-  const f=e.target,btn=f.querySelector("button[type=submit]");
+
+  const f=e.target;
+  const btn=f.querySelector("button[type=submit]");
   const v=n=>field(f,n).value;
   const tipos=$$("input[name=tipos]:checked",f).map(i=>i.value);
-  const country=v("country"),role=v("role");
-  if(v("name").trim().length<2)return toast("Escribe tu nombre.",true);
-  if(!v("id_number").trim())return toast("Indica tu número de ID.",true);
-  if(role==="profesional"&&!v("profession"))return toast("Selecciona tu profesión.",true);
-  if(v("city").trim().length<2)return toast("Indica tu municipio base.",true);
-  if(role==="otro"&&!v("role_other").trim())return toast("Indica cuál es tu profesión o actividad.",true);
-  if(!tipos.length)return toast("Elige al menos un tipo de gestión.",true);
-  if(!["mujer","hombre","otro"].includes(v("provider_gender")))return toast("Indica cómo te identificas para las preferencias de atención.",true);
-  if(!v("phone").trim()||!v("email").trim())return toast("Falta tu WhatsApp o tu correo.",true);
-  if(!field(f,"consent").checked)return toast(ERRORS.consent,true);
+  const country=v("country");
+  const uiRole=v("role");
+
+  /*
+   * El formulario usa los roles visibles:
+   *   profesional / estudiante / otro
+   *
+   * El backend Gestiones usa:
+   *   abogado / judicante / estudiante / dependiente
+   *
+   * Para este formulario:
+   *   profesional -> abogado
+   *   estudiante  -> estudiante
+   *   otro        -> dependiente
+   */
+  const backendRole=
+    uiRole==="profesional" ? "abogado" :
+    uiRole==="estudiante" ? "estudiante" :
+    "dependiente";
+
+  if(v("name").trim().length<2)
+    return toast("Escribe tu nombre.",true);
+
+  if(!v("id_number").trim())
+    return toast("Indica tu número de ID.",true);
+
+  if(uiRole==="profesional"&&!v("profession"))
+    return toast("Selecciona tu profesión.",true);
+
+  if(v("city").trim().length<2)
+    return toast("Indica tu municipio base.",true);
+
+  if(uiRole==="otro"&&!v("role_other").trim())
+    return toast("Indica cuál es tu profesión o actividad.",true);
+
+  if(!tipos.length)
+    return toast("Elige al menos un tipo de gestión.",true);
+
+  if(!["mujer","hombre","otro"].includes(v("provider_gender")))
+    return toast("Indica cómo te identificas para las preferencias de atención.",true);
+
+  if(!v("phone").trim()||!v("email").trim())
+    return toast("Falta tu WhatsApp o tu correo.",true);
+
+  if(!field(f,"consent").checked)
+    return toast(ERRORS.consent,true);
 
   setBusy(btn,true,"GUARDANDO…");
-  let lat=v("lat"),lng=v("lng");
-  if(!lat||!lng){
-    const g=await forwardGeocode(v("city").trim(),v("dept").trim(),country);
-    if(g){lat=g.lat;lng=g.lng}
-  }
-  const res=await api("gx_register_provider",{
-    token:providerToken(),role,profession:v("profession"),role_other:v("role_other").trim(),name:v("name").trim(),id_number:v("id_number").trim(),credential:v("credential").trim(),
-    country,city:v("city").trim(),dept:v("dept").trim(),lat,lng,radius_km:v("radius_km"),tipos,
-    provider_gender:v("provider_gender"),
-    phone_country:v("phone_country"),phone:toE164(v("phone_country"),v("phone")),email:v("email").trim(),bio:v("bio").trim(),
-    consent:true,website:v("website")
-  });
-  setBusy(btn,false);
-  if(!res.ok)return toast(errText(res.error),true);
 
-  toast(lat
-    ?"Perfil guardado."
-    :"Perfil guardado. No pudimos ubicar tu municipio en el mapa; te mostraremos solicitudes de ese mismo nombre.");
+  let lat=v("lat");
+  let lng=v("lng");
+
+  if(!lat||!lng){
+    const g=await forwardGeocode(
+      v("city").trim(),
+      v("dept").trim(),
+      country
+    );
+
+    if(g){
+      lat=g.lat;
+      lng=g.lng;
+    }
+  }
+
+  /*
+   * Registro compatible con el Index.gs nuevo.
+   *
+   * La corrección principal es enviar explícitamente:
+   *   offers_gestiones: true
+   *   offers_advice: false
+   *
+   * El backend exige que al menos una de esas dos opciones sea true.
+   */
+  const res=await api("gx_register_provider",{
+    token:providerToken(),
+    role:backendRole,
+    profession:v("profession"),
+    role_other:v("role_other").trim(),
+    name:v("name").trim(),
+    id_number:v("id_number").trim(),
+    credential:v("credential").trim(),
+    country,
+    city:v("city").trim(),
+    dept:v("dept").trim(),
+    lat,
+    lng,
+    radius_km:v("radius_km"),
+    tipos,
+    provider_gender:v("provider_gender"),
+    phone_country:v("phone_country"),
+    phone:toE164(v("phone_country"),v("phone")),
+    email:v("email").trim(),
+    bio:v("bio").trim(),
+    offers_gestiones:true,
+    offers_advice:false,
+    consent:true,
+    website:v("website")
+  });
+
+  setBusy(btn,false);
+
+  if(!res.ok)
+    return toast(errText(res.error),true);
+
+  toast(
+    lat
+      ? "Perfil guardado."
+      : "Perfil guardado. No pudimos ubicar tu municipio en el mapa; te mostraremos solicitudes de ese mismo nombre."
+  );
+
   S.takeSub="near";
   renderTake();
 }
