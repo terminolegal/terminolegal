@@ -3158,7 +3158,7 @@ body.dark .usage-guide-panel{
       <span>BUSCAR AYUDA</span>
     </button>
 
-    <a href="gestiones.html" class="advice-link gx-help-secondary">
+    <a href="index.html" class="advice-link gx-help-secondary">
       <span>PUBLICAR UNA GESTIÓN</span>
     </a>
   </div>
@@ -7278,7 +7278,7 @@ function applyCountryUI(){
    GESTIONES — vista previa dinámica
    Muestra, bajo "Publicar una gestión", cuántos profesionales
    cubren la zona del usuario y cuántas gestiones hay abiertas
-   cerca, usando el mismo backend (Apps Script) de gestiones.html.
+   cerca, usando el mismo backend (Apps Script) del marketplace (index.html).
    Disponible por ahora solo donde opera Gestiones (Colombia).
    ========================================================= */
 
@@ -7390,7 +7390,7 @@ function gxRenderStats(place,data){
   if(!data||!data.ok){
 
     gxWidgetStats.innerHTML=
-      `No pudimos consultar tu zona en este momento. <a href="gestiones.html">Buscar ayuda en Gestiones</a>`;
+      `No pudimos consultar tu zona en este momento. <a href="index.html">Buscar ayuda</a>`;
 
     return;
 
@@ -7416,7 +7416,7 @@ function gxRenderStats(place,data){
         ?"gestión abierta"
         :"gestiones abiertas"
     } cerca de ti. `+
-    `<a href="gestiones.html">Ver gestiones o publicar una gestión</a>`;
+    `<a href="index.html">Ver gestiones o publicar una gestión</a>`;
 
 }
 
@@ -7431,7 +7431,7 @@ async function gxDetectAndShowStats(){
     gxWidgetStats.hidden=false;
 
     gxWidgetStats.innerHTML=
-      `Tu navegador no permite detectar tu ubicación. <a href="gestiones.html">Busca ayuda directamente en Gestiones</a>.`;
+      `Tu navegador no permite detectar tu ubicación. <a href="index.html">Busca ayuda directamente</a>.`;
 
     return;
 
@@ -7478,7 +7478,7 @@ async function gxDetectAndShowStats(){
       gxWidgetStats.hidden=false;
 
       gxWidgetStats.innerHTML=
-        `Activa la ubicación para buscar gestiones cerca, o <a href="gestiones.html">entra a Gestiones</a>.`;
+        `Activa la ubicación para buscar gestiones cerca, o <a href="index.html">entra al marketplace</a>.`;
 
     },
 
