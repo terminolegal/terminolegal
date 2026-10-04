@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Calendario legal | Término Legal</title>
+<meta name="description" content="Consulta el calendario legal por país, festivos y fechas relevantes para el cómputo de términos.">
+<style>
+:root{--ink:#17202b;--muted:#667085;--line:#e5e7eb;--bg:#f7f8fa;--card:#fff;--accent:#111827}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+a{color:inherit}.wrap{width:min(1080px,calc(100% - 28px));margin:auto}
+header{padding:22px 0 8px}.brand{font-weight:800;text-decoration:none;font-size:20px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px}
+main{padding:20px 0 60px}.hero{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:0 8px 30px rgba(16,24,40,.05)}
+.kicker{font-size:13px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+h1{margin:7px 0 6px;font-size:clamp(30px,5vw,48px);letter-spacing:-.04em}.intro{color:var(--muted);max-width:760px;line-height:1.6}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.controls select,.btn{border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 13px;font:inherit}.btn{text-decoration:none;cursor:pointer}
+.summary{display:flex;justify-content:space-between;gap:16px;align-items:center;margin:24px 0 12px}.summary strong{font-size:18px}.notice{font-size:13px;color:var(--muted);background:#f9fafb;border:1px solid var(--line);padding:12px 14px;border-radius:14px}
+.month{background:#fff;border:1px solid var(--line);border-radius:18px;margin:10px 0;overflow:hidden}.month summary{list-style:none;cursor:pointer;padding:17px 18px;display:flex;align-items:center;justify-content:space-between;gap:15px}.month summary::-webkit-details-marker{display:none}.month-title{font-weight:750}.month-meta{font-size:13px;color:var(--muted)}.month-body{padding:0 18px 18px;border-top:1px solid var(--line)}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:14px}.weekday{text-align:center;font-size:11px;color:var(--muted);font-weight:700;padding:5px}.day{min-height:42px;border:1px solid #eef0f2;border-radius:9px;background:#fff;text-align:center;padding:9px 3px;font-size:13px;cursor:default}.day.weekend{background:#fafafa;color:#8a9099}.day.today{outline:2px solid #111827;outline-offset:-2px}.day.event{font-weight:800;background:#f1f3f5}.events{margin-top:15px;display:grid;gap:8px}.event{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:12px}.event-date{font-weight:800;min-width:82px}.event small{display:block;color:var(--muted);margin-top:2px}.event a{font-size:12px}.cta{margin-top:22px;padding:18px;border-radius:18px;background:#111827;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:15px}.cta a{background:#fff;color:#111827;text-decoration:none;border-radius:10px;padding:10px 13px;font-weight:700;white-space:nowrap}
+footer{color:var(--muted);font-size:12px;padding:20px 0}.empty{padding:25px;border:1px dashed var(--line);border-radius:14px;color:var(--muted);line-height:1.5}
+@media(max-width:620px){.hero{padding:20px}.summary{align-items:flex-start;flex-direction:column}.day{min-height:36px;padding:8px 1px;font-size:12px}.month summary{padding:15px}.cta{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<header><div class="wrap top"><a class="brand" href="/">Término Legal</a><a class="btn" href="/plazos.html">Calcular un término</a></div></header>
+<main class="wrap">
+<section class="hero">
+<div class="kicker">Calendario legal</div>
+<h1 id="title">Calendario legal</h1>
+<div class="intro" id="intro">Consulta fechas relevantes para el cómputo de términos y conecta cada fecha con el calculador.</div>
+<div class="controls">
+<label>
+<select id="country" aria-label="País"></select>
+</label>
+<a class="btn" id="calc" href="/plazos.html">Calcular un término</a>
+</div>
+</section>
+
+<div class="summary">
+<strong id="yearTitle">Calendario 2026</strong>
+<span class="notice" id="dataStatus"></span>
+</div>
+<div id="months"></div>
+
+<section class="cta">
+<div><strong>¿Necesitas calcular un término?</strong><br><span style="opacity:.75">Lleva una fecha del calendario al calculador de Término Legal.</span></div>
+<a href="/plazos.html">Abrir calculador</a>
+</section>
+<footer>Herramienta de referencia. Las fechas y reglas especiales deben contrastarse con la fuente oficial aplicable al caso concreto.</footer>
+</main>
+
+<script>
+const DATA_URL="/calendarios.json";
+const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const DAYS=["Lu","Ma","Mi","Ju","Vi","Sá","Do"];
+let DATA=null;
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function countryFromPath(){
+  const m=location.pathname.match(/^\/calendario\/([a-z]{2})\/?$/i);
+  return m?m[1].toUpperCase():"CO";
+}
+function isoDate(y,m,d){return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`}
+function formatDate(s){
+  return new Intl.DateTimeFormat("es-CO",{day:"numeric",month:"long",year:"numeric"}).format(new Date(s+"T12:00:00"));
+}
+function eventsFor(code,year){
+  return (DATA.events[code]||[]).filter(e=>e.date.startsWith(String(year)+"-"));
+}
+function render(){
+  const code=$("#country").value;
+  const country=DATA.countries.find(c=>c.code===code)||DATA.countries[0];
+  const year=new Date().getFullYear();
+  const ev=eventsFor(code,year);
+  const map=new Map(ev.map(e=>[e.date,e]));
+  $("#title").textContent=`Calendario legal de ${country.name}`;
+  $("#yearTitle").textContent=`Calendario ${year}`;
+  document.title=`Calendario legal de ${country.name} ${year} | Término Legal`;
+  $("#intro").textContent=`Consulta el calendario legal de ${country.name} ${year}, fechas relevantes y días identificados para el cómputo de términos.`;
+  $("#dataStatus").textContent=ev.length
+    ? `${ev.length} fecha${ev.length===1?"":"s"} registrada${ev.length===1?"":"s"}`
+    : "Calendario específico pendiente de validación";
+  $("#calc").href=`/plazos.html?pais=${code.toLowerCase()}`;
+
+  const root=$("#months"); root.innerHTML="";
+  for(let m=0;m<12;m++){
+    const first=new Date(year,m,1), total=new Date(year,m+1,0).getDate();
+    const offset=(first.getDay()+6)%7;
+    const monthEvents=ev.filter(e=>Number(e.date.slice(5,7))===m+1);
+    const details=document.createElement("details");
+    details.className="month";
+    if(m===new Date().getMonth()) details.open=true;
+
+    let days="";
+    for(let i=0;i<offset;i++) days+=`<span></span>`;
+    for(let d=1;d<=total;d++){
+      const date=new Date(year,m,d), key=isoDate(year,m,d), weekend=date.getDay()===0||date.getDay()===6;
+      const event=map.get(key), today=key===isoDate(new Date().getFullYear(),new Date().getMonth(),new Date().getDate());
+      days+=`<span class="day ${weekend?"weekend ":""}${event?"event ":""}${today?"today":""}" title="${event?esc(event.name):""}">${d}</span>`;
+    }
+
+    const list=monthEvents.length
+      ? `<div class="events">${monthEvents.map(e=>`<div class="event"><div class="event-date">${formatDate(e.date)}</div><div><strong>${esc(e.name)}</strong><small>${esc(e.type.replaceAll("_"," "))}</small><a href="${esc(e.source)}" target="_blank" rel="noopener">Fuente oficial</a></div></div>`).join("")}</div>`
+      : `<div class="empty">${ev.length?"No hay fechas registradas en este mes.":"Aún no se han incorporado fechas específicas verificadas para este país. Los fines de semana se muestran solo como referencia visual."}</div>`;
+
+    details.innerHTML=`<summary><span class="month-title">${MONTHS[m]}</span><span class="month-meta">${monthEvents.length?monthEvents.length+" fecha"+(monthEvents.length===1?"":"s"):"Sin fechas registradas"} · ${m===new Date().getMonth()?"mes actual":""}</span></summary>
+    <div class="month-body"><div class="week">${DAYS.map(d=>`<span class="weekday">${d}</span>`).join("")}${days}</div>${list}</div>`;
+    root.appendChild(details);
+  }
+}
+async function init(){
+  DATA=await fetch(DATA_URL,{cache:"no-store"}).then(r=>r.json());
+  const select=$("#country");
+  select.innerHTML=DATA.countries.map(c=>`<option value="${c.code}">${c.flag} ${esc(c.name)}</option>`).join("");
+  const wanted=countryFromPath();
+  select.value=DATA.countries.some(c=>c.code===wanted)?wanted:"CO";
+  select.addEventListener("change",()=>{
+    const c=select.value.toLowerCase();
+    history.pushState({}, "", `/calendario/${c}`);
+    render();
+  });
+  window.addEventListener("popstate",()=>{
+    select.value=countryFromPath();
+    render();
+  });
+  render();
+}
+init().catch(()=>{
+  $("#months").innerHTML=`<div class="empty">No fue posible cargar los datos del calendario.</div>`;
+});
+</script>
+</body>
+</html>
