@@ -1,0 +1,1338 @@
+{
+  "schema_version": "1.0",
+  "default_year": 2026,
+  "countries": [
+    {
+      "code": "AF",
+      "name": "Afganistán",
+      "flag": "🇦🇫",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "AL",
+      "name": "Albania",
+      "flag": "🇦🇱",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "DE",
+      "name": "Alemania",
+      "flag": "🇩🇪",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "AD",
+      "name": "Andorra",
+      "flag": "🇦🇩",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "AO",
+      "name": "Angola",
+      "flag": "🇦🇴",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "AG",
+      "name": "Antigua y Barbuda",
+      "flag": "🇦🇬",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "SA",
+      "name": "Arabia Saudita",
+      "flag": "🇸🇦",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "DZ",
+      "name": "Argelia",
+      "flag": "🇩🇿",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "AR",
+      "name": "Argentina",
+      "flag": "🇦🇷",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "AM",
+      "name": "Armenia",
+      "flag": "🇦🇲",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "AU",
+      "name": "Australia",
+      "flag": "🇦🇺",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "AT",
+      "name": "Austria",
+      "flag": "🇦🇹",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "AZ",
+      "name": "Azerbaiyán",
+      "flag": "🇦🇿",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "BS",
+      "name": "Bahamas",
+      "flag": "🇧🇸",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "BD",
+      "name": "Bangladés",
+      "flag": "🇧🇩",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "BB",
+      "name": "Barbados",
+      "flag": "🇧🇧",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "BH",
+      "name": "Baréin",
+      "flag": "🇧🇭",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "BZ",
+      "name": "Belice",
+      "flag": "🇧🇿",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "BJ",
+      "name": "Benín",
+      "flag": "🇧🇯",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "BY",
+      "name": "Bielorrusia",
+      "flag": "🇧🇾",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "BO",
+      "name": "Bolivia",
+      "flag": "🇧🇴",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "BA",
+      "name": "Bosnia y Herzegovina",
+      "flag": "🇧🇦",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "BW",
+      "name": "Botsuana",
+      "flag": "🇧🇼",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "BR",
+      "name": "Brasil",
+      "flag": "🇧🇷",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "BN",
+      "name": "Brunéi",
+      "flag": "🇧🇳",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "BG",
+      "name": "Bulgaria",
+      "flag": "🇧🇬",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "BF",
+      "name": "Burkina Faso",
+      "flag": "🇧🇫",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "BI",
+      "name": "Burundi",
+      "flag": "🇧🇮",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "BT",
+      "name": "Bután",
+      "flag": "🇧🇹",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "BE",
+      "name": "Bélgica",
+      "flag": "🇧🇪",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "CV",
+      "name": "Cabo Verde",
+      "flag": "🇨🇻",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "KH",
+      "name": "Camboya",
+      "flag": "🇰🇭",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "CM",
+      "name": "Camerún",
+      "flag": "🇨🇲",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "CA",
+      "name": "Canadá",
+      "flag": "🇨🇦",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "QA",
+      "name": "Catar",
+      "flag": "🇶🇦",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "TD",
+      "name": "Chad",
+      "flag": "🇹🇩",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "CL",
+      "name": "Chile",
+      "flag": "🇨🇱",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "CN",
+      "name": "China",
+      "flag": "🇨🇳",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "CY",
+      "name": "Chipre",
+      "flag": "🇨🇾",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "VA",
+      "name": "Ciudad del Vaticano",
+      "flag": "🇻🇦",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "CO",
+      "name": "Colombia",
+      "flag": "🇨🇴",
+      "status": "verified_initial"
+    },
+    {
+      "code": "KM",
+      "name": "Comoras",
+      "flag": "🇰🇲",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "CG",
+      "name": "Congo",
+      "flag": "🇨🇬",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "KP",
+      "name": "Corea del Norte",
+      "flag": "🇰🇵",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "KR",
+      "name": "Corea del Sur",
+      "flag": "🇰🇷",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "CR",
+      "name": "Costa Rica",
+      "flag": "🇨🇷",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "CI",
+      "name": "Costa de Marfil",
+      "flag": "🇨🇮",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "HR",
+      "name": "Croacia",
+      "flag": "🇭🇷",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "CU",
+      "name": "Cuba",
+      "flag": "🇨🇺",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "DK",
+      "name": "Dinamarca",
+      "flag": "🇩🇰",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "DM",
+      "name": "Dominica",
+      "flag": "🇩🇲",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "EC",
+      "name": "Ecuador",
+      "flag": "🇪🇨",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "EG",
+      "name": "Egipto",
+      "flag": "🇪🇬",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "SV",
+      "name": "El Salvador",
+      "flag": "🇸🇻",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "AE",
+      "name": "Emiratos Árabes Unidos",
+      "flag": "🇦🇪",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "ER",
+      "name": "Eritrea",
+      "flag": "🇪🇷",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "SK",
+      "name": "Eslovaquia",
+      "flag": "🇸🇰",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "SI",
+      "name": "Eslovenia",
+      "flag": "🇸🇮",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "ES",
+      "name": "España",
+      "flag": "🇪🇸",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "US",
+      "name": "Estados Unidos",
+      "flag": "🇺🇸",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "EE",
+      "name": "Estonia",
+      "flag": "🇪🇪",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "SZ",
+      "name": "Esuatini",
+      "flag": "🇸🇿",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "ET",
+      "name": "Etiopía",
+      "flag": "🇪🇹",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "PH",
+      "name": "Filipinas",
+      "flag": "🇵🇭",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "FI",
+      "name": "Finlandia",
+      "flag": "🇫🇮",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "FJ",
+      "name": "Fiyi",
+      "flag": "🇫🇯",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "FR",
+      "name": "Francia",
+      "flag": "🇫🇷",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "GA",
+      "name": "Gabón",
+      "flag": "🇬🇦",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "GM",
+      "name": "Gambia",
+      "flag": "🇬🇲",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "GE",
+      "name": "Georgia",
+      "flag": "🇬🇪",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "GH",
+      "name": "Ghana",
+      "flag": "🇬🇭",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "GD",
+      "name": "Granada",
+      "flag": "🇬🇩",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "GR",
+      "name": "Grecia",
+      "flag": "🇬🇷",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "GT",
+      "name": "Guatemala",
+      "flag": "🇬🇹",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "GN",
+      "name": "Guinea",
+      "flag": "🇬🇳",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "GQ",
+      "name": "Guinea Ecuatorial",
+      "flag": "🇬🇶",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "GW",
+      "name": "Guinea-Bisáu",
+      "flag": "🇬🇼",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "GY",
+      "name": "Guyana",
+      "flag": "🇬🇾",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "HT",
+      "name": "Haití",
+      "flag": "🇭🇹",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "HN",
+      "name": "Honduras",
+      "flag": "🇭🇳",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "HU",
+      "name": "Hungría",
+      "flag": "🇭🇺",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "IN",
+      "name": "India",
+      "flag": "🇮🇳",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "ID",
+      "name": "Indonesia",
+      "flag": "🇮🇩",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "IQ",
+      "name": "Irak",
+      "flag": "🇮🇶",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "IE",
+      "name": "Irlanda",
+      "flag": "🇮🇪",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "IR",
+      "name": "Irán",
+      "flag": "🇮🇷",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "IS",
+      "name": "Islandia",
+      "flag": "🇮🇸",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "MH",
+      "name": "Islas Marshall",
+      "flag": "🇲🇭",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "SB",
+      "name": "Islas Salomón",
+      "flag": "🇸🇧",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "IL",
+      "name": "Israel",
+      "flag": "🇮🇱",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "IT",
+      "name": "Italia",
+      "flag": "🇮🇹",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "JM",
+      "name": "Jamaica",
+      "flag": "🇯🇲",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "JP",
+      "name": "Japón",
+      "flag": "🇯🇵",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "JO",
+      "name": "Jordania",
+      "flag": "🇯🇴",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "KZ",
+      "name": "Kazajistán",
+      "flag": "🇰🇿",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "KE",
+      "name": "Kenia",
+      "flag": "🇰🇪",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "KG",
+      "name": "Kirguistán",
+      "flag": "🇰🇬",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "KI",
+      "name": "Kiribati",
+      "flag": "🇰🇮",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "KW",
+      "name": "Kuwait",
+      "flag": "🇰🇼",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "LA",
+      "name": "Laos",
+      "flag": "🇱🇦",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "LS",
+      "name": "Lesoto",
+      "flag": "🇱🇸",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "LV",
+      "name": "Letonia",
+      "flag": "🇱🇻",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "LR",
+      "name": "Liberia",
+      "flag": "🇱🇷",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "LY",
+      "name": "Libia",
+      "flag": "🇱🇾",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "LI",
+      "name": "Liechtenstein",
+      "flag": "🇱🇮",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "LT",
+      "name": "Lituania",
+      "flag": "🇱🇹",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "LU",
+      "name": "Luxemburgo",
+      "flag": "🇱🇺",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "LB",
+      "name": "Líbano",
+      "flag": "🇱🇧",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "MK",
+      "name": "Macedonia del Norte",
+      "flag": "🇲🇰",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "MG",
+      "name": "Madagascar",
+      "flag": "🇲🇬",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "MY",
+      "name": "Malasia",
+      "flag": "🇲🇾",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "MW",
+      "name": "Malaui",
+      "flag": "🇲🇼",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "MV",
+      "name": "Maldivas",
+      "flag": "🇲🇻",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "MT",
+      "name": "Malta",
+      "flag": "🇲🇹",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "ML",
+      "name": "Malí",
+      "flag": "🇲🇱",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "MA",
+      "name": "Marruecos",
+      "flag": "🇲🇦",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "MU",
+      "name": "Mauricio",
+      "flag": "🇲🇺",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "MR",
+      "name": "Mauritania",
+      "flag": "🇲🇷",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "FM",
+      "name": "Micronesia",
+      "flag": "🇫🇲",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "MD",
+      "name": "Moldavia",
+      "flag": "🇲🇩",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "MN",
+      "name": "Mongolia",
+      "flag": "🇲🇳",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "ME",
+      "name": "Montenegro",
+      "flag": "🇲🇪",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "MZ",
+      "name": "Mozambique",
+      "flag": "🇲🇿",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "MM",
+      "name": "Myanmar",
+      "flag": "🇲🇲",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "MX",
+      "name": "México",
+      "flag": "🇲🇽",
+      "status": "verified_initial"
+    },
+    {
+      "code": "MC",
+      "name": "Mónaco",
+      "flag": "🇲🇨",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "NA",
+      "name": "Namibia",
+      "flag": "🇳🇦",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "NR",
+      "name": "Nauru",
+      "flag": "🇳🇷",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "NP",
+      "name": "Nepal",
+      "flag": "🇳🇵",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "NI",
+      "name": "Nicaragua",
+      "flag": "🇳🇮",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "NG",
+      "name": "Nigeria",
+      "flag": "🇳🇬",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "NO",
+      "name": "Noruega",
+      "flag": "🇳🇴",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "NZ",
+      "name": "Nueva Zelanda",
+      "flag": "🇳🇿",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "NE",
+      "name": "Níger",
+      "flag": "🇳🇪",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "OM",
+      "name": "Omán",
+      "flag": "🇴🇲",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "PK",
+      "name": "Pakistán",
+      "flag": "🇵🇰",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "PW",
+      "name": "Palaos",
+      "flag": "🇵🇼",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "PS",
+      "name": "Palestina",
+      "flag": "🇵🇸",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "PA",
+      "name": "Panamá",
+      "flag": "🇵🇦",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "PG",
+      "name": "Papúa Nueva Guinea",
+      "flag": "🇵🇬",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "PY",
+      "name": "Paraguay",
+      "flag": "🇵🇾",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "NL",
+      "name": "Países Bajos",
+      "flag": "🇳🇱",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "PE",
+      "name": "Perú",
+      "flag": "🇵🇪",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "PL",
+      "name": "Polonia",
+      "flag": "🇵🇱",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "PT",
+      "name": "Portugal",
+      "flag": "🇵🇹",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "GB",
+      "name": "Reino Unido",
+      "flag": "🇬🇧",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "CF",
+      "name": "República Centroafricana",
+      "flag": "🇨🇫",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "CZ",
+      "name": "República Checa",
+      "flag": "🇨🇿",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "CD",
+      "name": "República Democrática del Congo",
+      "flag": "🇨🇩",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "DO",
+      "name": "República Dominicana",
+      "flag": "🇩🇴",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "RW",
+      "name": "Ruanda",
+      "flag": "🇷🇼",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "RO",
+      "name": "Rumanía",
+      "flag": "🇷🇴",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "RU",
+      "name": "Rusia",
+      "flag": "🇷🇺",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "WS",
+      "name": "Samoa",
+      "flag": "🇼🇸",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "KN",
+      "name": "San Cristóbal y Nieves",
+      "flag": "🇰🇳",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "SM",
+      "name": "San Marino",
+      "flag": "🇸🇲",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "VC",
+      "name": "San Vicente y las Granadinas",
+      "flag": "🇻🇨",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "LC",
+      "name": "Santa Lucía",
+      "flag": "🇱🇨",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "ST",
+      "name": "Santo Tomé y Príncipe",
+      "flag": "🇸🇹",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "SN",
+      "name": "Senegal",
+      "flag": "🇸🇳",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "RS",
+      "name": "Serbia",
+      "flag": "🇷🇸",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "SC",
+      "name": "Seychelles",
+      "flag": "🇸🇨",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "SL",
+      "name": "Sierra Leona",
+      "flag": "🇸🇱",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "SG",
+      "name": "Singapur",
+      "flag": "🇸🇬",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "SY",
+      "name": "Siria",
+      "flag": "🇸🇾",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "SO",
+      "name": "Somalia",
+      "flag": "🇸🇴",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "LK",
+      "name": "Sri Lanka",
+      "flag": "🇱🇰",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "ZA",
+      "name": "Sudáfrica",
+      "flag": "🇿🇦",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "SD",
+      "name": "Sudán",
+      "flag": "🇸🇩",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "SS",
+      "name": "Sudán del Sur",
+      "flag": "🇸🇸",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "SE",
+      "name": "Suecia",
+      "flag": "🇸🇪",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "CH",
+      "name": "Suiza",
+      "flag": "🇨🇭",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "SR",
+      "name": "Surinam",
+      "flag": "🇸🇷",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "TH",
+      "name": "Tailandia",
+      "flag": "🇹🇭",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "TZ",
+      "name": "Tanzania",
+      "flag": "🇹🇿",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "TJ",
+      "name": "Tayikistán",
+      "flag": "🇹🇯",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "TL",
+      "name": "Timor-Leste",
+      "flag": "🇹🇱",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "TG",
+      "name": "Togo",
+      "flag": "🇹🇬",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "TO",
+      "name": "Tonga",
+      "flag": "🇹🇴",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "TT",
+      "name": "Trinidad y Tobago",
+      "flag": "🇹🇹",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "TM",
+      "name": "Turkmenistán",
+      "flag": "🇹🇲",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "TR",
+      "name": "Turquía",
+      "flag": "🇹🇷",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "TV",
+      "name": "Tuvalu",
+      "flag": "🇹🇻",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "TN",
+      "name": "Túnez",
+      "flag": "🇹🇳",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "UA",
+      "name": "Ucrania",
+      "flag": "🇺🇦",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "UG",
+      "name": "Uganda",
+      "flag": "🇺🇬",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "UY",
+      "name": "Uruguay",
+      "flag": "🇺🇾",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "UZ",
+      "name": "Uzbekistán",
+      "flag": "🇺🇿",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "VU",
+      "name": "Vanuatu",
+      "flag": "🇻🇺",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "VE",
+      "name": "Venezuela",
+      "flag": "🇻🇪",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "VN",
+      "name": "Vietnam",
+      "flag": "🇻🇳",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "YE",
+      "name": "Yemen",
+      "flag": "🇾🇪",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "DJ",
+      "name": "Yibuti",
+      "flag": "🇩🇯",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "ZM",
+      "name": "Zambia",
+      "flag": "🇿🇲",
+      "status": "country_available_data_pending"
+    },
+    {
+      "code": "ZW",
+      "name": "Zimbabue",
+      "flag": "🇿🇼",
+      "status": "country_available_data_pending"
+    }
+  ],
+  "events": {
+    "CO": [
+      {
+        "date": "2026-01-01",
+        "name": "Año Nuevo",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      },
+      {
+        "date": "2026-01-12",
+        "name": "Día de los Reyes Magos",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      },
+      {
+        "date": "2026-03-23",
+        "name": "Día de San José",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      },
+      {
+        "date": "2026-04-02",
+        "name": "Jueves Santo",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      },
+      {
+        "date": "2026-04-03",
+        "name": "Viernes Santo",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      },
+      {
+        "date": "2026-05-01",
+        "name": "Día del Trabajo",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      },
+      {
+        "date": "2026-05-18",
+        "name": "Día de la Ascensión",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      },
+      {
+        "date": "2026-06-08",
+        "name": "Corpus Christi",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      },
+      {
+        "date": "2026-06-15",
+        "name": "Sagrado Corazón",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      },
+      {
+        "date": "2026-06-29",
+        "name": "San Pedro y San Pablo",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      },
+      {
+        "date": "2026-07-13",
+        "name": "Día de Nuestra Señora del Rosario de Chiquinquirá",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      },
+      {
+        "date": "2026-07-20",
+        "name": "Día de la Independencia",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      },
+      {
+        "date": "2026-08-07",
+        "name": "Batalla de Boyacá",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      },
+      {
+        "date": "2026-08-17",
+        "name": "La Asunción de la Virgen",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      },
+      {
+        "date": "2026-10-12",
+        "name": "Día de la Raza",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      },
+      {
+        "date": "2026-11-02",
+        "name": "Todos los Santos",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      },
+      {
+        "date": "2026-11-16",
+        "name": "Independencia de Cartagena",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      },
+      {
+        "date": "2026-12-08",
+        "name": "Día de la Inmaculada Concepción",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      },
+      {
+        "date": "2026-12-25",
+        "name": "Día de Navidad",
+        "type": "festivo",
+        "source": "https://sedeelectronica.minhacienda.gov.co/SedeElectronica/info/inicio.do?formAction=btDiasInhabiles&target=print"
+      }
+    ],
+    "MX": [
+      {
+        "date": "2026-01-01",
+        "name": "Año Nuevo",
+        "type": "descanso_obligatorio",
+        "source": "https://www.gob.mx/profedet/articulos/sabes-cuales-son-los-dias-de-descanso-obligatorio-para-este-2026?idiom=es"
+      },
+      {
+        "date": "2026-02-02",
+        "name": "Conmemoración de la Constitución de 1917",
+        "type": "descanso_obligatorio",
+        "source": "https://www.gob.mx/profedet/articulos/cuanto-te-deben-pagar-si-trabajas-el-lunes-2-de-febrero-de-2026"
+      },
+      {
+        "date": "2026-03-16",
+        "name": "Conmemoración del natalicio de Benito Juárez",
+        "type": "descanso_obligatorio",
+        "source": "https://www.gob.mx/profedet/articulos/sabes-cuales-son-los-dias-de-descanso-obligatorio-para-este-2026?idiom=es"
+      },
+      {
+        "date": "2026-05-01",
+        "name": "Día del Trabajo",
+        "type": "descanso_obligatorio",
+        "source": "https://www.gob.mx/profedet/articulos/el-viernes-1-de-mayo-de-2026-es-dia-de-descanso-obligatorio"
+      },
+      {
+        "date": "2026-09-16",
+        "name": "Independencia de México",
+        "type": "descanso_obligatorio",
+        "source": "https://www.gob.mx/profedet/articulos/sabes-cuales-son-los-dias-de-descanso-obligatorio-para-este-2026?idiom=es"
+      },
+      {
+        "date": "2026-11-16",
+        "name": "Conmemoración de la Revolución Mexicana",
+        "type": "descanso_obligatorio",
+        "source": "https://www.gob.mx/profedet/articulos/sabes-cuales-son-los-dias-de-descanso-obligatorio-para-este-2026?idiom=es"
+      },
+      {
+        "date": "2026-12-25",
+        "name": "Navidad",
+        "type": "descanso_obligatorio",
+        "source": "https://www.gob.mx/profedet/articulos/sabes-cuales-son-los-dias-de-descanso-obligatorio-para-este-2026?idiom=es"
+      }
+    ]
+  }
+}
