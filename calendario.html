@@ -4,131 +4,349 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Calendario legal | Término Legal</title>
-<meta name="description" content="Consulta el calendario legal por país, festivos y fechas relevantes para el cómputo de términos.">
+<meta name="description" content="Calendario legal por país con festivos y fechas relevantes para Término Legal.">
 <style>
-:root{--ink:#17202b;--muted:#667085;--line:#e5e7eb;--bg:#f7f8fa;--card:#fff;--accent:#111827}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-a{color:inherit}.wrap{width:min(1080px,calc(100% - 28px));margin:auto}
-header{padding:22px 0 8px}.brand{font-weight:800;text-decoration:none;font-size:20px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px}
-main{padding:20px 0 60px}.hero{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:0 8px 30px rgba(16,24,40,.05)}
-.kicker{font-size:13px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
-h1{margin:7px 0 6px;font-size:clamp(30px,5vw,48px);letter-spacing:-.04em}.intro{color:var(--muted);max-width:760px;line-height:1.6}
-.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.controls select,.btn{border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 13px;font:inherit}.btn{text-decoration:none;cursor:pointer}
-.summary{display:flex;justify-content:space-between;gap:16px;align-items:center;margin:24px 0 12px}.summary strong{font-size:18px}.notice{font-size:13px;color:var(--muted);background:#f9fafb;border:1px solid var(--line);padding:12px 14px;border-radius:14px}
-.month{background:#fff;border:1px solid var(--line);border-radius:18px;margin:10px 0;overflow:hidden}.month summary{list-style:none;cursor:pointer;padding:17px 18px;display:flex;align-items:center;justify-content:space-between;gap:15px}.month summary::-webkit-details-marker{display:none}.month-title{font-weight:750}.month-meta{font-size:13px;color:var(--muted)}.month-body{padding:0 18px 18px;border-top:1px solid var(--line)}
-.week{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:14px}.weekday{text-align:center;font-size:11px;color:var(--muted);font-weight:700;padding:5px}.day{min-height:42px;border:1px solid #eef0f2;border-radius:9px;background:#fff;text-align:center;padding:9px 3px;font-size:13px;cursor:default}.day.weekend{background:#fafafa;color:#8a9099}.day.today{outline:2px solid #111827;outline-offset:-2px}.day.event{font-weight:800;background:#f1f3f5}.events{margin-top:15px;display:grid;gap:8px}.event{display:flex;gap:12px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:12px}.event-date{font-weight:800;min-width:82px}.event small{display:block;color:var(--muted);margin-top:2px}.event a{font-size:12px}.cta{margin-top:22px;padding:18px;border-radius:18px;background:#111827;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:15px}.cta a{background:#fff;color:#111827;text-decoration:none;border-radius:10px;padding:10px 13px;font-weight:700;white-space:nowrap}
-footer{color:var(--muted);font-size:12px;padding:20px 0}.empty{padding:25px;border:1px dashed var(--line);border-radius:14px;color:var(--muted);line-height:1.5}
-@media(max-width:620px){.hero{padding:20px}.summary{align-items:flex-start;flex-direction:column}.day{min-height:36px;padding:8px 1px;font-size:12px}.month summary{padding:15px}.cta{align-items:flex-start;flex-direction:column}}
+:root{
+  --bg:#f7f8fa;--surface:#fff;--surface-2:#f5f6f8;--ink:#132238;--muted:#667085;
+  --line:#e4e7ec;--gold:#b88a32;--blue:#12385f;--weekend:#eef0f3;--today:#dce7f2;
+  --event:#f7f1e5;--event-border:#d9c18e;--shadow:0 10px 30px rgba(16,24,40,.05)
+}
+html[data-theme="dark"]{
+  --bg:#0d1117;--surface:#151b23;--surface-2:#1b222c;--ink:#edf2f7;--muted:#9aa6b2;
+  --line:#293340;--gold:#d0a451;--blue:#9fc1df;--weekend:#202731;--today:#26394c;
+  --event:#2b261b;--event-border:#66552e;--shadow:0 12px 32px rgba(0,0,0,.25)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,select{font:inherit}
+a{color:inherit}
+.wrap{width:min(1080px,calc(100% - 34px));margin:auto}
+header{padding:28px 0 4px}
+.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px}
+.back{justify-self:start;text-decoration:none;color:var(--muted);font-size:12px}
+.brand{justify-self:center;text-decoration:none;font-weight:800;letter-spacing:.22em;font-size:17px;color:var(--ink)}
+.brand span{color:var(--gold)}
+.actions{justify-self:end;display:flex;align-items:center;gap:8px}
+.country-wrap{position:relative}
+.country{
+  min-width:170px;border:0;background:transparent;color:var(--ink);padding:8px 24px 8px 8px;
+  appearance:auto;outline:none;cursor:pointer
+}
+.icon-btn{
+  width:36px;height:36px;border:1px solid var(--line);border-radius:10px;background:var(--surface);
+  color:var(--ink);cursor:pointer;box-shadow:var(--shadow)
+}
+main{padding:20px 0 55px}
+.hero{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:18px}
+.kicker{font-size:11px;color:var(--gold);font-weight:800;text-transform:uppercase;letter-spacing:.13em}
+h1{margin:6px 0 3px;font-family:Georgia,"Times New Roman",serif;font-size:clamp(29px,4vw,40px);font-weight:700;letter-spacing:-.025em}
+.intro{color:var(--muted);font-size:12px;line-height:1.55;max-width:690px}
+.year-nav{display:flex;align-items:center;gap:18px;white-space:nowrap}
+.year-nav button{border:0;background:transparent;color:var(--ink);cursor:pointer;font-size:18px;padding:6px}
+.year-nav strong{font-size:13px;min-width:42px;text-align:center}
+.status{font-size:11px;color:var(--muted);margin:4px 0 16px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:13px;font-size:11px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;border:1px solid var(--line);background:var(--surface)}
+.dot.week{background:var(--weekend)}
+.dot.event{background:var(--event);border-color:var(--event-border)}
+.dot.today{background:var(--today);border-color:var(--blue)}
+.month-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.month{
+  background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:12px 11px 10px;
+  box-shadow:var(--shadow);min-width:0
+}
+.month-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+.month-title{font-family:Georgia,"Times New Roman",serif;font-size:15px;font-weight:700}
+.month-meta{font-size:9px;color:var(--muted);text-align:right}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.weekday{text-align:center;font-size:8px;color:var(--muted);font-weight:700;padding:2px 0 4px}
+.day{
+  min-height:35px;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--ink);
+  display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;position:relative;
+  transition:background .12s,border-color .12s,transform .12s
+}
+.day:hover{background:var(--surface-2);border-color:var(--line)}
+.day.blank{cursor:default}
+.day.weekend{background:var(--weekend);color:var(--muted)}
+.day.event{background:var(--event);border-color:var(--event-border);font-weight:800}
+.day.today{box-shadow:inset 0 0 0 1.5px var(--blue)}
+.day.selected{outline:2px solid var(--gold);outline-offset:-2px}
+.day.event::after{content:"";position:absolute;width:3px;height:3px;border-radius:50%;background:var(--gold);right:4px;top:4px}
+.info{
+  margin-top:15px;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:15px;
+  display:none;box-shadow:var(--shadow)
+}
+.info.show{display:block}
+.info-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.info-date{font-family:Georgia,"Times New Roman",serif;font-size:18px;font-weight:700}
+.info-kind{font-size:10px;color:var(--muted);margin-top:3px}
+.info-close{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:18px}
+.info-text{margin-top:11px;font-size:12px;line-height:1.55}
+.info-source{margin-top:10px;font-size:11px;color:var(--muted)}
+.info-source a{color:var(--blue);text-underline-offset:2px}
+.empty{padding:16px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-size:12px;line-height:1.55}
+.cta{
+  margin-top:18px;padding:15px 17px;border:1px solid var(--line);border-radius:13px;background:var(--surface);
+  display:flex;justify-content:space-between;align-items:center;gap:15px
+}
+.cta strong{font-size:12px}.cta span{font-size:11px;color:var(--muted)}
+.cta a{font-size:11px;text-decoration:none;background:var(--blue);color:#fff;border-radius:8px;padding:9px 12px;white-space:nowrap}
+footer{padding:18px 0 0;color:var(--muted);font-size:10px;line-height:1.5;text-align:center}
+@media(max-width:850px){.month-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.top{grid-template-columns:1fr auto}.brand{grid-column:1/-1;grid-row:1}.back{grid-row:2}.actions{grid-row:2}.hero{align-items:flex-start;flex-direction:column}.year-nav{align-self:flex-end}}
+@media(max-width:560px){
+  .wrap{width:min(100% - 22px,1080px)}header{padding-top:20px}
+  .top{gap:8px}.brand{font-size:15px}.country{min-width:135px;font-size:11px}
+  .month-grid{grid-template-columns:1fr}.month{padding:12px}.day{min-height:38px;font-size:11px}
+  .cta{align-items:flex-start;flex-direction:column}.cta a{align-self:stretch;text-align:center}
+}
 </style>
 </head>
 <body>
-<header><div class="wrap top"><a class="brand" href="/">Término Legal</a><a class="btn" href="/plazos.html">Calcular un término</a></div></header>
+<header>
+  <div class="wrap top">
+    <a class="back" href="/plazos.html">‹ Calcular término</a>
+    <a class="brand" href="/">TÉRMINO <span>LEGAL</span></a>
+    <div class="actions">
+      <div class="country-wrap">
+        <select id="country" class="country" aria-label="Seleccionar país"></select>
+      </div>
+      <button id="theme" class="icon-btn" type="button" aria-label="Cambiar modo de color" title="Cambiar modo de color">◐</button>
+    </div>
+  </div>
+</header>
+
 <main class="wrap">
-<section class="hero">
-<div class="kicker">Calendario legal</div>
-<h1 id="title">Calendario legal</h1>
-<div class="intro" id="intro">Consulta fechas relevantes para el cómputo de términos y conecta cada fecha con el calculador.</div>
-<div class="controls">
-<label>
-<select id="country" aria-label="País"></select>
-</label>
-<a class="btn" id="calc" href="/plazos.html">Calcular un término</a>
-</div>
-</section>
+  <section class="hero">
+    <div>
+      <div class="kicker">Calendario anual</div>
+      <h1 id="title">Colombia · 2026</h1>
+      <div id="intro" class="intro">Consulta las fechas registradas para el calendario de referencia.</div>
+    </div>
+    <div class="year-nav" aria-label="Navegación de año">
+      <button id="prevYear" type="button" aria-label="Año anterior">‹</button>
+      <strong id="year">2026</strong>
+      <button id="nextYear" type="button" aria-label="Año siguiente">›</button>
+    </div>
+  </section>
 
-<div class="summary">
-<strong id="yearTitle">Calendario 2026</strong>
-<span class="notice" id="dataStatus"></span>
-</div>
-<div id="months"></div>
+  <div id="status" class="status"></div>
 
-<section class="cta">
-<div><strong>¿Necesitas calcular un término?</strong><br><span style="opacity:.75">Lleva una fecha del calendario al calculador de Término Legal.</span></div>
-<a href="/plazos.html">Abrir calculador</a>
-</section>
-<footer>Herramienta de referencia. Las fechas y reglas especiales deben contrastarse con la fuente oficial aplicable al caso concreto.</footer>
+  <div class="legend" aria-label="Leyenda">
+    <span><i class="dot event"></i> Fecha registrada</span>
+    <span><i class="dot week"></i> Fin de semana</span>
+    <span><i class="dot today"></i> Hoy</span>
+  </div>
+
+  <section id="months" class="month-grid" aria-label="Calendario anual"></section>
+
+  <section id="dateInfo" class="info" aria-live="polite">
+    <div class="info-top">
+      <div>
+        <div id="infoDate" class="info-date"></div>
+        <div id="infoKind" class="info-kind"></div>
+      </div>
+      <button id="closeInfo" class="info-close" type="button" aria-label="Cerrar">×</button>
+    </div>
+    <div id="infoText" class="info-text"></div>
+    <div id="infoSource" class="info-source"></div>
+  </section>
+
+  <section class="cta">
+    <div>
+      <strong>¿Necesitas calcular un término?</strong><br>
+      <span>Cuando quieras, una fecha del calendario podrá conectarse con el calculador de Término Legal.</span>
+    </div>
+    <a href="/plazos.html">Abrir calculador</a>
+  </section>
+
+  <footer>
+    Herramienta de referencia. Las fechas y reglas especiales deben contrastarse con la fuente oficial aplicable al caso concreto.
+  </footer>
 </main>
 
 <script>
 const DATA_URL="/calendarios/calendarios.json";
 const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-const DAYS=["Lu","Ma","Mi","Ju","Vi","Sá","Do"];
+const DAYS=["lu","ma","mi","ju","vi","sá","do"];
+const DAY_NAMES=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
 let DATA=null;
+let currentYear=new Date().getFullYear();
+let selectedDate=null;
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-
-function countryFromPath(){
+function pad(n){return String(n).padStart(2,"0")}
+function iso(y,m,d){return `${y}-${pad(m+1)}-${pad(d)}`}
+function pathCountry(){
   const m=location.pathname.match(/^\/calendario\/([a-z]{2})\/?$/i);
   return m?m[1].toUpperCase():"CO";
 }
-function isoDate(y,m,d){return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`}
-function formatDate(s){
-  return new Intl.DateTimeFormat("es-CO",{day:"numeric",month:"long",year:"numeric"}).format(new Date(s+"T12:00:00"));
+function dateObj(key){return new Date(key+"T12:00:00")}
+function dateLabel(key){
+  return new Intl.DateTimeFormat("es-CO",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(dateObj(key));
 }
 function eventsFor(code,year){
-  return (DATA.events[code]||[]).filter(e=>e.date.startsWith(String(year)+"-"));
+  return (DATA.events?.[code]||[]).filter(e=>String(e.date).startsWith(String(year)+"-"));
+}
+function eventMap(events){
+  return new Map(events.map(e=>[e.date,e]));
+}
+function countryByCode(code){
+  return DATA.countries.find(c=>c.code===code)||DATA.countries[0];
+}
+function applyTheme(theme){
+  document.documentElement.dataset.theme=theme;
+  localStorage.setItem("tl_calendar_theme",theme);
+}
+function initTheme(){
+  const saved=localStorage.getItem("tl_calendar_theme");
+  const theme=saved||((window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light");
+  applyTheme(theme);
+}
+function setUrlCountry(code){
+  history.pushState({},"",`/calendario/${code.toLowerCase()}`);
 }
 function render(){
   const code=$("#country").value;
-  const country=DATA.countries.find(c=>c.code===code)||DATA.countries[0];
-  const year=new Date().getFullYear();
-  const ev=eventsFor(code,year);
-  const map=new Map(ev.map(e=>[e.date,e]));
-  $("#title").textContent=`Calendario legal de ${country.name}`;
-  $("#yearTitle").textContent=`Calendario ${year}`;
-  document.title=`Calendario legal de ${country.name} ${year} | Término Legal`;
-  $("#intro").textContent=`Consulta el calendario legal de ${country.name} ${year}, fechas relevantes y días identificados para el cómputo de términos.`;
-  $("#dataStatus").textContent=ev.length
-    ? `${ev.length} fecha${ev.length===1?"":"s"} registrada${ev.length===1?"":"s"}`
-    : "Calendario específico pendiente de validación";
-  $("#calc").href=`/plazos.html?pais=${code.toLowerCase()}`;
+  const country=countryByCode(code);
+  const events=eventsFor(code,currentYear);
+  const map=eventMap(events);
+  const today=iso(new Date().getFullYear(),new Date().getMonth(),new Date().getDate());
 
-  const root=$("#months"); root.innerHTML="";
+  $("#title").textContent=`${country.name} · ${currentYear}`;
+  $("#year").textContent=currentYear;
+  document.title=`Calendario legal ${country.name} ${currentYear} | Término Legal`;
+  $("#intro").textContent=events.length
+    ? `Festivos y fechas registradas para ${country.name}. Consulta cada fecha para ver su información y fuente.`
+    : `Calendario de ${country.name}. Las fechas específicas de este año aún están pendientes de validación.`;
+  $("#status").textContent=events.length
+    ? `${events.length} fecha${events.length===1?"":"s"} registrada${events.length===1?"":"s"} · Los fines de semana se muestran como referencia.`
+    : "No hay fechas específicas verificadas cargadas para este año. Los fines de semana se muestran como referencia.";
+
+  const root=$("#months");
+  root.innerHTML="";
   for(let m=0;m<12;m++){
-    const first=new Date(year,m,1), total=new Date(year,m+1,0).getDate();
+    const first=new Date(currentYear,m,1);
+    const total=new Date(currentYear,m+1,0).getDate();
     const offset=(first.getDay()+6)%7;
-    const monthEvents=ev.filter(e=>Number(e.date.slice(5,7))===m+1);
-    const details=document.createElement("details");
-    details.className="month";
-    if(m===new Date().getMonth()) details.open=true;
+    const monthEvents=events.filter(e=>Number(e.date.slice(5,7))===m+1);
+    const workdays=Array.from({length:total},(_,i)=>new Date(currentYear,m,i+1))
+      .filter(d=>d.getDay()!==0&&d.getDay()!==6).length;
 
-    let days="";
-    for(let i=0;i<offset;i++) days+=`<span></span>`;
+    let cells="";
+    for(let i=0;i<offset;i++) cells+=`<span class="day blank" aria-hidden="true"></span>`;
     for(let d=1;d<=total;d++){
-      const date=new Date(year,m,d), key=isoDate(year,m,d), weekend=date.getDay()===0||date.getDay()===6;
-      const event=map.get(key), today=key===isoDate(new Date().getFullYear(),new Date().getMonth(),new Date().getDate());
-      days+=`<span class="day ${weekend?"weekend ":""}${event?"event ":""}${today?"today":""}" title="${event?esc(event.name):""}">${d}</span>`;
+      const key=iso(currentYear,m,d);
+      const dt=new Date(currentYear,m,d);
+      const ev=map.get(key);
+      const weekend=dt.getDay()===0||dt.getDay()===6;
+      const isToday=key===today;
+      const isSelected=key===selectedDate;
+      cells+=`<button type="button" class="day ${weekend?"weekend ":""}${ev?"event ":""}${isToday?"today ":""}${isSelected?"selected":""}"
+        data-date="${key}" aria-label="${dateLabel(key)}${ev?" — "+esc(ev.name):""}" title="${ev?esc(ev.name):"Seleccionar fecha"}">${d}</button>`;
     }
 
-    const list=monthEvents.length
-      ? `<div class="events">${monthEvents.map(e=>`<div class="event"><div class="event-date">${formatDate(e.date)}</div><div><strong>${esc(e.name)}</strong><small>${esc(e.type.replaceAll("_"," "))}</small><a href="${esc(e.source)}" target="_blank" rel="noopener">Fuente oficial</a></div></div>`).join("")}</div>`
-      : `<div class="empty">${ev.length?"No hay fechas registradas en este mes.":"Aún no se han incorporado fechas específicas verificadas para este país. Los fines de semana se muestran solo como referencia visual."}</div>`;
+    const card=document.createElement("article");
+    card.className="month";
+    card.innerHTML=`
+      <div class="month-head">
+        <div class="month-title">${MONTHS[m]}</div>
+        <div class="month-meta">${workdays} días hábiles · ${monthEvents.length?monthEvents.length+" fecha"+(monthEvents.length===1?"":"s"):"sin fechas"}</div>
+      </div>
+      <div class="week">
+        ${DAYS.map(d=>`<span class="weekday">${d}</span>`).join("")}
+        ${cells}
+      </div>`;
+    root.appendChild(card);
+  }
 
-    details.innerHTML=`<summary><span class="month-title">${MONTHS[m]}</span><span class="month-meta">${monthEvents.length?monthEvents.length+" fecha"+(monthEvents.length===1?"":"s"):"Sin fechas registradas"} · ${m===new Date().getMonth()?"mes actual":""}</span></summary>
-    <div class="month-body"><div class="week">${DAYS.map(d=>`<span class="weekday">${d}</span>`).join("")}${days}</div>${list}</div>`;
-    root.appendChild(details);
+  root.querySelectorAll("[data-date]").forEach(btn=>{
+    btn.addEventListener("click",()=>showDate(btn.dataset.date));
+  });
+
+  if(selectedDate && !selectedDate.startsWith(String(currentYear)+"-")){
+    selectedDate=null;
+    $("#dateInfo").classList.remove("show");
   }
 }
-async function init(){
-  DATA=await fetch(DATA_URL,{cache:"no-store"}).then(r=>r.json());
+function showDate(key){
+  selectedDate=key;
+  const code=$("#country").value;
+  const events=eventsFor(code,currentYear);
+  const ev=events.find(e=>e.date===key);
+  const dt=dateObj(key);
+  const weekend=dt.getDay()===0||dt.getDay()===6;
+
+  $("#infoDate").textContent=dateLabel(key);
+  $("#infoKind").textContent=ev
+    ? (ev.type||"Fecha registrada").replaceAll("_"," ")
+    : (weekend?"Fin de semana":"Día sin fecha registrada");
+
+  $("#infoText").textContent=ev
+    ? ev.name
+    : (weekend
+      ? "La fecha corresponde a sábado o domingo. Se muestra como referencia visual; su efecto jurídico depende de la regla aplicable."
+      : "No hay una fecha especial registrada para este día en la base de datos actual.");
+
+  $("#infoSource").innerHTML=ev?.source
+    ? `Fuente: <a href="${esc(ev.source)}" target="_blank" rel="noopener noreferrer">consultar fuente oficial</a>`
+    : "";
+
+  $("#dateInfo").classList.add("show");
+  renderSelectionOnly();
+  $("#dateInfo").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function renderSelectionOnly(){
+  document.querySelectorAll(".day.selected").forEach(x=>x.classList.remove("selected"));
+  if(!selectedDate)return;
+  const btn=document.querySelector(`[data-date="${selectedDate}"]`);
+  if(btn)btn.classList.add("selected");
+}
+function populateCountries(){
   const select=$("#country");
-  select.innerHTML=DATA.countries.map(c=>`<option value="${c.code}">${c.flag} ${esc(c.name)}</option>`).join("");
-  const wanted=countryFromPath();
+  const wanted=pathCountry();
+  select.innerHTML=DATA.countries
+    .slice()
+    .sort((a,b)=>a.name.localeCompare(b.name,"es"))
+    .map(c=>`<option value="${esc(c.code)}">${esc(c.flag||"")} ${esc(c.name)}</option>`)
+    .join("");
   select.value=DATA.countries.some(c=>c.code===wanted)?wanted:"CO";
-  select.addEventListener("change",()=>{
-    const c=select.value.toLowerCase();
-    history.pushState({}, "", `/calendario/${c}`);
+}
+async function init(){
+  initTheme();
+  $("#theme").addEventListener("click",()=>{
+    applyTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");
+  });
+  $("#prevYear").addEventListener("click",()=>{currentYear--;selectedDate=null;$("#dateInfo").classList.remove("show");render();});
+  $("#nextYear").addEventListener("click",()=>{currentYear++;selectedDate=null;$("#dateInfo").classList.remove("show");render();});
+  $("#closeInfo").addEventListener("click",()=>{$("#dateInfo").classList.remove("show");selectedDate=null;renderSelectionOnly();});
+
+  DATA=await fetch(DATA_URL,{cache:"no-store"}).then(r=>{
+    if(!r.ok) throw new Error("No se pudo cargar calendarios.json");
+    return r.json();
+  });
+  populateCountries();
+  $("#country").addEventListener("change",()=>{
+    selectedDate=null;
+    $("#dateInfo").classList.remove("show");
+    setUrlCountry($("#country").value);
     render();
   });
   window.addEventListener("popstate",()=>{
-    select.value=countryFromPath();
+    const c=pathCountry();
+    $("#country").value=DATA.countries.some(x=>x.code===c)?c:"CO";
+    selectedDate=null;
+    $("#dateInfo").classList.remove("show");
     render();
   });
   render();
 }
-init().catch(()=>{
-  $("#months").innerHTML=`<div class="empty">No fue posible cargar los datos del calendario.</div>`;
+init().catch(err=>{
+  console.error(err);
+  $("#status").textContent="No fue posible cargar los datos del calendario.";
+  $("#months").innerHTML=`<div class="empty">Revisa que el archivo <strong>/calendarios/calendarios.json</strong> exista en el repositorio y que su ruta coincida con la configuración del calendario.</div>`;
 });
 </script>
 </body>
