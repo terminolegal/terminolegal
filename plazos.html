@@ -2482,20 +2482,6 @@ body.dark .usage-guide-panel{
 
       </div>
 
-      <a id="annualCalendarLink"
-         class="calendar-external-link"
-         href="/calendario/co"
-         aria-label="Abrir calendario legal anual"
-         title="Calendario legal anual">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="3" y="4" width="18" height="17" rx="3"></rect>
-          <line x1="8" y1="2" x2="8" y2="6"></line>
-          <line x1="16" y1="2" x2="16" y2="6"></line>
-          <line x1="3" y1="9" x2="21" y2="9"></line>
-        </svg>
-        <span>Calendario anual</span>
-      </a>
-
     </div>
 
     <div class="date-input-wrap">
@@ -6831,11 +6817,6 @@ const countryFlagDisplay=
     "countryFlagDisplay"
   );
 
-const annualCalendarLink=
-  document.getElementById(
-    "annualCalendarLink"
-  );
-
 const countryInline=
   document.getElementById(
     "countryInline"
@@ -6884,31 +6865,6 @@ function populateCountrySelect(){
 }
 
 
-function updateAnnualCalendarLink(){
-
-  if(!annualCalendarLink)
-    return;
-
-  const code=
-    String(currentCountry||DEFAULT_COUNTRY).toLowerCase();
-
-  annualCalendarLink.href=
-    `/calendario/${code}`;
-
-  const info=
-    COUNTRIES[currentCountry]||COUNTRIES[DEFAULT_COUNTRY];
-
-  annualCalendarLink.setAttribute(
-    "aria-label",
-    `Abrir calendario legal anual de ${info.name}`
-  );
-
-  annualCalendarLink.title=
-    `Calendario legal anual de ${info.name}`;
-
-}
-
-
 function applyCountryUI(){
 
   const info=
@@ -6920,7 +6876,6 @@ function applyCountryUI(){
   countryInline.title=
     `${info.name} — ${info.note} Haz clic para cambiar de jurisdicción.`;
 
-  updateAnnualCalendarLink();
 
   /* Términos frecuentes es una sección transversal de la plataforma.
      Colombia conserva su catálogo inicial y las demás jurisdicciones
@@ -6939,6 +6894,94 @@ function applyCountryUI(){
   updateGxWidgetVisibility();
 
 }
+
+
+function setCountry(code,persist){
+
+  if(!COUNTRIES[code])
+    code=DEFAULT_COUNTRY;
+
+  currentCountry=code;
+
+  const currentCatalogTerms=
+    buildCountryFrequentCatalog(code)
+      .flatMap(category=>category.terms||[])
+      .map(term=>term.name);
+
+  if(
+    selectedLegalTerm &&
+    !currentCatalogTerms.includes(selectedLegalTerm)
+  ){
+    clearLegalTerm();
+  }
+
+  countrySelect.value=code;
+
+  if(persist){
+    try{
+      localStorage.setItem(
+        COUNTRY_STORAGE_KEY,
+        code
+      );
+    }catch{}
+  }
+
+  applyCountryUI();
+
+  syncUnitAvailability();
+
+  if(getSelectedUnit()==="hours")
+    applyDefaultHourPreset(true);
+
+  if(!calendarPicker.hidden)
+    renderCalendar();
+
+}
+
+
+function initCountry(){
+
+  populateCountrySelect();
+
+  let saved=null;
+
+  try{
+    saved=localStorage.getItem(
+      COUNTRY_STORAGE_KEY
+    );
+  }catch{}
+
+  const detected=detectCountry();
+
+  const initial=
+    saved&&COUNTRIES[saved]
+      ?saved
+      :(COUNTRIES[detected]
+        ?detected
+        :DEFAULT_COUNTRY);
+
+  setCountry(
+    initial,
+    false
+  );
+
+}
+
+
+countrySelect.addEventListener(
+  "change",
+  ()=>{
+    setCountry(
+      countrySelect.value,
+      true
+    );
+
+    resetResultView();
+  }
+);
+
+
+initCountry();
 
 
 /* =========================================================
