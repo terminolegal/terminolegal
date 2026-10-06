@@ -86,12 +86,15 @@ html[data-theme="dark"]{
 .a11y-small{font-weight:700;font-size:.72rem;line-height:1}
 
 *{box-sizing:border-box}
-html{scroll-behavior:smooth;font-size:100%}
+html{scroll-behavior:smooth;font-size:100%;--text-scale:1}
 .a11y-bar{position:fixed;top:50%;right:0;transform:translateY(-50%);display:flex;flex-direction:column;background:var(--blue);border-radius:10px 0 0 10px;box-shadow:0 8px 24px var(--shadow);overflow:hidden;z-index:1000}
 .a11y-btn{width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,.18);color:#fff;cursor:pointer;padding:0}
 .a11y-btn:last-child{border-bottom:0}.a11y-btn:hover,.a11y-btn[aria-pressed="true"]{background:var(--gold)}
 .a11y-btn svg{width:19px;height:19px}.a11y-big{font-weight:700;font-size:1.05rem;line-height:1}.a11y-small{font-weight:700;font-size:.72rem;line-height:1}
 @media(max-width:560px){.a11y-btn{width:40px;height:40px}.a11y-btn svg{width:18px;height:18px}}
+body.text-scale-active *{
+  /* La escala se aplica a la tipografía, no al tamaño físico de los controles. */
+}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 button,select{font:inherit}
 a{color:inherit}
@@ -169,13 +172,6 @@ footer{padding:18px 0 0;color:var(--muted);font-size:10px;line-height:1.5;text-a
 </head>
 <body>
 
-<div class="a11y-bar" role="toolbar" aria-label="Accesibilidad">
-  <button type="button" id="contrastBtn" class="a11y-btn" aria-pressed="false" title="Contraste" aria-label="Cambiar modo de color">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 3a9 9 0 000 18z" fill="currentColor" stroke="none"></path></svg>
-  </button>
-  <button type="button" id="increaseTextBtn" class="a11y-btn" title="Aumentar letra" aria-label="Aumentar letra"><span class="a11y-big">A</span></button>
-  <button type="button" id="decreaseTextBtn" class="a11y-btn" title="Reducir letra" aria-label="Reducir letra"><span class="a11y-small">A</span></button>
-</div>
 <div class="a11y-bar" role="toolbar" aria-label="Accesibilidad">
   <button type="button" id="contrastBtn" class="a11y-btn" aria-pressed="false" title="Contraste" aria-label="Contraste">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -530,6 +526,7 @@ function render(){
     selectedDate=null;
     $("#dateInfo").classList.remove("show");
   }
+  if(textScaleStep!==0) applyTextScale();
 }
 function showDate(key){
   selectedDate=key;
@@ -611,6 +608,7 @@ function populateCountries(){
 }
 async function init(){
   initTheme();
+  applyTextScale();
   contrastBtn.setAttribute("aria-pressed",String(document.documentElement.dataset.theme==="dark"));
   $("#prevYear").addEventListener("click",()=>{currentYear--;selectedDate=null;$("#dateInfo").classList.remove("show");render();});
   $("#nextYear").addEventListener("click",()=>{currentYear++;selectedDate=null;$("#dateInfo").classList.remove("show");render();});
@@ -649,7 +647,21 @@ const increaseTextBtn=document.getElementById("increaseTextBtn");
 let textScaleStep=0;
 const MIN_STEP=-2;
 const MAX_STEP=3;
-function applyTextScale(){document.documentElement.style.fontSize=(100+textScaleStep*8)+"%";}
+function applyTextScale(){
+  const scale=1+(textScaleStep*0.08);
+  document.documentElement.style.setProperty("--text-scale",String(scale));
+  document.body.classList.add("text-scale-active");
+
+  document.querySelectorAll("body *").forEach(el=>{
+    if(el.classList.contains("a11y-bar") || el.closest(".a11y-bar")) return;
+    if(!el.dataset.tlBaseFont) {
+      const px=parseFloat(getComputedStyle(el).fontSize);
+      if(Number.isFinite(px)) el.dataset.tlBaseFont=String(px);
+    }
+    const base=parseFloat(el.dataset.tlBaseFont);
+    if(Number.isFinite(base)) el.style.fontSize=(base*scale)+"px";
+  });
+}
 contrastBtn.addEventListener("click",()=>{
   const isDark=document.documentElement.dataset.theme!=="dark";
   applyTheme(isDark?"dark":"light");
