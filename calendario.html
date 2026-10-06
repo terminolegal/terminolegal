@@ -3,9 +3,37 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Calendario legal | T&#233;rmino Legal</title>
-<meta name="description" content="Calendario legal por pa&#237;s con festivos y fechas relevantes para T&#233;rmino Legal.">
+<title>Calendario legal | Término Legal</title>
+<meta name="description" content="Calendario legal por país con festivos y fechas relevantes para Término Legal.">
 <style>
+.country-wrap{position:relative}
+.country-button{min-width:175px;height:36px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);padding:0 10px;display:flex;align-items:center;gap:8px;cursor:pointer;box-shadow:var(--shadow);font-size:12px;font-weight:600}
+.country-button:hover{border-color:var(--gold)}
+.country-chevron{margin-left:auto;color:var(--muted)}
+.country-menu{position:absolute;right:0;top:43px;width:300px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 45px rgba(0,0,0,.18);padding:8px;display:none;z-index:50}
+.country-menu.open{display:block}
+.country-search{width:100%;height:36px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2);color:var(--ink);padding:0 10px;outline:none;font-size:12px;margin-bottom:7px}
+.country-search:focus{border-color:var(--gold)}
+.country-list{max-height:330px;overflow:auto}
+.country-option{width:100%;display:flex;align-items:center;gap:9px;border:0;background:transparent;color:var(--ink);border-radius:8px;padding:9px 10px;text-align:left;cursor:pointer;font-size:11px}
+.country-option:hover,.country-option.active{background:var(--surface-2)}
+.country-option .flag{width:20px;text-align:center;font-size:15px}
+.country-option .check{margin-left:auto;color:var(--gold);font-weight:800}
+.country-empty{padding:14px 10px;color:var(--muted);font-size:11px}
+.year-nav{position:relative}
+.year-button{border:0;background:transparent;color:var(--ink);cursor:pointer;padding:6px 4px;display:flex;align-items:center;gap:5px;border-radius:8px}
+.year-button:hover{background:var(--surface-2)}
+.year-caret{font-size:12px;color:var(--muted)}
+.year-picker{position:absolute;right:0;top:43px;width:285px;background:var(--surface);border:1px solid var(--line);border-radius:13px;box-shadow:0 18px 45px rgba(0,0,0,.18);padding:12px;display:none;z-index:40}
+.year-picker.open{display:block}
+.year-picker-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.year-picker-head button{width:30px;height:30px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);cursor:pointer}
+.year-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.year-cell{border:1px solid transparent;border-radius:8px;background:var(--surface-2);color:var(--ink);padding:9px 4px;cursor:pointer;font-size:11px}
+.year-cell:hover{border-color:var(--gold)}
+.year-cell.current{border-color:var(--gold);font-weight:800}
+.year-cell.selected{background:var(--blue);color:#fff}
+.year-today{width:100%;margin-top:10px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);padding:8px;cursor:pointer;font-size:10px}
 :root{
   --bg:#f7f8fa;--surface:#fff;--surface-2:#f5f6f8;--ink:#132238;--muted:#667085;
   --line:#e4e7ec;--gold:#b88a32;--blue:#12385f;--weekend:#eef0f3;--today:#dce7f2;
@@ -97,7 +125,9 @@ footer{padding:18px 0 0;color:var(--muted);font-size:10px;line-height:1.5;text-a
 @media(max-width:850px){.month-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.top{grid-template-columns:1fr auto}.brand{grid-column:1/-1;grid-row:1}.back{grid-row:2}.actions{grid-row:2}.hero{align-items:flex-start;flex-direction:column}.year-nav{align-self:flex-end}}
 @media(max-width:560px){
   .wrap{width:min(100% - 22px,1080px)}header{padding-top:20px}
-  .top{gap:8px}.brand{font-size:15px}.country{min-width:135px;font-size:11px}
+  .top{gap:8px}.brand{font-size:15px}.country-button{min-width:145px;font-size:11px}
+  .country-menu{right:-4px;width:min(300px,calc(100vw - 22px))}
+  .year-picker{right:-4px;width:min(285px,calc(100vw - 22px))}
   .month-grid{grid-template-columns:1fr}.month{padding:12px}.day{min-height:38px;font-size:11px}
   .cta{align-items:flex-start;flex-direction:column}.cta a{align-self:stretch;text-align:center}
 }
@@ -106,13 +136,19 @@ footer{padding:18px 0 0;color:var(--muted);font-size:10px;line-height:1.5;text-a
 <body>
 <header>
   <div class="wrap top">
-    <a class="back" href="/plazos.html">&#8249; Calcular t&#233;rmino</a>
-    <a class="brand" href="/">T&#201;RMINO <span>LEGAL</span></a>
+    <a class="back" href="/plazos.html">‹ Calcular término</a>
+    <a class="brand" href="/">TÉRMINO <span>LEGAL</span></a>
     <div class="actions">
-      <div class="country-wrap">
-        <select id="country" class="country" aria-label="Seleccionar pa&#237;s"></select>
+      <div class="country-wrap" id="countryPicker">
+        <button id="countryButton" class="country-button" type="button" aria-haspopup="listbox" aria-expanded="false">
+          <span id="countryFlag">🌐</span><span id="countryName">Colombia</span><span class="country-chevron">⌄</span>
+        </button>
+        <div id="countryMenu" class="country-menu" role="listbox" aria-label="Seleccionar país">
+          <input id="countrySearch" class="country-search" type="search" placeholder="Buscar país..." autocomplete="off" aria-label="Buscar país">
+          <div id="countryList" class="country-list"></div>
+        </div>
       </div>
-      <button id="theme" class="icon-btn" type="button" aria-label="Cambiar modo de color" title="Cambiar modo de color">&#9680;</button>
+      <button id="theme" class="icon-btn" type="button" aria-label="Cambiar modo de color" title="Cambiar modo de color">◐</button>
     </div>
   </div>
 </header>
@@ -121,13 +157,24 @@ footer{padding:18px 0 0;color:var(--muted);font-size:10px;line-height:1.5;text-a
   <section class="hero">
     <div>
       <div class="kicker">Calendario anual</div>
-      <h1 id="title">Colombia &#183; 2026</h1>
+      <h1 id="title">Colombia · 2026</h1>
       <div id="intro" class="intro">Consulta las fechas registradas para el calendario de referencia.</div>
     </div>
-    <div class="year-nav" aria-label="Navegaci&#243;n de a&#241;o">
-      <button id="prevYear" type="button" aria-label="A&#241;o anterior">&#8249;</button>
-      <strong id="year">2026</strong>
-      <button id="nextYear" type="button" aria-label="A&#241;o siguiente">&#8250;</button>
+    <div class="year-nav" aria-label="Navegación de año">
+      <button id="prevYear" type="button" aria-label="Año anterior">‹</button>
+      <button id="yearButton" class="year-button" type="button" aria-haspopup="dialog" aria-expanded="false">
+        <strong id="year">2026</strong><span class="year-caret">⌄</span>
+      </button>
+      <button id="nextYear" type="button" aria-label="Año siguiente">›</button>
+      <div id="yearPicker" class="year-picker" role="dialog" aria-label="Seleccionar año">
+        <div class="year-picker-head">
+          <button id="decadePrev" type="button">‹</button>
+          <strong id="decadeLabel"></strong>
+          <button id="decadeNext" type="button">›</button>
+        </div>
+        <div id="yearGrid" class="year-grid"></div>
+        <button id="yearToday" class="year-today" type="button">Ir al año actual</button>
+      </div>
     </div>
   </section>
 
@@ -147,7 +194,7 @@ footer{padding:18px 0 0;color:var(--muted);font-size:10px;line-height:1.5;text-a
         <div id="infoDate" class="info-date"></div>
         <div id="infoKind" class="info-kind"></div>
       </div>
-      <button id="closeInfo" class="info-close" type="button" aria-label="Cerrar">&#215;</button>
+      <button id="closeInfo" class="info-close" type="button" aria-label="Cerrar">×</button>
     </div>
     <div id="infoText" class="info-text"></div>
     <div id="infoSource" class="info-source"></div>
@@ -155,8 +202,8 @@ footer{padding:18px 0 0;color:var(--muted);font-size:10px;line-height:1.5;text-a
 
   <section class="cta">
     <div>
-      <strong>&#191;Necesitas calcular un t&#233;rmino?</strong><br>
-      <span>Cuando quieras, una fecha del calendario podr&#225; conectarse con el calculador de T&#233;rmino Legal.</span>
+      <strong>¿Necesitas calcular un término?</strong><br>
+      <span>Cuando quieras, una fecha del calendario podrá conectarse con el calculador de Término Legal.</span>
     </div>
     <a href="/plazos.html">Abrir calculador</a>
   </section>
@@ -169,8 +216,8 @@ footer{padding:18px 0 0;color:var(--muted);font-size:10px;line-height:1.5;text-a
 <script>
 const DATA_URL="/calendarios/calendarios.json";
 const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-const DAYS=["lu","ma","mi","ju","vi","s\u00e1","do"];
-const DAY_NAMES=["domingo","lunes","martes","mi\u00e9rcoles","jueves","viernes","s\u00e1bado"];
+const DAYS=["lu","ma","mi","ju","vi","sá","do"];
+const DAY_NAMES=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
 let DATA=null;
 let currentYear=new Date().getFullYear();
 let selectedDate=null;
@@ -209,21 +256,21 @@ function setUrlCountry(code){
   history.pushState({},"",`/calendario/${code.toLowerCase()}`);
 }
 function render(){
-  const code=$("#country").value;
+  const code=selectedCountry().code;
   const country=countryByCode(code);
   const events=eventsFor(code,currentYear);
   const map=eventMap(events);
   const today=iso(new Date().getFullYear(),new Date().getMonth(),new Date().getDate());
 
-  $("#title").textContent=`${country.name} \u00b7 ${currentYear}`;
+  $("#title").textContent=`${country.name} · ${currentYear}`;
   $("#year").textContent=currentYear;
-  document.title=`Calendario legal ${country.name} ${currentYear} | T\u00e9rmino Legal`;
+  document.title=`Calendario legal ${country.name} ${currentYear} | Término Legal`;
   $("#intro").textContent=events.length
-    ? `Festivos y fechas registradas para ${country.name}. Consulta cada fecha para ver su informaci\u00f3n y fuente.`
-    : `Calendario de ${country.name}. Las fechas espec\u00edficas de este a\u00f1o a\u00fan est\u00e1n pendientes de validaci\u00f3n.`;
+    ? `Festivos y fechas registradas para ${country.name}. Consulta cada fecha para ver su información y fuente.`
+    : `Calendario de ${country.name}. Las fechas específicas de este año aún están pendientes de validación.`;
   $("#status").textContent=events.length
-    ? `${events.length} fecha${events.length===1?"":"s"} registrada${events.length===1?"":"s"} \u00b7 Los fines de semana se muestran como referencia.`
-    : "No hay fechas espec\u00edficas verificadas cargadas para este a\u00f1o. Los fines de semana se muestran como referencia.";
+    ? `${events.length} fecha${events.length===1?"":"s"} registrada${events.length===1?"":"s"} · Los fines de semana se muestran como referencia.`
+    : "No hay fechas específicas verificadas cargadas para este año. Los fines de semana se muestran como referencia.";
 
   const root=$("#months");
   root.innerHTML="";
@@ -245,7 +292,7 @@ function render(){
       const isToday=key===today;
       const isSelected=key===selectedDate;
       cells+=`<button type="button" class="day ${weekend?"weekend ":""}${ev?"event ":""}${isToday?"today ":""}${isSelected?"selected":""}"
-        data-date="${key}" aria-label="${dateLabel(key)}${ev?" \u2014 "+esc(ev.name):""}" title="${ev?esc(ev.name):"Seleccionar fecha"}">${d}</button>`;
+        data-date="${key}" aria-label="${dateLabel(key)}${ev?" — "+esc(ev.name):""}" title="${ev?esc(ev.name):"Seleccionar fecha"}">${d}</button>`;
     }
 
     const card=document.createElement("article");
@@ -253,7 +300,7 @@ function render(){
     card.innerHTML=`
       <div class="month-head">
         <div class="month-title">${MONTHS[m]}</div>
-        <div class="month-meta">${workdays} d\u00edas h\u00e1biles \u00b7 ${monthEvents.length?monthEvents.length+" fecha"+(monthEvents.length===1?"":"s"):"sin fechas"}</div>
+        <div class="month-meta">${workdays} días hábiles · ${monthEvents.length?monthEvents.length+" fecha"+(monthEvents.length===1?"":"s"):"sin fechas"}</div>
       </div>
       <div class="week">
         ${DAYS.map(d=>`<span class="weekday">${d}</span>`).join("")}
@@ -273,7 +320,7 @@ function render(){
 }
 function showDate(key){
   selectedDate=key;
-  const code=$("#country").value;
+  const code=selectedCountry().code;
   const events=eventsFor(code,currentYear);
   const ev=events.find(e=>e.date===key);
   const dt=dateObj(key);
@@ -282,13 +329,13 @@ function showDate(key){
   $("#infoDate").textContent=dateLabel(key);
   $("#infoKind").textContent=ev
     ? (ev.type||"Fecha registrada").replaceAll("_"," ")
-    : (weekend?"Fin de semana":"D\u00eda sin fecha registrada");
+    : (weekend?"Fin de semana":"Día sin fecha registrada");
 
   $("#infoText").textContent=ev
     ? ev.name
     : (weekend
-      ? "La fecha corresponde a s\u00e1bado o domingo. Se muestra como referencia visual; su efecto jur\u00eddico depende de la regla aplicable."
-      : "No hay una fecha especial registrada para este d\u00eda en la base de datos actual.");
+      ? "La fecha corresponde a sábado o domingo. Se muestra como referencia visual; su efecto jurídico depende de la regla aplicable."
+      : "No hay una fecha especial registrada para este día en la base de datos actual.");
 
   $("#infoSource").innerHTML=ev?.source
     ? `Fuente: <a href="${esc(ev.source)}" target="_blank" rel="noopener noreferrer">consultar fuente oficial</a>`
@@ -298,21 +345,45 @@ function showDate(key){
   renderSelectionOnly();
   $("#dateInfo").scrollIntoView({behavior:"smooth",block:"nearest"});
 }
+let decadeStart=Math.floor(currentYear/10)*10;
+function renderYearPicker(){
+  decadeStart=Math.floor(currentYear/10)*10;
+  $("#decadeLabel").textContent=`${decadeStart}–${decadeStart+9}`;
+  const now=new Date().getFullYear();
+  $("#yearGrid").innerHTML=Array.from({length:12},(_,i)=>decadeStart-1+i).map(y=>`<button type="button" class="year-cell ${y===currentYear?"selected ":""}${y===now?"current":""}" data-year="${y}">${y}</button>`).join("");
+  $("#yearGrid").querySelectorAll("[data-year]").forEach(b=>b.onclick=()=>{currentYear=Number(b.dataset.year);selectedDate=null;$("#dateInfo").classList.remove("show");closeYearPicker();render();});
+}
+function openYearPicker(){renderYearPicker();$("#yearPicker").classList.add("open");$("#yearButton").setAttribute("aria-expanded","true")}
+function closeYearPicker(){$("#yearPicker").classList.remove("open");$("#yearButton").setAttribute("aria-expanded","false")}
+function openCountryMenu(){$("#countryMenu").classList.add("open");$("#countryButton").setAttribute("aria-expanded","true");$("#countrySearch").value="";renderCountryList("");setTimeout(()=>$("#countrySearch").focus(),0)}
+function closeCountryMenu(){$("#countryMenu").classList.remove("open");$("#countryButton").setAttribute("aria-expanded","false")}
+
 function renderSelectionOnly(){
   document.querySelectorAll(".day.selected").forEach(x=>x.classList.remove("selected"));
   if(!selectedDate)return;
   const btn=document.querySelector(`[data-date="${selectedDate}"]`);
   if(btn)btn.classList.add("selected");
 }
-function populateCountries(){
-  const select=$("#country");
+function selectedCountry(){
   const wanted=pathCountry();
-  select.innerHTML=DATA.countries
-    .slice()
-    .sort((a,b)=>a.name.localeCompare(b.name,"es"))
-    .map(c=>`<option value="${esc(c.code)}">${esc(c.flag||"")} ${esc(c.name)}</option>`)
-    .join("");
-  select.value=DATA.countries.some(c=>c.code===wanted)?wanted:"CO";
+  return DATA.countries.find(c=>c.code===wanted)||DATA.countries.find(c=>c.code==="CO")||DATA.countries[0];
+}
+function setCountryUI(c){
+  $("#countryFlag").textContent=c?.flag||"🌐";
+  $("#countryName").textContent=c?.name||c?.code||"País";
+}
+function renderCountryList(filter=""){
+  const current=selectedCountry(),q=filter.trim().toLocaleLowerCase("es");
+  const list=DATA.countries.slice().sort((a,b)=>a.name.localeCompare(b.name,"es"))
+    .filter(c=>!q||c.name.toLocaleLowerCase("es").includes(q)||c.code.toLowerCase().includes(q));
+  $("#countryList").innerHTML=list.length?list.map(c=>`<button type="button" class="country-option ${c.code===current.code?"active":""}" data-country="${esc(c.code)}"><span class="flag">${esc(c.flag||"🌐")}</span><span>${esc(c.name)}</span>${c.code===current.code?'<span class="check">✓</span>':""}</button>`).join(""):'<div class="country-empty">No encontramos ese país.</div>';
+  $("#countryList").querySelectorAll("[data-country]").forEach(b=>b.onclick=()=>{
+    setUrlCountry(b.dataset.country);selectedDate=null;$("#dateInfo").classList.remove("show");closeCountryMenu();render();
+  });
+}
+function populateCountries(){
+  setCountryUI(selectedCountry());
+  renderCountryList("");
 }
 async function init(){
   initTheme();
@@ -321,6 +392,14 @@ async function init(){
   });
   $("#prevYear").addEventListener("click",()=>{currentYear--;selectedDate=null;$("#dateInfo").classList.remove("show");render();});
   $("#nextYear").addEventListener("click",()=>{currentYear++;selectedDate=null;$("#dateInfo").classList.remove("show");render();});
+  $("#yearButton").addEventListener("click",()=>$("#yearPicker").classList.contains("open")?closeYearPicker():openYearPicker());
+  $("#decadePrev").addEventListener("click",()=>{decadeStart-=10;renderYearPicker();});
+  $("#decadeNext").addEventListener("click",()=>{decadeStart+=10;renderYearPicker();});
+  $("#yearToday").addEventListener("click",()=>{currentYear=new Date().getFullYear();selectedDate=null;$("#dateInfo").classList.remove("show");closeYearPicker();render();});
+  $("#countryButton").addEventListener("click",()=>$("#countryMenu").classList.contains("open")?closeCountryMenu():openCountryMenu());
+  $("#countrySearch").addEventListener("input",e=>renderCountryList(e.target.value));
+  document.addEventListener("click",e=>{if(!$("#countryPicker").contains(e.target))closeCountryMenu();if(!$(".year-nav").contains(e.target))closeYearPicker()});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeCountryMenu();closeYearPicker()}});
   $("#closeInfo").addEventListener("click",()=>{$("#dateInfo").classList.remove("show");selectedDate=null;renderSelectionOnly();});
 
   DATA=await fetch(DATA_URL,{cache:"no-store"}).then(r=>{
@@ -328,15 +407,9 @@ async function init(){
     return r.json();
   });
   populateCountries();
-  $("#country").addEventListener("change",()=>{
-    selectedDate=null;
-    $("#dateInfo").classList.remove("show");
-    setUrlCountry($("#country").value);
-    render();
-  });
   window.addEventListener("popstate",()=>{
-    const c=pathCountry();
-    $("#country").value=DATA.countries.some(x=>x.code===c)?c:"CO";
+    setCountryUI(selectedCountry());
+    renderCountryList("");
     selectedDate=null;
     $("#dateInfo").classList.remove("show");
     render();
@@ -346,7 +419,7 @@ async function init(){
 init().catch(err=>{
   console.error(err);
   $("#status").textContent="No fue posible cargar los datos del calendario.";
-  $("#months").innerHTML=`<div class="empty">Revisa que el archivo <strong>/calendarios/calendarios.json</strong> exista en el repositorio y que su ruta coincida con la configuraci\u00f3n del calendario.</div>`;
+  $("#months").innerHTML=`<div class="empty">Revisa que el archivo <strong>/calendarios/calendarios.json</strong> exista en el repositorio y que su ruta coincida con la configuración del calendario.</div>`;
 });
 </script>
 </body>
