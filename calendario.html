@@ -26,6 +26,13 @@
 .year-caret{font-size:12px;color:var(--muted)}
 .year-picker{position:absolute;right:0;top:43px;width:285px;background:var(--surface);border:1px solid var(--line);border-radius:13px;box-shadow:0 18px 45px rgba(0,0,0,.18);padding:12px;display:none;z-index:40}
 .year-picker.open{display:block}
+.year-jump{display:grid;grid-template-columns:1fr auto;gap:6px;margin-bottom:10px}
+.year-jump input{width:100%;height:34px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);padding:0 9px;font-size:12px;outline:none}
+.year-jump input:focus{border-color:var(--gold)}
+.year-jump button{height:34px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);padding:0 11px;cursor:pointer;font-size:11px;font-weight:700}
+.year-range-head{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:0 0 8px;color:var(--muted);font-size:9px}
+.year-range-head button{border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink);padding:5px 7px;cursor:pointer;font-size:9px}
+.year-range-head button:hover,.year-jump button:hover{border-color:var(--gold)}
 .year-picker-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .year-picker-head button{width:30px;height:30px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);cursor:pointer}
 .year-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
@@ -57,10 +64,6 @@ header{padding:28px 0 4px}
 .brand span{color:var(--gold)}
 .actions{justify-self:end;display:flex;align-items:center;gap:8px}
 .country-wrap{position:relative}
-.country{
-  min-width:170px;border:0;background:transparent;color:var(--ink);padding:8px 24px 8px 8px;
-  appearance:auto;outline:none;cursor:pointer
-}
 .icon-btn{
   width:36px;height:36px;border:1px solid var(--line);border-radius:10px;background:var(--surface);
   color:var(--ink);cursor:pointer;box-shadow:var(--shadow)
@@ -70,16 +73,9 @@ main{padding:20px 0 55px}
 .kicker{font-size:11px;color:var(--gold);font-weight:800;text-transform:uppercase;letter-spacing:.13em}
 h1{margin:6px 0 3px;font-family:Georgia,"Times New Roman",serif;font-size:clamp(29px,4vw,40px);font-weight:700;letter-spacing:-.025em}
 .intro{color:var(--muted);font-size:12px;line-height:1.55;max-width:690px}
-.year-nav{display:flex;align-items:center;gap:18px;white-space:nowrap}
+.year-nav{position:relative;display:flex;align-items:center;gap:10px;white-space:nowrap}
 .year-nav button{border:0;background:transparent;color:var(--ink);cursor:pointer;font-size:18px;padding:6px}
 .year-nav strong{font-size:13px;min-width:42px;text-align:center}
-.status{font-size:11px;color:var(--muted);margin:4px 0 16px}
-.legend{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:13px;font-size:11px;color:var(--muted)}
-.legend span{display:inline-flex;align-items:center;gap:6px}
-.dot{width:9px;height:9px;border-radius:50%;display:inline-block;border:1px solid var(--line);background:var(--surface)}
-.dot.week{background:var(--weekend)}
-.dot.event{background:var(--event);border-color:var(--event-border)}
-.dot.today{background:var(--today);border-color:var(--blue)}
 .month-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
 .month{
   background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:12px 11px 10px;
@@ -101,7 +97,6 @@ h1{margin:6px 0 3px;font-family:Georgia,"Times New Roman",serif;font-size:clamp(
 .day.event{background:var(--event);border-color:var(--event-border);font-weight:800}
 .day.today{box-shadow:inset 0 0 0 1.5px var(--blue)}
 .day.selected{outline:2px solid var(--gold);outline-offset:-2px}
-.day.event::after{content:"";position:absolute;width:3px;height:3px;border-radius:50%;background:var(--gold);right:4px;top:4px}
 .info{
   margin-top:15px;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:15px;
   display:none;box-shadow:var(--shadow)
@@ -137,7 +132,7 @@ footer{padding:18px 0 0;color:var(--muted);font-size:10px;line-height:1.5;text-a
 <header>
   <div class="wrap top">
     <a class="back" href="/plazos.html">‹ Calcular término</a>
-    <a class="brand" href="/">TÉRMINO <span>LEGAL</span></a>
+    <a class="brand" href="/" aria-label="Término Legal — inicio">TÉRMINO <span>LEGAL</span></a>
     <div class="actions">
       <div class="country-wrap" id="countryPicker">
         <button id="countryButton" class="country-button" type="button" aria-haspopup="listbox" aria-expanded="false">
@@ -163,28 +158,29 @@ footer{padding:18px 0 0;color:var(--muted);font-size:10px;line-height:1.5;text-a
     <div class="year-nav" aria-label="Navegación de año">
       <button id="prevYear" type="button" aria-label="Año anterior">‹</button>
       <button id="yearButton" class="year-button" type="button" aria-haspopup="dialog" aria-expanded="false">
-        <strong id="year">2026</strong><span class="year-caret">⌄</span>
+        <strong id="year">2026</strong>
       </button>
       <button id="nextYear" type="button" aria-label="Año siguiente">›</button>
       <div id="yearPicker" class="year-picker" role="dialog" aria-label="Seleccionar año">
         <div class="year-picker-head">
-          <button id="decadePrev" type="button">‹</button>
+          <button id="decadePrev" type="button" aria-label="Década anterior">‹</button>
           <strong id="decadeLabel"></strong>
-          <button id="decadeNext" type="button">›</button>
+          <button id="decadeNext" type="button" aria-label="Década siguiente">›</button>
+        </div>
+        <div class="year-jump">
+          <input id="yearInput" type="number" min="1" max="9999" inputmode="numeric" aria-label="Escribir año" placeholder="Año">
+          <button id="yearGo" type="button">Ir</button>
+        </div>
+        <div class="year-range-head">
+          <button id="centuryPrev" type="button" aria-label="Siglo anterior">−100</button>
+          <span>Salto de siglo</span>
+          <button id="centuryNext" type="button" aria-label="Siglo siguiente">+100</button>
         </div>
         <div id="yearGrid" class="year-grid"></div>
         <button id="yearToday" class="year-today" type="button">Ir al año actual</button>
       </div>
     </div>
   </section>
-
-  <div id="status" class="status"></div>
-
-  <div class="legend" aria-label="Leyenda">
-    <span><i class="dot event"></i> Fecha registrada</span>
-    <span><i class="dot week"></i> Fin de semana</span>
-    <span><i class="dot today"></i> Hoy</span>
-  </div>
 
   <section id="months" class="month-grid" aria-label="Calendario anual"></section>
 
@@ -234,8 +230,167 @@ function dateObj(key){return new Date(key+"T12:00:00")}
 function dateLabel(key){
   return new Intl.DateTimeFormat("es-CO",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(dateObj(key));
 }
+function addHoliday(list, date, name, source, type="Festivo nacional"){
+  const key=iso(date.getFullYear(),date.getMonth(),date.getDate());
+  list.push({date:key,name,source,type});
+}
+function addFixed(list,year,month,day,name,source,type="Festivo nacional"){
+  addHoliday(list,new Date(year,month-1,day),name,source,type);
+}
+function moveToMonday(date){
+  const d=new Date(date.getFullYear(),date.getMonth(),date.getDate());
+  const day=d.getDay();
+  if(day===0)d.setDate(d.getDate()+1);
+  else if(day!==1)d.setDate(d.getDate()+(8-day));
+  return d;
+}
+function easterSunday(year){
+  const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31)-1,day=((h+l-7*m+114)%31)+1;
+  return new Date(year,month,day);
+}
+function getColombiaHolidays(year){
+  const list=[],src="https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=4954";
+  addFixed(list,year,1,1,"Año Nuevo",src); addFixed(list,year,5,1,"Día del Trabajo",src);
+  addFixed(list,year,7,20,"Independencia de Colombia",src); addFixed(list,year,8,7,"Batalla de Boyacá",src);
+  addFixed(list,year,12,8,"Inmaculada Concepción",src); addFixed(list,year,12,25,"Navidad",src);
+  [[1,6,"Día de los Reyes Magos"],[3,19,"Día de San José"],[6,29,"San Pedro y San Pablo"],[8,15,"Asunción de la Virgen"],[10,12,"Día de la Raza"],[11,1,"Todos los Santos"],[11,11,"Independencia de Cartagena"]].forEach(([m,d,n])=>addHoliday(list,moveToMonday(new Date(year,m-1,d)),n,src));
+  const e=easterSunday(year);
+  addHoliday(list,new Date(e.getFullYear(),e.getMonth(),e.getDate()-3),"Jueves Santo",src);
+  addHoliday(list,new Date(e.getFullYear(),e.getMonth(),e.getDate()-2),"Viernes Santo",src);
+  addHoliday(list,new Date(e.getFullYear(),e.getMonth(),e.getDate()+43),"Ascensión del Señor",src);
+  addHoliday(list,new Date(e.getFullYear(),e.getMonth(),e.getDate()+64),"Corpus Christi",src);
+  addHoliday(list,new Date(e.getFullYear(),e.getMonth(),e.getDate()+71),"Sagrado Corazón de Jesús",src);
+  addHoliday(list,moveToMonday(new Date(year,6,9)),"Nuestra Señora del Rosario de Chiquinquirá",src);
+  return list;
+}
+function getArgentinaHolidays(year){
+  const list=[],src="https://www.argentina.gob.ar/normativa/nacional/ley-27399-281835/texto";
+  addFixed(list,year,1,1,"Año Nuevo",src); addFixed(list,year,3,24,"Día Nacional de la Memoria por la Verdad y la Justicia",src);
+  addFixed(list,year,4,2,"Día del Veterano y de los Caídos en la Guerra de Malvinas",src); addFixed(list,year,5,1,"Día del Trabajo",src);
+  addFixed(list,year,5,25,"Revolución de Mayo",src); addFixed(list,year,6,20,"Paso a la Inmortalidad del General Manuel Belgrano",src);
+  addFixed(list,year,7,9,"Día de la Independencia",src); addFixed(list,year,12,8,"Inmaculada Concepción de María",src); addFixed(list,year,12,25,"Navidad",src);
+  const e=easterSunday(year);
+  addHoliday(list,new Date(year,e.getMonth(),e.getDate()-2),"Viernes Santo",src);
+  const ash=new Date(year,e.getMonth(),e.getDate()-46);
+  addHoliday(list,new Date(year,ash.getMonth(),ash.getDate()-2),"Carnaval",src);
+  addHoliday(list,new Date(year,ash.getMonth(),ash.getDate()-1),"Carnaval",src);
+  [[6,17,"Paso a la Inmortalidad del General Martín Miguel de Güemes"],[8,17,"Paso a la Inmortalidad del General José de San Martín"],[10,12,"Día del Respeto a la Diversidad Cultural"],[11,20,"Día de la Soberanía Nacional"]].forEach(([m,d,n])=>addHoliday(list,moveTransferableArgentina(new Date(year,m-1,d)),n,src));
+  return list;
+}
+function moveTransferableArgentina(date){
+  const day=date.getDay();
+  if(day===2||day===3)date.setDate(date.getDate()-day+1);
+  else if(day===4||day===5)date.setDate(date.getDate()+(8-day));
+  return date;
+}
+function getSpainHolidays(year){
+  const list=[],src="https://www.boe.es/buscar/act.php?id=BOE-A-1983-20906";
+  // Base estatal: no incorpora fiestas autonómicas ni locales. Algunas fiestas nacionales
+  // opcionales se determinan cada año por el calendario laboral oficial.
+  [[1,1,"Año Nuevo"],[5,1,"Fiesta del Trabajo"],[8,15,"Asunción de la Virgen"],[10,12,"Fiesta Nacional de España"],[11,1,"Todos los Santos"],[12,6,"Día de la Constitución Española"],[12,8,"Inmaculada Concepción"],[12,25,"Navidad"]].forEach(([m,d,n])=>addHoliday(list,observedSpain(new Date(year,m-1,d)),n,src));
+  const e=easterSunday(year);
+  addHoliday(list,new Date(year,e.getMonth(),e.getDate()-2),"Viernes Santo",src);
+  addHoliday(list,observedSpain(new Date(year,0,6)),"Epifanía del Señor",src);
+  return list;
+}
+function observedSpain(date){
+  const d=new Date(date.getFullYear(),date.getMonth(),date.getDate());
+  if(d.getDay()===0)d.setDate(d.getDate()+1);
+  return d;
+}
+/*
+ * Calendario perpetuo: la cuadrícula no depende de una base anual.
+ * Los festivos se calculan mediante reglas compactas por país. Así el calendario
+ * puede recorrer décadas y siglos sin almacenar miles de fechas.
+ *
+ * Nota de producto: las reglas nacionales cambian históricamente y algunos
+ * países tienen fiestas regionales/locales. Para esos casos el motor muestra
+ * únicamente las reglas nacionales validadas que aquí estén definidas.
+ */
+const HOLIDAY_RULES={
+  CO:getColombiaHolidays,
+  AR:getArgentinaHolidays,
+  ES:getSpainHolidays,
+  // Reglas nacionales compactas de referencia. Los países que no requieren
+  // una regla móvil pueden usar fixedHolidayRules() sin aumentar el peso anual.
+  US:(y)=>fixedHolidayRules(y,"https://www.law.cornell.edu/uscode/text/5/6103",[
+    [1,1,"New Year's Day"],[6,19,"Juneteenth National Independence Day"],[7,4,"Independence Day"],[11,11,"Veterans Day"],[12,25,"Christmas Day"]
+  ]),
+  BR:(y)=>fixedHolidayRules(y,"https://www.planalto.gov.br/ccivil_03/leis/l0662.htm",[
+    [1,1,"Confraternização Universal"],[4,21,"Tiradentes"],[5,1,"Dia Mundial do Trabalho"],[9,7,"Independência do Brasil"],[10,12,"Nossa Senhora Aparecida"],[11,2,"Finados"],[11,15,"Proclamação da República"],[12,25,"Natal"]
+  ]),
+  CL:(y)=>fixedHolidayRules(y,"https://www.bcn.cl/leychile/navegar?idNorma=30667",[
+    [1,1,"Año Nuevo"],[5,1,"Día del Trabajo"],[5,21,"Glorias Navales"],[6,29,"San Pedro y San Pablo"],[7,16,"Virgen del Carmen"],[8,15,"Asunción de la Virgen"],[9,18,"Independencia Nacional"],[9,19,"Glorias del Ejército"],[10,12,"Encuentro de Dos Mundos"],[10,31,"Día de las Iglesias Evangélicas y Protestantes"],[11,1,"Todos los Santos"],[12,8,"Inmaculada Concepción"],[12,25,"Navidad"]
+  ]),
+  PE:(y)=>fixedHolidayRules(y,"https://www.gob.pe/institucion/minjus/normas-legales",[
+    [1,1,"Año Nuevo"],[4,17,"Viernes Santo"],[5,1,"Día del Trabajo"],[6,29,"San Pedro y San Pablo"],[7,28,"Independencia del Perú"],[7,29,"Fiestas Patrias"],[8,30,"Santa Rosa de Lima"],[10,8,"Combate de Angamos"],[11,1,"Todos los Santos"],[12,8,"Inmaculada Concepción"],[12,25,"Navidad"]
+  ]),
+  UY:(y)=>fixedHolidayRules(y,"https://www.impo.com.uy/bases/leyes/6997-1919",[
+    [1,1,"Año Nuevo"],[4,19,"Desembarco de los Treinta y Tres Orientales"],[5,1,"Día de los Trabajadores"],[6,19,"Natalicio de Artigas"],[7,18,"Jura de la Constitución"],[8,25,"Declaratoria de la Independencia"],[10,12,"Día de la Raza"],[11,2,"Día de los Difuntos"],[12,25,"Día de la Familia"]
+  ]),
+  PY:(y)=>fixedHolidayRules(y,"https://www.bacn.gov.py/leyes-paraguayas/",[
+    [1,1,"Año Nuevo"],[3,1,"Día de los Héroes"],[5,1,"Día de los Trabajadores"],[5,14,"Independencia Nacional"],[5,15,"Independencia Nacional"],[6,12,"Paz del Chaco"],[8,15,"Fundación de Asunción"],[9,29,"Batalla de Boquerón"],[12,8,"Virgen de Caacupé"],[12,25,"Navidad"]
+  ]),
+  BO:(y)=>fixedHolidayRules(y,"https://www.lexivox.org/norms/BO-L-1962.html",[
+    [1,1,"Año Nuevo"],[1,22,"Estado Plurinacional de Bolivia"],[5,1,"Día del Trabajo"],[6,21,"Año Nuevo Aymara"],[8,6,"Independencia de Bolivia"],[11,2,"Todos los Santos"],[12,25,"Navidad"]
+  ]),
+  EC:(y)=>fixedHolidayRules(y,"https://www.funcionjudicial.gob.ec/",[
+    [1,1,"Año Nuevo"],[5,1,"Día del Trabajo"],[5,24,"Batalla de Pichincha"],[8,10,"Primer Grito de Independencia"],[10,9,"Independencia de Guayaquil"],[11,2,"Día de los Difuntos"],[11,3,"Independencia de Cuenca"],[12,25,"Navidad"]
+  ]),
+  CR:(y)=>fixedHolidayRules(y,"https://www.pgrweb.go.cr/scij/",[
+    [1,1,"Año Nuevo"],[4,11,"Batalla de Rivas"],[5,1,"Día del Trabajo"],[7,25,"Anexión del Partido de Nicoya"],[8,2,"Virgen de los Ángeles"],[8,15,"Día de la Madre"],[9,15,"Independencia"],[10,12,"Día de las Culturas"],[12,25,"Navidad"]
+  ]),
+  PA:(y)=>fixedHolidayRules(y,"https://www.gacetaoficial.gob.pa/",[
+    [1,1,"Año Nuevo"],[1,9,"Día de los Mártires"],[5,1,"Día del Trabajo"],[11,3,"Separación de Panamá de Colombia"],[11,5,"Consolidación de la Independencia"],[11,10,"Primer Grito de Independencia"],[11,28,"Independencia de Panamá de España"],[12,8,"Día de la Madre"],[12,25,"Navidad"]
+  ]),
+  DO:(y)=>fixedHolidayRules(y,"https://www.consultoria.gov.do/",[
+    [1,1,"Año Nuevo"],[1,6,"Día de los Reyes Magos"],[1,21,"Nuestra Señora de la Altagracia"],[1,26,"Día de Duarte"],[5,1,"Día del Trabajo"],[8,16,"Restauración"],[9,24,"Nuestra Señora de las Mercedes"],[11,6,"Constitución"],[12,25,"Navidad"]
+  ]),
+  CA:(y)=>fixedHolidayRules(y,"https://laws-lois.justice.gc.ca/eng/acts/h-6/",[
+    [1,1,"New Year's Day"],[7,1,"Canada Day"],[9,30,"National Day for Truth and Reconciliation"],[11,11,"Remembrance Day"],[12,25,"Christmas Day"]
+  ]),
+  AU:(y)=>fixedHolidayRules(y,"https://www.fairwork.gov.au/employment-conditions/public-holidays",[
+    [1,1,"New Year's Day"],[1,26,"Australia Day"],[4,25,"Anzac Day"],[12,25,"Christmas Day"],[12,26,"Boxing Day"]
+  ]),
+  NZ:(y)=>fixedHolidayRules(y,"https://www.employment.govt.nz/leave-and-holidays/public-holidays",[
+    [1,1,"New Year's Day"],[2,6,"Waitangi Day"],[4,25,"ANZAC Day"],[6,5,"King's Birthday"],[10,28,"Labour Day"],[12,25,"Christmas Day"],[12,26,"Boxing Day"]
+  ]),
+  JP:(y)=>fixedHolidayRules(y,"https://www8.cao.go.jp/chosei/shukujitsu/gaiyou.html",[
+    [1,1,"元日"],[2,11,"建国記念の日"],[2,23,"天皇誕生日"],[4,29,"昭和の日"],[5,3,"憲法記念日"],[5,4,"みどりの日"],[5,5,"こどもの日"],[8,11,"山の日"],[11,3,"文化の日"],[11,23,"勤労感謝の日"]
+  ]),
+  KR:(y)=>fixedHolidayRules(y,"https://elaw.klri.re.kr/eng_service/main.do",[
+    [1,1,"New Year's Day"],[3,1,"Independence Movement Day"],[5,5,"Children's Day"],[6,6,"Memorial Day"],[8,15,"Liberation Day"],[10,3,"National Foundation Day"],[10,9,"Hangul Day"],[12,25,"Christmas Day"]
+  ]),
+  IN:(y)=>fixedHolidayRules(y,"https://www.indiacode.nic.in/",[
+    [1,26,"Republic Day"],[5,1,"Labour Day"],[8,15,"Independence Day"],[10,2,"Gandhi Jayanti"]
+  ]),
+  FR:(y)=>fixedHolidayRules(y,"https://www.legifrance.gouv.fr/codes/id/LEGISCTA000006177698",[
+    [1,1,"Jour de l'An"],[5,1,"Fête du Travail"],[5,8,"Victoire 1945"],[7,14,"Fête nationale"],[8,15,"Assomption"],[11,1,"Toussaint"],[11,11,"Armistice"],[12,25,"Noël"]
+  ]),
+  DE:(y)=>fixedHolidayRules(y,"https://www.gesetze-im-internet.de/",[
+    [1,1,"Neujahrstag"],[5,1,"Tag der Arbeit"],[10,3,"Tag der Deutschen Einheit"],[12,25,"Erster Weihnachtstag"],[12,26,"Zweiter Weihnachtstag"]
+  ]),
+  IT:(y)=>fixedHolidayRules(y,"https://www.normattiva.it/",[
+    [1,1,"Capodanno"],[1,6,"Epifania"],[4,25,"Festa della Liberazione"],[5,1,"Festa del Lavoro"],[6,2,"Festa della Repubblica"],[8,15,"Ferragosto"],[11,1,"Ognissanti"],[12,8,"Immacolata Concezione"],[12,25,"Natale"],[12,26,"Santo Stefano"]
+  ]),
+  PT:(y)=>fixedHolidayRules(y,"https://diariodarepublica.pt/",[
+    [1,1,"Ano Novo"],[4,25,"Dia da Liberdade"],[5,1,"Dia do Trabalhador"],[6,10,"Dia de Portugal"],[8,15,"Assunção de Nossa Senhora"],[10,5,"Implantação da República"],[11,1,"Todos os Santos"],[12,1,"Restauração da Independência"],[12,8,"Imaculada Conceição"],[12,25,"Natal"]
+  ]),
+  GB:(y)=>fixedHolidayRules(y,"https://www.gov.uk/bank-holidays",[
+    [1,1,"New Year's Day"],[12,25,"Christmas Day"],[12,26,"Boxing Day"]
+  ])
+};
+function fixedHolidayRules(year,source,rules){
+  return rules.map(([m,d,name])=>{const dt=new Date(year,m-1,d);return {date:iso(year,m-1,d),name,source,type:"Festivo nacional"};});
+}
 function eventsFor(code,year){
-  return (DATA.events?.[code]||[]).filter(e=>String(e.date).startsWith(String(year)+"-"));
+  const fn=HOLIDAY_RULES[code];
+  return fn?dedupeEvents(fn(year)):[];
+}
+function dedupeEvents(events){
+  const map=new Map();
+  events.forEach(e=>{if(!map.has(e.date))map.set(e.date,e);else map.get(e.date).name += " · "+e.name;});
+  return [...map.values()];
 }
 function eventMap(events){
   return new Map(events.map(e=>[e.date,e]));
@@ -265,12 +420,11 @@ function render(){
   $("#title").textContent=`${country.name} · ${currentYear}`;
   $("#year").textContent=currentYear;
   document.title=`Calendario legal ${country.name} ${currentYear} | Término Legal`;
-  $("#intro").textContent=events.length
-    ? `Festivos y fechas registradas para ${country.name}. Consulta cada fecha para ver su información y fuente.`
-    : `Calendario de ${country.name}. Las fechas específicas de este año aún están pendientes de validación.`;
-  $("#status").textContent=events.length
-    ? `${events.length} fecha${events.length===1?"":"s"} registrada${events.length===1?"":"s"} · Los fines de semana se muestran como referencia.`
-    : "No hay fechas específicas verificadas cargadas para este año. Los fines de semana se muestran como referencia.";
+  const supported=!!HOLIDAY_RULES[code];
+  $("#intro").textContent=supported
+    ? `${events.length} festivos nacionales calculados para ${currentYear}`
+    : `Calendario perpetuo · festivos nacionales pendientes de validación`;
+
 
   const root=$("#months");
   root.innerHTML="";
@@ -328,8 +482,8 @@ function showDate(key){
 
   $("#infoDate").textContent=dateLabel(key);
   $("#infoKind").textContent=ev
-    ? (ev.type||"Fecha registrada").replaceAll("_"," ")
-    : (weekend?"Fin de semana":"Día sin fecha registrada");
+    ? (ev.type||"Festivo nacional").replaceAll("_"," ")
+    : (weekend?"Fin de semana":"Fecha de referencia");
 
   $("#infoText").textContent=ev
     ? ev.name
@@ -347,12 +501,23 @@ function showDate(key){
 }
 let decadeStart=Math.floor(currentYear/10)*10;
 function renderYearPicker(){
-  decadeStart=Math.floor(currentYear/10)*10;
   $("#decadeLabel").textContent=`${decadeStart}–${decadeStart+9}`;
+  $("#yearInput").value=currentYear;
   const now=new Date().getFullYear();
   $("#yearGrid").innerHTML=Array.from({length:12},(_,i)=>decadeStart-1+i).map(y=>`<button type="button" class="year-cell ${y===currentYear?"selected ":""}${y===now?"current":""}" data-year="${y}">${y}</button>`).join("");
-  $("#yearGrid").querySelectorAll("[data-year]").forEach(b=>b.onclick=()=>{currentYear=Number(b.dataset.year);selectedDate=null;$("#dateInfo").classList.remove("show");closeYearPicker();render();});
+  $("#yearGrid").querySelectorAll("[data-year]").forEach(b=>b.onclick=()=>selectYear(Number(b.dataset.year)));
 }
+function selectYear(year){
+  year=Math.trunc(Number(year));
+  if(!Number.isFinite(year)||year<1||year>9999)return;
+  currentYear=year;
+  decadeStart=Math.floor(currentYear/10)*10;
+  selectedDate=null;
+  $("#dateInfo").classList.remove("show");
+  closeYearPicker();
+  render();
+}
+function goYearFromInput(){selectYear($("#yearInput").value)}
 function openYearPicker(){renderYearPicker();$("#yearPicker").classList.add("open");$("#yearButton").setAttribute("aria-expanded","true")}
 function closeYearPicker(){$("#yearPicker").classList.remove("open");$("#yearButton").setAttribute("aria-expanded","false")}
 function openCountryMenu(){$("#countryMenu").classList.add("open");$("#countryButton").setAttribute("aria-expanded","true");$("#countrySearch").value="";renderCountryList("");setTimeout(()=>$("#countrySearch").focus(),0)}
@@ -395,7 +560,11 @@ async function init(){
   $("#yearButton").addEventListener("click",()=>$("#yearPicker").classList.contains("open")?closeYearPicker():openYearPicker());
   $("#decadePrev").addEventListener("click",()=>{decadeStart-=10;renderYearPicker();});
   $("#decadeNext").addEventListener("click",()=>{decadeStart+=10;renderYearPicker();});
-  $("#yearToday").addEventListener("click",()=>{currentYear=new Date().getFullYear();selectedDate=null;$("#dateInfo").classList.remove("show");closeYearPicker();render();});
+  $("#centuryPrev").addEventListener("click",()=>{decadeStart-=100;renderYearPicker();});
+  $("#centuryNext").addEventListener("click",()=>{decadeStart+=100;renderYearPicker();});
+  $("#yearGo").addEventListener("click",goYearFromInput);
+  $("#yearInput").addEventListener("keydown",e=>{if(e.key==="Enter")goYearFromInput();});
+  $("#yearToday").addEventListener("click",()=>selectYear(new Date().getFullYear()));
   $("#countryButton").addEventListener("click",()=>$("#countryMenu").classList.contains("open")?closeCountryMenu():openCountryMenu());
   $("#countrySearch").addEventListener("input",e=>renderCountryList(e.target.value));
   document.addEventListener("click",e=>{if(!$("#countryPicker").contains(e.target))closeCountryMenu();if(!$(".year-nav").contains(e.target))closeYearPicker()});
