@@ -1,0 +1,36 @@
+{
+  "CO": {
+    "nombre": "Colombia",
+    "moneda": "COP",
+    "indicativo": "+57",
+    "activo": true,
+    "gestiones": true,
+    "locale": "es-CO",
+    "division": "Departamento",
+    "paso_precio": 1000,
+    "ejemplos": {
+      "entidad": "Notaria 2",
+      "ciudad": "Samacá",
+      "region": "Boyacá",
+      "precio": "100000",
+      "telefono": "3001234567"
+    }
+  },
+  "ES": {
+    "nombre": "España",
+    "moneda": "EUR",
+    "indicativo": "+34",
+    "activo": false,
+    "gestiones": false,
+    "locale": "es-ES",
+    "division": "Provincia",
+    "paso_precio": 5,
+    "ejemplos": {
+      "entidad": "Juzgado de Primera Instancia n.º 3 de Alcalá de Henares",
+      "ciudad": "Alcalá de Henares",
+      "region": "Madrid",
+      "precio": "50",
+      "telefono": "612345678"
+    }
+  }
+}
