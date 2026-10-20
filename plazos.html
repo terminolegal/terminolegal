@@ -3042,7 +3042,7 @@ body.dark .usage-guide-panel{
 
 /* CONFIGURACIÓN GLOBAL — debe inicializarse antes de registrar o ejecutar
    cualquier interacción del usuario. */
-const APP_VERSION="11.8";
+const APP_VERSION="11.9";
 const SHARE_TITLE="Término Legal — resultado";
 const SHARE_URL="https://terminolegal.vercel.app/";
 const CALCULATION_SHEET_ENDPOINT="https://script.google.com/macros/s/AKfycbwXy7J715BTG5sjOLGn0lrC44wtyFl99yoy3N__QCaR38lWeWgzARUEj56LgY3jfXcu/exec";
@@ -6999,7 +6999,7 @@ countrySelect.addEventListener(
 );
 
 
-initCountry();
+/* initCountry() se ejecuta al final del script (ver más abajo). */
 
 
 /* =========================================================
@@ -8518,6 +8518,99 @@ exportPdfBtn.addEventListener("click",async()=>{
 /* Ctrl+P / menú del navegador: barato porque es idempotente. */
 window.addEventListener("beforeprint",()=>{preparePrintArea();});
 
+/* =========================================================
+   COMPARTIR — imagen del calendario + texto
+   1) Web Share con archivo (móvil y varios navegadores de escritorio)
+   2) Web Share solo con texto
+   3) Respaldo: copia el texto y descarga la imagen
+   ========================================================= */
+function dataUrlToBlob(url){
+  const parts=url.split(",");
+  const mime=(/data:([^;]+)/.exec(parts[0])||[])[1]||"image/jpeg";
+  const bin=atob(parts[1]);
+  const arr=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+  return new Blob([arr],{type:mime});
+}
+function buildShareText(t){
+  const lang=outputLang(t.country||currentCountry);
+  const full=amountText(t.amount,t.countMode||t.type,t.unit,lang);
+  const label=full.slice(String(t.amount).length).trim();
+  const fmt=d=>t.unit==="hours"?formatShortDateTime(d,lang):formatShortDate(d,lang);
+  const suffix=t.legalTerm?` (${t.legalTerm})`:"";
+  return tr(lang,"shareText",{start:fmt(t.start),amount:t.amount,label,suffix,end:fmt(t.end),url:SHARE_URL});
+}
+async function copyText(text){
+  try{
+    if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);return true;}
+  }catch{}
+  try{
+    const ta=document.createElement("textarea");
+    ta.value=text;ta.setAttribute("readonly","");
+    ta.style.cssText="position:fixed;top:0;left:0;opacity:0";
+    document.body.appendChild(ta);ta.select();
+    const ok=document.execCommand("copy");
+    ta.remove();return ok;
+  }catch{return false;}
+}
+function downloadDataUrl(url,name){
+  const a=document.createElement("a");
+  a.href=url;a.download=name;a.rel="noopener";
+  document.body.appendChild(a);a.click();a.remove();
+}
+let shareBusy=false;
+exportShareBtn.addEventListener("click",async()=>{
+  if(!lastTermData||shareBusy) return;
+  shareBusy=true;
+  const t=lastTermData;
+  const lang=outputLang(t.country||currentCountry);
+  const msg=(es,pt,en)=>lang==="en"?en:lang==="pt"?pt:es;
+  try{
+    trackEvent("compartir","",t);
+    const text=buildShareText(t);
+    const imgUrl=getCalendarImageURL(t);
+    let file=null;
+    if(imgUrl){
+      try{file=new File([dataUrlToBlob(imgUrl)],"termino-legal-calendario.jpg",{type:"image/jpeg"});}catch{}
+    }
+    /* 1) Con imagen */
+    if(file&&navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+      try{
+        await navigator.share({files:[file],title:SHARE_TITLE,text});
+        return;
+      }catch(err){
+        if(err&&err.name==="AbortError") return;
+      }
+    }
+    /* 2) Solo texto */
+    if(navigator.share){
+      try{
+        await navigator.share({title:SHARE_TITLE,text});
+        return;
+      }catch(err){
+        if(err&&err.name==="AbortError") return;
+      }
+    }
+    /* 3) Respaldo */
+    const copied=await copyText(text);
+    if(imgUrl) downloadDataUrl(imgUrl,"termino-legal-calendario.jpg");
+    showToast(copied
+      ?msg("Texto copiado"+(imgUrl?" e imagen del calendario descargada.":"."),
+           "Texto copiado"+(imgUrl?" e imagem do calendário baixada.":"."),
+           "Text copied"+(imgUrl?" and calendar image downloaded.":"."))
+      :msg("No se pudo compartir en este navegador.",
+           "Não foi possível compartilhar neste navegador.",
+           "Sharing isn't available in this browser."));
+  }catch(err){
+    console.error("Error al compartir:",err);
+    showToast(msg("No se pudo compartir. Inténtalo de nuevo.",
+                  "Não foi possível compartilhar. Tente novamente.",
+                  "Couldn't share. Please try again."));
+  }finally{
+    shareBusy=false;
+  }
+});
+
 
 /* =========================================================
    COMPARTIR
@@ -9112,6 +9205,26 @@ document
     });
   });
 
+
+/* País inicial: se aplica al final, cuando TODAS las const/let del script ya
+   existen. Antes se ejecutaba a mitad del script y lanzaba
+   "Cannot access 'gxWidget' before initialization", lo que abortaba el resto
+   (calendario en imagen, Guardar PDF y Compartir). */
+initCountry();
+
+/* Configuración centralizada de países (config/paises.json).
+   Si no carga, la app sigue funcionando igual que antes (solo Colombia). */
+fetch("config/paises.json",{cache:"no-cache"})
+  .then(r=>r.ok?r.json():null)
+  .then(cfg=>{
+    if(!cfg) return;
+    const on=Object.keys(cfg).filter(k=>cfg[k]&&cfg[k].activo&&cfg[k].gestiones);
+    if(on.length){
+      GX_ENABLED.splice(0,GX_ENABLED.length,...on);
+      updateGxWidgetVisibility();
+    }
+  })
+  .catch(()=>{});
 
 /* Visita: se registra al final, cuando todo lo demás ya está listo. */
 trackVisit();
