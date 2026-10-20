@@ -555,6 +555,48 @@ const COUNTRIES={
   ZW:{name:"Zimbabue",flag:"🇿🇼",cur:"ZWG",dial:"263",locale:"en-ZW"}
 };
 
+/* =========================================================
+   CONFIGURACIÓN CENTRAL DE PAÍSES — config/paises.json
+   Un solo archivo controla: país activo, si opera "Gestiones", moneda,
+   indicativo y ejemplos locales de los formularios.
+   Si el JSON no carga, todo sigue funcionando como antes (Colombia).
+   ========================================================= */
+const PAISES_CFG={};
+const flagOf=c=>String(c).toUpperCase().replace(/./g,ch=>String.fromCodePoint(127397+ch.charCodeAt(0)));
+async function cargarPaises(){
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),4000);
+  try{
+    const r=await fetch("config/paises.json",{signal:ctrl.signal,cache:"no-cache"});
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    const cfg=await r.json();
+    const on=[];
+    Object.entries(cfg).forEach(([code,c])=>{
+      if(!c||typeof c!=="object")return;
+      code=code.toUpperCase();
+      PAISES_CFG[code]=c;
+      const base=COUNTRIES[code]||(COUNTRIES[code]={name:c.nombre||code,flag:flagOf(code),cur:"USD",dial:"",locale:"es-"+code});
+      if(c.nombre)base.name=c.nombre;
+      if(c.moneda)base.cur=c.moneda;
+      if(c.indicativo)base.dial=String(c.indicativo).replace(/^\+/,"");
+      if(c.locale)base.locale=c.locale;
+      if(c.activo&&c.gestiones)on.push(code);
+    });
+    if(on.length)ENABLED.splice(0,ENABLED.length,...on);
+  }catch(e){
+    console.warn("paises.json no disponible; se usa la configuración por defecto (CO).",e);
+  }finally{clearTimeout(timer)}
+}
+/* Ejemplo local para placeholders: ej("CO","ciudad","Samacá") */
+function ej(country,key,fallback){
+  const c=PAISES_CFG[country];
+  return (c&&c.ejemplos&&c.ejemplos[key])||fallback;
+}
+function localeOf(country){
+  const c=COUNTRIES[country||(S&&S.loc&&S.loc.country)||ENABLED[0]];
+  return (c&&c.locale)||"es-CO";
+}
+
 const TIPOS={
   secuestro:"Diligencia de secuestro",
   radicacion:"Radicación de documentos",
@@ -691,11 +733,11 @@ function tile(iso){
 }
 function whenText(iso){
   const d=new Date(iso);
-  return d.toLocaleDateString("es-CO",{weekday:"long",day:"numeric",month:"long"})+
-         ", "+d.toLocaleTimeString("es-CO",{hour:"numeric",minute:"2-digit"});
+  return d.toLocaleDateString(localeOf(),{weekday:"long",day:"numeric",month:"long"})+
+         ", "+d.toLocaleTimeString(localeOf(),{hour:"numeric",minute:"2-digit"});
 }
 function timeText(iso){
-  return new Date(iso).toLocaleTimeString("es-CO",{hour:"numeric",minute:"2-digit"});
+  return new Date(iso).toLocaleTimeString(localeOf(),{hour:"numeric",minute:"2-digit"});
 }
 function localNow(){
   const d=new Date(),p=n=>String(n).padStart(2,"0");
@@ -1049,7 +1091,7 @@ function renderNeedForm(){
     <select id="tipo" name="tipo">${Object.entries(TIPOS).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select>
 
     <label for="entidad">Despacho o entidad <span class="muted">(opcional)</span></label>
-    <input id="entidad" name="entidad" type="text" maxlength="120" placeholder="Ej.: Inspección de Policía de Cota">
+    <input id="entidad" name="entidad" type="text" maxlength="120" placeholder="Ej.: ${esc(ej(country,"entidad","Inspección de Policía de Cota"))}">
 
     ${ENABLED.length>1?`<label for="country">País</label>
     <select id="country" name="country">${ENABLED.map(c=>`<option value="${c}" ${c===country?"selected":""}>${COUNTRIES[c].name}</option>`).join("")}</select>`
@@ -1057,9 +1099,9 @@ function renderNeedForm(){
 
     <div class="grid2">
       <div><label for="city">Municipio donde se hace</label>
-        <input id="city" name="city" type="text" maxlength="80" required autocomplete="off" placeholder="Ej.: Samacá" value="${esc((S.loc&&S.loc.city)||"")}"></div>
-      <div><label for="dept">Departamento</label>
-        <input id="dept" name="dept" type="text" maxlength="80" autocomplete="off" placeholder="Ej.: Boyacá" value="${esc((S.loc&&S.loc.dept)||"")}"></div>
+        <input id="city" name="city" type="text" maxlength="80" required autocomplete="off" placeholder="Ej.: ${esc(ej(country,"ciudad","Samacá"))}" value="${esc((S.loc&&S.loc.city)||"")}"></div>
+      <div><label for="dept">${esc((PAISES_CFG[country]||{}).division||"Departamento")}</label>
+        <input id="dept" name="dept" type="text" maxlength="80" autocomplete="off" placeholder="Ej.: ${esc(ej(country,"region","Boyacá"))}" value="${esc((S.loc&&S.loc.dept)||"")}"></div>
     </div>
     <input type="hidden" name="lat" value="${S.loc&&S.loc.city?S.loc.lat:""}">
     <input type="hidden" name="lng" value="${S.loc&&S.loc.city?S.loc.lng:""}">
@@ -1077,7 +1119,7 @@ function renderNeedForm(){
         <div id="tlCalendar" class="tl-calendar" hidden></div>
       </div>
       <div><label for="price">Tu oferta en ${cur}</label>
-        <input id="price" name="price" type="number" inputmode="numeric" min="1" step="1000" required placeholder="130000"></div>
+        <input id="price" name="price" type="number" inputmode="numeric" min="1" step="${Number((PAISES_CFG[country]||{}).paso_precio)||1000}" required placeholder="${esc(ej(country,"precio","130000"))}"></div>
     </div>
 
     <div class="grid2">
@@ -1112,7 +1154,7 @@ function renderNeedForm(){
       <div><label for="name">Tu nombre</label>
         <input id="name" name="name" type="text" maxlength="100" required autocomplete="name" value="${esc(store.get("tl_gx_name")||"")}"></div>
       <div><label for="contact">Tu WhatsApp</label>
-        <input id="contact" name="contact" type="tel" inputmode="tel" required autocomplete="tel" placeholder="3001234567" value="${esc(store.get("tl_gx_contact")||"")}"></div>
+        <input id="contact" name="contact" type="tel" inputmode="tel" required autocomplete="tel" placeholder="${esc(ej(country,"telefono","3001234567"))}" value="${esc(store.get("tl_gx_contact")||"")}"></div>
     </div>
     <p class="hint">Tu contacto solo se comparte con la persona cuyo ofrecimiento aceptes.</p>
 
@@ -1167,7 +1209,7 @@ function initTLCalendar(){
     const first=new Date(y,m,1),days=new Date(y,m+1,0).getDate();
     const prevDays=new Date(y,m,0).getDate();
     const selected=parseDate();
-    let html=`<div class="tl-cal-head"><strong class="tl-cal-title">${new Intl.DateTimeFormat("es-CO",{month:"long",year:"numeric"}).format(view)}</strong><div class="tl-cal-nav"><button type="button" data-cal="prev" aria-label="Mes anterior">‹</button><button type="button" data-cal="next" aria-label="Mes siguiente">›</button></div></div>`;
+    let html=`<div class="tl-cal-head"><strong class="tl-cal-title">${new Intl.DateTimeFormat(localeOf(),{month:"long",year:"numeric"}).format(view)}</strong><div class="tl-cal-nav"><button type="button" data-cal="prev" aria-label="Mes anterior">‹</button><button type="button" data-cal="next" aria-label="Mes siguiente">›</button></div></div>`;
     html+=`<div class="tl-cal-week">${["Do","Lu","Ma","Mi","Ju","Vi","Sa"].map(x=>`<span>${x}</span>`).join("")}</div><div class="tl-cal-grid">`;
     const start=first.getDay();
     for(let i=0;i<42;i++){
@@ -1575,7 +1617,7 @@ function renderProviderForm(p){
           <select id="phone_country" name="phone_country" class="phone-country" aria-label="Código de país del celular" title="Selecciona el país y su código">
             ${Object.entries(COUNTRIES).map(([k,v])=>`<option value="${k}" ${k===phoneCountry?"selected":""}>${v.flag} +${v.dial}</option>`).join("")}
           </select>
-          <input id="pphone" name="phone" class="phone-number" type="tel" inputmode="tel" required autocomplete="tel" placeholder="3001234567" aria-label="Número de celular o WhatsApp">
+          <input id="pphone" name="phone" class="phone-number" type="tel" inputmode="tel" required autocomplete="tel" placeholder="${esc(ej(phoneCountry,"telefono","3001234567"))}" aria-label="Número de celular o WhatsApp">
         </div>
         <p class="hint">Código de país + número.</p>
       </div>
@@ -1754,7 +1796,7 @@ async function submitProvider(e){
 /* =========================================================
    INICIO
    ========================================================= */
-render();
+cargarPaises().then(render);
 
 
 /* =========================================================
