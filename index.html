@@ -36,8 +36,11 @@ body{margin:0;background:var(--bg);color:var(--ink);
 .app{width:min(760px,94%);margin:0 auto;padding:28px 0 60px}
 
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-home{display:inline-flex;align-items:center;gap:9px;text-decoration:none;color:inherit;min-width:0}
+.brand-home-logo{width:38px;height:38px;flex:0 0 38px;display:block}
 .brand-name{font-weight:700;letter-spacing:.14em;font-size:1.05rem;color:var(--navy);margin:0}
 .brand-name span{color:var(--gold)}
+@media(max-width:420px){.brand-home{gap:6px}.brand-home-logo{width:31px;height:31px;flex-basis:31px}.brand-name{font-size:.88rem;letter-spacing:.1em}}
 .back{font-size:.78rem;color:var(--muted);text-decoration:none}
 .back:hover{color:var(--navy);text-decoration:underline}
 .plazos-link{display:inline-flex;align-items:center;gap:7px;font-weight:600}
@@ -259,7 +262,15 @@ button.primary,button.secondary,button.link{font:inherit;cursor:pointer}
 <div class="app">
 
   <div class="top">
-    <div class="brand-name">TÉRMINO <span>LEGAL</span></div>
+    <a class="brand-home" href="/" aria-label="Término Legal — inicio">
+      <svg class="brand-home-logo" viewBox="0 0 40 40" role="img" aria-label="Logo de Término Legal">
+        <rect x="3" y="4" width="34" height="33" rx="7" fill="#c6a15b" opacity=".16"></rect>
+        <rect x="4.5" y="5.5" width="31" height="31" rx="6" fill="none" stroke="#c6a15b" stroke-width="2"></rect>
+        <path d="M12 3.5v7M28 3.5v7M5 14h30" fill="none" stroke="#c6a15b" stroke-width="2.2" stroke-linecap="round"></path>
+        <path d="M12 20h5v5h-5zM23 20h5v5h-5zM12 28h5v3h-5zM23 28h5v3h-5z" fill="#c6a15b"></path>
+      </svg>
+      <span class="brand-name">TÉRMINO <span>LEGAL</span></span>
+    </a>
     <a class="back plazos-link" href="/plazos.html" aria-label="Calcular un término">
       <span class="plazos-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -327,16 +338,12 @@ button.primary,button.secondary,button.link{font:inherit;cursor:pointer}
   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817-5.963 6.817H1.684l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/>
 </svg>
   </a>
-
-  <a href="/" class="tl-social-btn tl-home-logo" aria-label="Ir a Gestiones en Término Legal" title="Gestiones en Término Legal">
-    <svg viewBox="0 0 32 32" aria-hidden="true" role="img" fill="none">
-      <rect x="3" y="5" width="26" height="24" rx="4" stroke="currentColor" stroke-width="2.2"/>
-      <path d="M3 11h26" stroke="currentColor" stroke-width="2.2"/>
-      <path d="M10 3v5M22 3v5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
-      <path d="m10 19 3.5 3.5L22 14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<a href="https://www.youtube.com/@Terminolegal" target="_blank" rel="noopener noreferrer" class="tl-social-btn tl-youtube" aria-label="Canal de YouTube de Término Legal" title="YouTube de Término Legal">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z"/>
     </svg>
   </a>
-</div>
+  </div>
 
 </div>
 
