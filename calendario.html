@@ -175,6 +175,8 @@ footer{padding:18px 0 0;color:var(--muted);font-size:10px;line-height:1.5;text-a
 .tl-social-btn{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:transparent;border:1px solid var(--line);color:var(--ink);text-decoration:none;cursor:pointer;padding:0;transition:background .15s,border-color .15s,transform .15s}
 .tl-social-btn:hover{background:var(--surface-2);border-color:var(--gold);transform:translateY(-1px)}
 .tl-social-btn svg{width:15px;height:15px;color:var(--gold)}
+.tl-social-btn.tl-home-logo{color:var(--gold);border-color:var(--gold)}
+.tl-social-btn.tl-home-logo svg{width:21px;height:21px;color:var(--gold)}
 @media(max-width:480px){.tl-social-bar{padding-top:11px;gap:5px}.tl-social-label{font-size:9px;margin-right:2px}.tl-social-btn{width:29px;height:29px}.tl-social-btn svg{width:14px;height:14px}}
 </style>
 </head>
@@ -271,9 +273,12 @@ footer{padding:18px 0 0;color:var(--muted);font-size:10px;line-height:1.5;text-a
 
   <div class="tl-social-bar" aria-label="Redes sociales de Término Legal">
     <span class="tl-social-label">Término Legal</span>
-  <a href="https://terminolegal.vercel.app/" target="_blank" rel="noopener noreferrer" class="tl-social-btn" aria-label="Sitio web de Término Legal" title="Término Legal">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
-      <circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c2.4 2.5 3.6 5.5 3.6 9S14.4 18.5 12 21c-2.4-2.5-3.6-5.5-3.6-9S9.6 5.5 12 3z"></path>
+  <a href="/" class="tl-social-btn tl-home-logo" aria-label="Ir a Gestiones en Término Legal" title="Gestiones en Término Legal">
+    <svg viewBox="0 0 32 32" aria-hidden="true" role="img">
+      <rect x="3" y="4" width="26" height="25" rx="5" fill="currentColor" opacity=".12"></rect>
+      <rect x="4.5" y="5.5" width="23" height="23" rx="4" fill="none" stroke="currentColor" stroke-width="1.6"></rect>
+      <path d="M10 3.5v5M22 3.5v5M5 11h22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+      <text x="16" y="22" text-anchor="middle" font-size="8" font-family="Arial,sans-serif" font-weight="800" fill="currentColor">TL</text>
     </svg>
   </a>
   <a href="https://web.facebook.com/terminolegal" target="_blank" rel="noopener noreferrer" class="tl-social-btn" aria-label="Facebook de Término Legal" title="Facebook">
@@ -318,8 +323,17 @@ const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&g
 function pad(n){return String(n).padStart(2,"0")}
 function iso(y,m,d){return `${y}-${pad(m+1)}-${pad(d)}`}
 function pathCountry(){
+  // La URL explícita tiene prioridad; luego la última selección guardada;
+  // finalmente usamos la región del navegador y Colombia como respaldo.
   const m=location.pathname.match(/^\/calendario\/([a-z]{2})\/?$/i);
-  return m?m[1].toUpperCase():"CO";
+  if(m) return m[1].toUpperCase();
+  try {
+    const saved=localStorage.getItem("tl_calendar_country");
+    if(saved && /^[a-z]{2}$/i.test(saved)) return saved.toUpperCase();
+  } catch(_) {}
+  const locale=(navigator.languages && navigator.languages[0]) || navigator.language || "";
+  const region=locale.match(/[-_]([a-z]{2})$/i);
+  return region ? region[1].toUpperCase() : "CO";
 }
 function dateObj(key){return new Date(key+"T12:00:00")}
 function dateLabel(key){
@@ -505,7 +519,9 @@ function initTheme(){
   if(btn)btn.setAttribute("aria-pressed",String(theme==="dark"));
 }
 function setUrlCountry(code){
-  history.pushState({},"",`/calendario/${code.toLowerCase()}`);
+  const normalized=String(code||"CO").toUpperCase();
+  try { localStorage.setItem("tl_calendar_country",normalized); } catch(_) {}
+  history.pushState({},"",`/calendario/${normalized.toLowerCase()}`);
 }
 function render(){
   const code=selectedCountry().code;
