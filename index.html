@@ -353,7 +353,7 @@ button.primary,button.secondary,button.link{font:inherit;cursor:pointer}
 /* =========================================================
    CONFIGURACIÓN
    ========================================================= */
-const ENDPOINT="https://script.google.com/macros/s/AKfycbxxpJvRo52OHIHCA-eIHhgRfZCIeNEi8MNfa89j88uxTAWxmLXy4-BFhNjmdyKKVDdU/exec";
+const ENDPOINT="https://script.google.com/macros/s/AKfycbzoivqCgR2bdCcxFs4vGynDq-glVCS-ZX93DmQruFY9i_mDyxzi1fZjS18GyXwNC-4/exec";
 
 /* Países activos. Mantener igual que GX_ENABLED en gestiones_backend.gs */
 const ENABLED=["CO"];
@@ -1255,7 +1255,7 @@ function initTLCalendar(){
     if(action==="today"){view=new Date(today.getFullYear(),today.getMonth(),1);dateInput.value=`${pad(today.getDate())}/${pad(today.getMonth()+1)}/${today.getFullYear()}`;render();syncHidden();return}
     if(b.dataset.date){const d=new Date(`${b.dataset.date}T00:00:00`);dateInput.value=`${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;view=new Date(d.getFullYear(),d.getMonth(),1);render();syncHidden();cal.hidden=true;timeInput.focus()}
   });
-  document.addEventListener("click",e=>{if(!cal.hidden&&!cal.contains(e.target)&&e.target!==dateInput)cal.hidden=true});
+  document.addEventListener("click",e=>{const path=e.composedPath?e.composedPath():[];if(!cal.hidden&&!path.includes(cal)&&e.target!==dateInput)cal.hidden=true});
   const now=new Date();
   timeInput.value=`${pad(now.getHours())}:${pad(Math.ceil(now.getMinutes()/5)*5%60)}`;
   if(Math.ceil(now.getMinutes()/5)*5>=60){const h=(now.getHours()+1)%24;timeInput.value=`${pad(h)}:00`}
