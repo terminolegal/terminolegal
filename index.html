@@ -1013,11 +1013,21 @@ async function renderZone(){
     $("#detectZone").onclick=onDetectZone;
     return;
   }
+  /* País aún no habilitado (config/paises.json → gestiones:true): no se consulta
+     al backend, que respondería "country" y se vería como un error genérico. */
+  if(S.loc.country&&!ENABLED.includes(S.loc.country)){
+    const nombre=(COUNTRIES[S.loc.country]||{}).name||S.loc.country;
+    el.innerHTML=`<div class="zone-row"><div><strong>${esc(S.loc.city||nombre)}, ${esc(nombre)}</strong>
+      <span class="muted">Todavía no operamos en ${esc(nombre)}. Puedes seguir explorando el mapa o cambiar de zona.</span></div>
+      <button type="button" class="btn-sm" id="detectZone">DETECTAR MI ZONA</button></div>`;
+    $("#detectZone").onclick=onDetectZone;
+    return;
+  }
   el.innerHTML=`<span class="muted">Consultando tu zona…</span>`;
   const res=await api("gx_zone_stats",{country:S.loc.country,city:S.loc.city,lat:S.loc.lat,lng:S.loc.lng});
   if(!res.ok){
     el.innerHTML=`<div class="zone-row"><div><strong>Comunidad de ${esc(S.loc.city||"tu zona")}</strong>
-      <span class="muted">No pudimos cargar los datos de la zona.</span></div>
+      <span class="muted">${esc(res.error==="country"?errText("country"):"No pudimos cargar los datos de la zona.")}</span></div>
       <button type="button" class="btn-sm" id="detectZone">ACTUALIZAR</button></div>`;
     $("#detectZone").onclick=onDetectZone;
     return;
