@@ -588,9 +588,19 @@ async function cargarPaises(){
   }finally{clearTimeout(timer)}
 }
 /* Ejemplo local para placeholders: ej("CO","ciudad","Samacá") */
+const EJ_NEUTRO={entidad:"Juzgado, notaría u oficina",ciudad:"Tu ciudad",region:"Tu región",precio:"",telefono:"Tu número"};
 function ej(country,key,fallback){
   const c=PAISES_CFG[country];
-  return (c&&c.ejemplos&&c.ejemplos[key])||fallback;
+  const v=c&&c.ejemplos&&c.ejemplos[key];
+  if(v)return v;
+  return country==="CO"?fallback:(EJ_NEUTRO[key]!==undefined?EJ_NEUTRO[key]:fallback);
+}
+/* Paso del campo de precio según el país (COP: 1000, EUR: 5, etc.) */
+function pasoPrecio(country){
+  return Number((PAISES_CFG[country]||{}).paso_precio)||(country==="CO"?1000:1);
+}
+function countryOfGx(g){
+  return (g&&g.country)||(S&&S.loc&&S.loc.country)||ENABLED[0];
 }
 function localeOf(country){
   const c=COUNTRIES[country||(S&&S.loc&&S.loc.country)||ENABLED[0]];
@@ -1100,7 +1110,7 @@ function renderNeedForm(){
     <div class="grid2">
       <div><label for="city">Municipio donde se hace</label>
         <input id="city" name="city" type="text" maxlength="80" required autocomplete="off" placeholder="Ej.: ${esc(ej(country,"ciudad","Samacá"))}" value="${esc((S.loc&&S.loc.city)||"")}"></div>
-      <div><label for="dept">${esc((PAISES_CFG[country]||{}).division||"Departamento")}</label>
+      <div><label for="dept">${esc((PAISES_CFG[country]||{}).division||(country==="CO"?"Departamento":"Región"))}</label>
         <input id="dept" name="dept" type="text" maxlength="80" autocomplete="off" placeholder="Ej.: ${esc(ej(country,"region","Boyacá"))}" value="${esc((S.loc&&S.loc.dept)||"")}"></div>
     </div>
     <input type="hidden" name="lat" value="${S.loc&&S.loc.city?S.loc.lat:""}">
@@ -1119,7 +1129,7 @@ function renderNeedForm(){
         <div id="tlCalendar" class="tl-calendar" hidden></div>
       </div>
       <div><label for="price">Tu oferta en ${cur}</label>
-        <input id="price" name="price" type="number" inputmode="numeric" min="1" step="${Number((PAISES_CFG[country]||{}).paso_precio)||1000}" required placeholder="${esc(ej(country,"precio","130000"))}"></div>
+        <input id="price" name="price" type="number" inputmode="numeric" min="1" step="${pasoPrecio(country)}" required placeholder="${esc(ej(country,"precio","130000"))}"></div>
     </div>
 
     <div class="grid2">
@@ -1314,17 +1324,21 @@ function mineCard(g){
   if(g.status==="abierta"){
     inner+=pending.length
       ?`<p class="muted" style="margin-top:10px"><b>${pending.length}</b> ${pending.length===1?"oferta":"ofertas"} para tu solicitud</p>`+
-        pending.slice().sort((a,b)=>a.price-b.price).map(o=>`
+        pending.slice().sort((a,b)=>a.price-b.price).map((o,i)=>{
+        const diff=o.price-g.price;
+        const diffTxt=!(g.price>0)?"":(diff===0?"Igual a tu oferta":(diff<0?`${money(-diff,g.currency)} menos que tu oferta`:`${money(diff,g.currency)} más que tu oferta`));
+        return `
         <div class="offer">
           <div>
             <strong>${esc(o.provider.name||"Profesional")}</strong>
             <span class="chip">${esc(ROLES[o.provider.role]||o.provider.role||"")}</span>
             ${o.provider.verified?`<span class="chip ok">Verificado</span>`:""}
-            <div class="muted">${o.provider.distance_km!=null?`A ${o.provider.distance_km} km del lugar. `:""}<b class="price" style="font-size:.95rem">${money(o.price,g.currency)}</b></div>
+            ${i===0&&pending.length>1?`<span class="chip ok">Mejor precio</span>`:""}
+            <div class="muted">${o.provider.distance_km!=null?`A ${o.provider.distance_km} km del lugar. `:""}<b class="price" style="font-size:.95rem">${money(o.price,g.currency)}</b>${diffTxt?` · ${esc(diffTxt)}`:""}</div>
             ${o.message?`<p class="msg">${esc(o.message)}</p>`:""}
           </div>
           <button type="button" class="btn-sm" data-act="accept" data-g="${g.id}" data-o="${o.id}">ACEPTAR</button>
-        </div>`).join("")
+        </div>`}).join("")
       :`<p class="muted" style="margin-top:10px">Esperando ofertas de profesionales de la zona…</p>`;
     inner+=`<div class="actions"><button type="button" class="secondary" data-act="cancel" data-g="${g.id}">Cancelar solicitud</button></div>`;
   }
@@ -1373,6 +1387,14 @@ $("#view").addEventListener("click",async e=>{
     if(!res.ok){b.disabled=false;return toast(errText(res.error),true)}
     toast(act==="done"?"Gestión cumplida.":"Solicitud cancelada.");
     return renderMine();
+  }
+
+  if(act==="quick"){
+    const inp=b.closest(".counter").querySelector("[name=cprice]");
+    const base=Number(b.dataset.base)||Number(inp.value)||0;
+    const step=Number(b.dataset.step)||1;
+    inp.value=Math.max(step,Math.round(base*(1+Number(b.dataset.pct)/100)/step)*step);
+    return;
   }
 
   if(act==="counterToggle"){
@@ -1506,7 +1528,10 @@ function nearCard(g){
     ${actions}
     <div class="counter" hidden>
       <div><label style="margin-top:0">Tu valor (${esc(g.currency)})</label>
-        <input name="cprice" type="number" inputmode="numeric" min="1" step="1000" value="${mine?mine.price:g.price}"></div>
+        <input name="cprice" type="number" inputmode="numeric" min="1" step="${pasoPrecio(countryOfGx(g))}" value="${mine?mine.price:g.price}">
+        <div class="quick" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px" aria-label="Ajustes rápidos de precio">
+          ${[-10,-5,5,10,20].map(pc=>`<button type="button" class="chipbtn" data-act="quick" data-pct="${pc}" data-base="${g.price}" data-step="${pasoPrecio(countryOfGx(g))}">${pc>0?"+":""}${pc}%</button>`).join("")}
+        </div></div>
       <div><label style="margin-top:0">Mensaje <span class="muted">(opcional)</span></label>
         <input name="cmsg" type="text" maxlength="200" placeholder="Ej.: Estoy a 10 minutos del despacho"></div>
       <button type="button" class="btn-sm" data-act="counterSend" data-g="${g.id}">ENVIAR OFERTA</button>
