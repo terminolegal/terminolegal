@@ -290,6 +290,8 @@ button.primary,button.secondary,button.link{font:inherit;cursor:pointer}
   <h1>Solicita una diligencia</h1>
   <p class="intro">Publica la diligencia que requieres con tu oferta de pago. La comunidad disponible podrá aceptar tu oferta o proponerte otro valor. Compara las propuestas y elige quién la realizará.</p>
 
+  <div id="acct" class="muted" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:-6px 0 14px" hidden></div>
+
   <div class="zone" id="zone" aria-live="polite"></div>
 
   <div class="seg" role="group" aria-label="Qué quieres hacer">
@@ -348,6 +350,44 @@ button.primary,button.secondary,button.link{font:inherit;cursor:pointer}
 </div>
 
 <div id="toast" role="status" aria-live="polite"></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {
+  getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,
+  signInWithPopup,GoogleAuthProvider,sendPasswordResetEmail,sendEmailVerification,signOut
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+const app=initializeApp({
+  apiKey:"AIzaSyBM3pwVv3cgxr0uxdfxVKe4vqj3nkeo0IE",
+  authDomain:"termino-legal.firebaseapp.com",
+  projectId:"termino-legal",
+  appId:"1:250328474421:web:f39c5a487db5e43fe0627c"
+});
+const auth=getAuth(app);
+auth.languageCode="es";
+
+let resolveReady;
+const ready=new Promise(r=>resolveReady=r);
+
+window.TLAuth={
+  ready,
+  get user(){return auth.currentUser},
+  token:async()=>auth.currentUser?auth.currentUser.getIdToken():null,
+  signUp:(e,p)=>createUserWithEmailAndPassword(auth,e,p),
+  signIn:(e,p)=>signInWithEmailAndPassword(auth,e,p),
+  google:()=>signInWithPopup(auth,new GoogleAuthProvider()),
+  reset:e=>sendPasswordResetEmail(auth,e),
+  verify:()=>sendEmailVerification(auth.currentUser),
+  logout:()=>signOut(auth)
+};
+window.dispatchEvent(new Event("tl-auth-loaded"));
+
+onAuthStateChanged(auth,u=>{
+  resolveReady();
+  window.dispatchEvent(new CustomEvent("tl-auth",{detail:u}));
+});
+</script>
 
 <script>
 /* =========================================================
@@ -665,6 +705,8 @@ const ERRORS={
   rate_limited:"Demasiadas solicitudes seguidas. Espera un momento.",
   country:"Todavía no operamos en ese país.",
   limit:"Ya tienes 10 solicitudes abiertas. Cierra alguna antes de publicar otra.",
+  auth:"Tu sesión no es válida. Cierra sesión y vuelve a ingresar.",
+  email_unverified:"Verifica tu correo para continuar. Te enviamos un enlace.",
   network:"No pudimos conectar. Revisa tu conexión e intenta de nuevo.",
   server:"Algo falló de nuestro lado. Intenta de nuevo en un momento."
 };
@@ -717,10 +759,11 @@ async function api(action,data={}){
   const ctrl=new AbortController();
   const timer=setTimeout(()=>ctrl.abort(),25000);
   try{
+    const idToken=window.TLAuth?await TLAuth.token():null;
     const res=await fetch(ENDPOINT,{
       method:"POST",
       headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify({action,visitor_id:visitorId(),...data}),
+      body:JSON.stringify({action,visitor_id:visitorId(),id_token:idToken,...data}),
       signal:ctrl.signal
     });
     const json=await res.json();
@@ -846,10 +889,153 @@ function saveLoc(place){
 
 function render(){
   clearInterval(S.timer);
+  const u=window.TLAuth&&TLAuth.user;
+  $(".seg").hidden=!u;
+  $("#zone").hidden=!u;
+  renderAccountBar();
+  if(!u)return renderAuth("login");
   $("#roleNeed").setAttribute("aria-pressed",String(S.role==="need"));
   $("#roleTake").setAttribute("aria-pressed",String(S.role==="take"));
   renderZone();
   S.role==="need"?renderNeed():renderTake();
+}
+
+/* =========================================================
+   CUENTA (Firebase Authentication)
+   ========================================================= */
+const AUTH_ERR={
+  "auth/invalid-email":"El correo no es válido.",
+  "auth/missing-password":"Escribe tu contraseña.",
+  "auth/weak-password":"La contraseña debe tener al menos 8 caracteres.",
+  "auth/email-already-in-use":"Ese correo ya tiene cuenta. Inicia sesión.",
+  "auth/invalid-credential":"Correo o contraseña incorrectos.",
+  "auth/user-not-found":"Correo o contraseña incorrectos.",
+  "auth/wrong-password":"Correo o contraseña incorrectos.",
+  "auth/too-many-requests":"Demasiados intentos. Espera unos minutos o restablece tu contraseña.",
+  "auth/network-request-failed":"No pudimos conectar. Revisa tu conexión e intenta de nuevo.",
+  "auth/popup-closed-by-user":"",
+  "auth/cancelled-popup-request":""
+};
+
+function renderAccountBar(){
+  const box=$("#acct"),u=window.TLAuth&&TLAuth.user;
+  if(!u){box.hidden=true;box.innerHTML="";return}
+  box.hidden=false;
+  box.innerHTML=`<span>Sesión: <b>${esc(u.email||"")}</b></span>
+    ${u.emailVerified?"":`<span class="chip warn">Correo sin verificar</span><button type="button" class="link" id="resendVerif" style="margin:0">Reenviar verificación</button>`}
+    <button type="button" class="link" id="logoutBtn" style="margin:0">Cerrar sesión</button>`;
+  $("#logoutBtn").onclick=()=>TLAuth.logout();
+  const rv=$("#resendVerif");
+  if(rv)rv.onclick=async()=>{
+    try{await TLAuth.verify();toast("Te enviamos el correo de verificación.")}
+    catch{toast(ERRORS.server,true)}
+  };
+}
+
+function renderAuth(mode){
+  clearInterval(S.timer);
+  S._refresh=null;
+  const reg=mode==="register",rec=mode==="reset";
+  $("#view").innerHTML=`
+  <form id="authForm" class="card" novalidate>
+    <h2>${rec?"Restablecer contraseña":reg?"Crea tu cuenta":"Ingresa a tu cuenta"}</h2>
+    <p class="muted">${rec
+      ?"Te enviaremos un enlace al correo para crear una nueva contraseña."
+      :"Con tu cuenta retomas tus solicitudes, ofertas y perfil desde cualquier dispositivo."}</p>
+
+    <label for="aemail">Correo</label>
+    <input id="aemail" name="email" type="email" maxlength="120" required autocomplete="email">
+
+    ${rec?"":`<label for="apass">Contraseña</label>
+    <input id="apass" name="pass" type="password" minlength="8" maxlength="100" required autocomplete="${reg?"new-password":"current-password"}">
+    ${reg?`<p class="hint">Mínimo 8 caracteres.</p>`:""}`}
+
+    ${reg?`<label class="check"><input type="checkbox" name="consent" required>
+      <span>Acepto la política de tratamiento de datos personales de Término Legal.</span></label>`:""}
+
+    <button class="primary" type="submit">${rec?"ENVIAR ENLACE":reg?"CREAR CUENTA":"INGRESAR"}</button>
+    ${rec?"":`<button type="button" class="secondary" id="gBtn" style="width:100%;margin-top:10px">Continuar con Google</button>`}
+    ${mode==="login"?`<button type="button" class="link" id="toReset">Olvidé mi contraseña</button><br>`:""}
+    <button type="button" class="link" id="toMode">${reg||rec?"Ya tengo cuenta: ingresar":"No tengo cuenta: crear una"}</button>
+  </form>`;
+
+  const f=$("#authForm");
+  $("#toMode").onclick=()=>renderAuth(reg||rec?"login":"register");
+  const tr=$("#toReset");if(tr)tr.onclick=()=>renderAuth("reset");
+
+  const showErr=err=>{
+    const m=AUTH_ERR[err&&err.code];
+    if(m!=="")toast(m||ERRORS.server,true);
+  };
+
+  const g=$("#gBtn");
+  if(g)g.onclick=async()=>{try{await TLAuth.google()}catch(err){showErr(err)}};
+
+  f.onsubmit=async e=>{
+    e.preventDefault();
+    const btn=f.querySelector("button[type=submit]");
+    const email=field(f,"email").value.trim();
+    const pass=rec?"":field(f,"pass").value;
+    if(!email)return toast(AUTH_ERR["auth/invalid-email"],true);
+    if(!rec&&pass.length<8)return toast(AUTH_ERR["auth/weak-password"],true);
+    if(reg&&!field(f,"consent").checked)return toast(ERRORS.consent,true);
+    setBusy(btn,true,"UN MOMENTO…");
+    try{
+      if(rec){
+        await TLAuth.reset(email);
+        setBusy(btn,false);
+        toast("Si el correo tiene cuenta, recibirá un enlace para restablecer la contraseña.");
+        return renderAuth("login");
+      }
+      if(reg){
+        await TLAuth.signUp(email,pass);
+        try{await TLAuth.verify()}catch{}
+        toast("Cuenta creada. Te enviamos un correo para verificarla.");
+      }else{
+        await TLAuth.signIn(email,pass);
+      }
+      /* el resto lo hace el listener tl-auth */
+    }catch(err){
+      setBusy(btn,false);
+      showErr(err);
+    }
+  };
+}
+
+/* Crea la cuenta en el backend y vincula lo que había en este dispositivo */
+async function ensureAccount(){
+  const res=await api("gx_account_init",{
+    legacy_requester:store.get("tl_gx_rtok")||"",
+    legacy_provider:store.get("tl_gx_ptok")||""
+  });
+  if(!res.ok){toast(errText(res.error),true);return false}
+  if(res.claimed&&(res.claimed.requester||res.claimed.provider))
+    toast("Vinculamos a tu cuenta las solicitudes y el perfil de este dispositivo.");
+  return true;
+}
+
+let _uid,_started=false;
+window.addEventListener("tl-auth",async e=>{
+  if(!_started)return;
+  const u=e.detail,uid=u?u.uid:null;
+  if(uid===_uid)return;
+  _uid=uid;
+  S.provider=null;S.offers=[];
+  if(u)await ensureAccount();
+  else{store.set("tl_gx_name","");store.set("tl_gx_contact","")}
+  render();
+});
+
+/* El módulo de Firebase se ejecuta después de este script: se espera su carga (máx. 8 s) */
+function authReadyOrTimeout(){
+  const loaded=new Promise(res=>{
+    if(window.TLAuth)res();
+    else window.addEventListener("tl-auth-loaded",res,{once:true});
+  });
+  return Promise.race([
+    loaded.then(()=>TLAuth.ready),
+    new Promise(r=>setTimeout(r,8000))
+  ]);
 }
 
 $("#roleNeed").onclick=()=>{S.role="need";store.set("tl_gx_role","need");render()};
@@ -1442,7 +1628,6 @@ async function renderTake(){
   S._refresh=null;
   const v=$("#view");
   v.innerHTML=`<div class="empty">Cargando…</div>`;
-  if(!store.get("tl_gx_ptok"))return renderProviderForm(null);
 
   const res=await api("gx_provider_me",{token:providerToken()});
   if(S.role!=="take")return;
@@ -1831,7 +2016,16 @@ async function submitProvider(e){
 /* =========================================================
    INICIO
    ========================================================= */
-cargarPaises().then(render);
+(async function startApp(){
+  await Promise.all([cargarPaises(),authReadyOrTimeout()]);
+  if(!window.TLAuth)toast("No pudimos cargar el servicio de cuentas. Recarga la página.",true);
+  const u=window.TLAuth&&TLAuth.user;
+  _uid=u?u.uid:null;
+  _started=true;
+  if(u)await ensureAccount();
+  render();
+})();
+
 
 
 /* =========================================================
