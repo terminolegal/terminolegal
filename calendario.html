@@ -741,7 +741,7 @@ increaseTextBtn.addEventListener("click",()=>{
 
 init().catch(err=>{
   console.error(err);
-  $("#status").textContent="No fue posible cargar los datos del calendario.";
+  const st=$("#status");if(st)st.textContent="No fue posible cargar los datos del calendario.";
   $("#months").innerHTML=`<div class="empty">Revisa que el archivo <strong>/calendarios/calendarios.json</strong> exista en el repositorio y que su ruta coincida con la configuración del calendario.</div>`;
 });
 </script>
