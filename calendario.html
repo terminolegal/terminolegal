@@ -526,7 +526,9 @@ function initTheme(){
 function setUrlCountry(code){
   const normalized=String(code||"CO").toUpperCase();
   try { localStorage.setItem("tl_calendar_country",normalized); } catch(_) {}
-  history.pushState({},"",`/calendario/${normalized.toLowerCase()}`);
+  // GitHub Pages publica una única página base; conservamos /calendario/
+  // y guardamos el país elegido en el almacenamiento local del navegador.
+  history.pushState({},"","/calendario/");
 }
 function render(){
   const code=selectedCountry().code;

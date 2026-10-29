@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Calendario legal | Término Legal</title>
+<meta name="description" content="Calendario legal por país con festivos y fechas relevantes para Término Legal.">
+<style>
+.country-wrap{position:relative}
+.country-button{min-width:175px;height:36px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);padding:0 10px;display:flex;align-items:center;gap:8px;cursor:pointer;box-shadow:var(--shadow);font-size:12px;font-weight:600}
+.country-button:hover{border-color:var(--gold)}
+.country-chevron{margin-left:auto;color:var(--muted)}
+.country-menu{position:absolute;right:0;top:43px;width:300px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 45px rgba(0,0,0,.18);padding:8px;display:none;z-index:50}
+.country-menu.open{display:block}
+.country-search{width:100%;height:36px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2);color:var(--ink);padding:0 10px;outline:none;font-size:12px;margin-bottom:7px}
+.country-search:focus{border-color:var(--gold)}
+.country-list{max-height:330px;overflow:auto}
+.country-option{width:100%;display:flex;align-items:center;gap:9px;border:0;background:transparent;color:var(--ink);border-radius:8px;padding:9px 10px;text-align:left;cursor:pointer;font-size:11px}
+.country-option:hover,.country-option.active{background:var(--surface-2)}
+.country-option .flag{width:20px;text-align:center;font-size:15px}
+.country-option .check{margin-left:auto;color:var(--gold);font-weight:800}
+.country-empty{padding:14px 10px;color:var(--muted);font-size:11px}
+.year-nav{position:relative}
+.year-button{border:0;background:transparent;color:var(--ink);cursor:pointer;padding:6px 4px;display:flex;align-items:center;gap:5px;border-radius:8px}
+.year-button:hover{background:var(--surface-2)}
+.year-caret{font-size:12px;color:var(--muted)}
+.year-picker{position:absolute;right:0;top:43px;width:285px;background:var(--surface);border:1px solid var(--line);border-radius:13px;box-shadow:0 18px 45px rgba(0,0,0,.18);padding:12px;display:none;z-index:40}
+.year-picker.open{display:block}
+.year-jump{display:grid;grid-template-columns:1fr auto;gap:6px;margin-bottom:10px}
+.year-jump input{width:100%;height:34px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);padding:0 9px;font-size:12px;outline:none}
+.year-jump input:focus{border-color:var(--gold)}
+.year-jump button{height:34px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);padding:0 11px;cursor:pointer;font-size:11px;font-weight:700}
+.year-range-head{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:0 0 8px;color:var(--muted);font-size:9px}
+.year-range-head button{border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink);padding:5px 7px;cursor:pointer;font-size:9px}
+.year-range-head button:hover,.year-jump button:hover{border-color:var(--gold)}
+.year-picker-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.year-picker-head button{width:30px;height:30px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);cursor:pointer}
+.year-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.year-cell{border:1px solid transparent;border-radius:8px;background:var(--surface-2);color:var(--ink);padding:9px 4px;cursor:pointer;font-size:11px}
+.year-cell:hover{border-color:var(--gold)}
+.year-cell.current{border-color:var(--gold);font-weight:800}
+.year-cell.selected{background:var(--blue);color:#fff}
+.year-today{width:100%;margin-top:10px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);padding:8px;cursor:pointer;font-size:10px}
+:root{
+  --bg:#f7f8fa;--surface:#fff;--surface-2:#f5f6f8;--ink:#132238;--muted:#667085;
+  --line:#e4e7ec;--gold:#b88a32;--blue:#12385f;--weekend:#eef0f3;--today:#dce7f2;
+  --event:#f7f1e5;--event-border:#d9c18e;--shadow:0 10px 30px rgba(16,24,40,.05)
+}
+html[data-theme="dark"]{
+  --bg:#0d1117;--surface:#151b23;--surface-2:#1b222c;--ink:#edf2f7;--muted:#9aa6b2;
+  --line:#293340;--gold:#d0a451;--blue:#9fc1df;--weekend:#202731;--today:#26394c;
+  --event:#2b261b;--event-border:#66552e;--shadow:0 12px 32px rgba(0,0,0,.25)
+}
+
+/* ACCESIBILIDAD — igual que Término Legal */
+.a11y-bar{
+  position:fixed;
+  top:50%;
+  right:0;
+  transform:translateY(-50%);
+  display:flex;
+  flex-direction:column;
+  background:var(--blue);
+  border-radius:10px 0 0 10px;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+  overflow:hidden;
+  z-index:1000
+}
+.a11y-btn{
+  width:42px;
+  height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:transparent;
+  border:0;
+  border-bottom:1px solid rgba(255,255,255,.18);
+  color:#fff;
+  cursor:pointer;
+  padding:0
+}
+.a11y-btn:last-child{border-bottom:0}
+.a11y-btn svg{width:19px;height:19px}
+.a11y-btn:hover,.a11y-btn[aria-pressed="true"]{background:var(--gold)}
+.a11y-big{font-weight:700;font-size:1.05rem;line-height:1}
+.a11y-small{font-weight:700;font-size:.72rem;line-height:1}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;font-size:100%;--text-scale:1}
+.a11y-bar{position:fixed;top:50%;right:0;transform:translateY(-50%);display:flex;flex-direction:column;background:var(--blue);border-radius:10px 0 0 10px;box-shadow:0 8px 24px var(--shadow);overflow:hidden;z-index:1000}
+.a11y-btn{width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,.18);color:#fff;cursor:pointer;padding:0}
+.a11y-btn:last-child{border-bottom:0}.a11y-btn:hover,.a11y-btn[aria-pressed="true"]{background:var(--gold)}
+.a11y-btn svg{width:19px;height:19px}.a11y-big{font-weight:700;font-size:1.05rem;line-height:1}.a11y-small{font-weight:700;font-size:.72rem;line-height:1}
+@media(max-width:560px){.a11y-btn{width:40px;height:40px}.a11y-btn svg{width:18px;height:18px}}
+body.text-scale-active *{
+  /* La escala se aplica a la tipografía, no al tamaño físico de los controles. */
+}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,select{font:inherit}
+a{color:inherit}
+.wrap{width:min(1080px,calc(100% - 34px));margin:auto}
+header{padding:28px 0 4px}
+.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px}
+.back{justify-self:start;text-decoration:none;color:var(--muted);font-size:12px}
+.brand{justify-self:center;text-decoration:none;font-weight:800;letter-spacing:.22em;font-size:17px;color:var(--ink)}
+.brand span{color:var(--gold)}
+.actions{justify-self:end;display:flex;align-items:center;gap:8px}
+.country-wrap{position:relative}
+.icon-btn{
+  width:36px;height:36px;border:1px solid var(--line);border-radius:10px;background:var(--surface);
+  color:var(--ink);cursor:pointer;box-shadow:var(--shadow)
+}
+main{padding:20px 0 55px}
+.hero{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:18px}
+.kicker{font-size:11px;color:var(--gold);font-weight:800;text-transform:uppercase;letter-spacing:.13em}
+h1{margin:6px 0 3px;font-family:Georgia,"Times New Roman",serif;font-size:clamp(29px,4vw,40px);font-weight:700;letter-spacing:-.025em}
+.intro{color:var(--muted);font-size:12px;line-height:1.55;max-width:690px}
+.year-nav{position:relative;display:flex;align-items:center;gap:10px;white-space:nowrap}
+.year-nav button{border:0;background:transparent;color:var(--ink);cursor:pointer;font-size:18px;padding:6px}
+.year-nav strong{font-size:13px;min-width:42px;text-align:center}
+.month-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.month{
+  background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:12px 11px 10px;
+  box-shadow:var(--shadow);min-width:0
+}
+.month-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+.month-title{font-family:Georgia,"Times New Roman",serif;font-size:15px;font-weight:700}
+.month-meta{font-size:9px;color:var(--muted);text-align:right}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.weekday{text-align:center;font-size:8px;color:var(--muted);font-weight:700;padding:2px 0 4px}
+.day{
+  min-height:35px;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--ink);
+  display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;position:relative;
+  transition:background .12s,border-color .12s,transform .12s
+}
+.day:hover{background:var(--surface-2);border-color:var(--line)}
+.day.blank{cursor:default}
+.day.weekend{background:var(--weekend);color:var(--muted)}
+.day.event{background:var(--event);border-color:var(--event-border);font-weight:800}
+.day.today{box-shadow:inset 0 0 0 1.5px var(--blue)}
+.day.selected{outline:2px solid var(--gold);outline-offset:-2px}
+.info{
+  margin-top:15px;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:15px;
+  display:none;box-shadow:var(--shadow)
+}
+.info.show{display:block}
+.info-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.info-date{font-family:Georgia,"Times New Roman",serif;font-size:18px;font-weight:700}
+.info-kind{font-size:10px;color:var(--muted);margin-top:3px}
+.info-close{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:18px}
+.info-text{margin-top:11px;font-size:12px;line-height:1.55}
+.info-source{margin-top:10px;font-size:11px;color:var(--muted)}
+.info-source a{color:var(--blue);text-underline-offset:2px}
+.empty{padding:16px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-size:12px;line-height:1.55}
+.cta{
+  margin-top:18px;padding:15px 17px;border:1px solid var(--line);border-radius:13px;background:var(--surface);
+  display:flex;justify-content:space-between;align-items:center;gap:15px
+}
+.cta strong{font-size:12px}.cta span{font-size:11px;color:var(--muted)}
+.cta a{font-size:11px;text-decoration:none;background:var(--blue);color:#fff;border-radius:8px;padding:9px 12px;white-space:nowrap}
+footer{padding:18px 0 0;color:var(--muted);font-size:10px;line-height:1.5;text-align:center}
+@media(max-width:850px){.month-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.top{grid-template-columns:1fr auto}.brand{grid-column:1/-1;grid-row:1}.back{grid-row:2}.actions{grid-row:2}.hero{align-items:flex-start;flex-direction:column}.year-nav{align-self:flex-end}}
+@media(max-width:560px){
+  .wrap{width:min(100% - 22px,1080px)}header{padding-top:20px}
+  .top{gap:8px}.brand{font-size:15px}.country-button{min-width:145px;font-size:11px}
+  .country-menu{right:-4px;width:min(300px,calc(100vw - 22px))}
+  .year-picker{right:-4px;width:min(285px,calc(100vw - 22px))}
+  .month-grid{grid-template-columns:1fr}.month{padding:12px}.day{min-height:38px;font-size:11px}
+  .cta{align-items:flex-start;flex-direction:column}.cta a{align-self:stretch;text-align:center}
+}
+
+/* REDES SOCIALES — barra inferior Término Legal */
+.tl-social-bar{margin-top:18px;padding:12px 0 4px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:7px}
+.tl-social-label{color:var(--muted);font-size:10px;margin-right:3px}
+.tl-social-btn{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:transparent;border:1px solid var(--line);color:var(--ink);text-decoration:none;cursor:pointer;padding:0;transition:background .15s,border-color .15s,transform .15s}
+.tl-social-btn:hover{background:var(--surface-2);border-color:var(--gold);transform:translateY(-1px)}
+.tl-social-btn svg{width:15px;height:15px;color:var(--gold)}
+.tl-social-btn.tl-home-logo{color:var(--gold);border-color:var(--gold)}
+.tl-social-btn.tl-home-logo svg{width:21px;height:21px;color:var(--gold)}
+@media(max-width:480px){.tl-social-bar{padding-top:11px;gap:5px}.tl-social-label{font-size:9px;margin-right:2px}.tl-social-btn{width:29px;height:29px}.tl-social-btn svg{width:14px;height:14px}}
+</style>
+</head>
+<body>
+
+<div class="a11y-bar" role="toolbar" aria-label="Accesibilidad">
+  <button type="button" id="contrastBtn" class="a11y-btn" aria-pressed="false" title="Contraste" aria-label="Contraste">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M12 3a9 9 0 000 18z" fill="currentColor" stroke="none"></path>
+    </svg>
+  </button>
+  <button type="button" id="increaseTextBtn" class="a11y-btn" title="Aumentar letra" aria-label="Aumentar letra"><span class="a11y-big">A</span></button>
+  <button type="button" id="decreaseTextBtn" class="a11y-btn" title="Reducir letra" aria-label="Reducir letra"><span class="a11y-small">A</span></button>
+</div>
+
+<header>
+  <div class="wrap top">
+    <a class="back" href="/plazos.html">‹ Calcular término</a>
+    <a class="brand" href="/" aria-label="Término Legal — inicio">TÉRMINO <span>LEGAL</span></a>
+    <div class="actions">
+      <div class="country-wrap" id="countryPicker">
+        <button id="countryButton" class="country-button" type="button" aria-haspopup="listbox" aria-expanded="false">
+          <span id="countryFlag">🌐</span><span id="countryName">Colombia</span><span class="country-chevron">⌄</span>
+        </button>
+        <div id="countryMenu" class="country-menu" role="listbox" aria-label="Seleccionar país">
+          <input id="countrySearch" class="country-search" type="search" placeholder="Buscar país..." autocomplete="off" aria-label="Buscar país">
+          <div id="countryList" class="country-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <div class="kicker">Calendario anual</div>
+      <h1 id="title">Colombia · 2026</h1>
+      <div id="intro" class="intro">Consulta las fechas registradas para el calendario de referencia.</div>
+    </div>
+    <div class="year-nav" aria-label="Navegación de año">
+      <button id="prevYear" type="button" aria-label="Año anterior">‹</button>
+      <button id="yearButton" class="year-button" type="button" aria-haspopup="dialog" aria-expanded="false">
+        <strong id="year">2026</strong>
+      </button>
+      <button id="nextYear" type="button" aria-label="Año siguiente">›</button>
+      <div id="yearPicker" class="year-picker" role="dialog" aria-label="Seleccionar año">
+        <div class="year-picker-head">
+          <button id="decadePrev" type="button" aria-label="Década anterior">‹</button>
+          <strong id="decadeLabel"></strong>
+          <button id="decadeNext" type="button" aria-label="Década siguiente">›</button>
+        </div>
+        <div class="year-jump">
+          <input id="yearInput" type="number" min="1" max="9999" inputmode="numeric" aria-label="Escribir año" placeholder="Año">
+          <button id="yearGo" type="button">Ir</button>
+        </div>
+        <div class="year-range-head">
+          <button id="centuryPrev" type="button" aria-label="Siglo anterior">−100</button>
+          <span>Salto de siglo</span>
+          <button id="centuryNext" type="button" aria-label="Siglo siguiente">+100</button>
+        </div>
+        <div id="yearGrid" class="year-grid"></div>
+        <button id="yearToday" class="year-today" type="button">Ir al año actual</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="months" class="month-grid" aria-label="Calendario anual"></section>
+
+  <section id="dateInfo" class="info" aria-live="polite">
+    <div class="info-top">
+      <div>
+        <div id="infoDate" class="info-date"></div>
+        <div id="infoKind" class="info-kind"></div>
+      </div>
+      <button id="closeInfo" class="info-close" type="button" aria-label="Cerrar">×</button>
+    </div>
+    <div id="infoText" class="info-text"></div>
+    <div id="infoSource" class="info-source"></div>
+  </section>
+
+  <section class="cta">
+    <div>
+      <strong>¿Necesitas calcular un término?</strong><br>
+      <span>Cuando quieras, una fecha del calendario podrá conectarse con el calculador de Término Legal.</span>
+    </div>
+    <a href="/plazos.html">Abrir calculador</a>
+  </section>
+
+  <footer>
+    Herramienta de referencia. Las fechas y reglas especiales deben contrastarse con la fuente oficial aplicable al caso concreto.
+  </footer>
+
+  <div class="tl-social-bar" aria-label="Redes sociales de Término Legal">
+    <span class="tl-social-label">Término Legal</span>
+  <a href="/" class="tl-social-btn tl-home-logo" aria-label="Ir a Gestiones en Término Legal" title="Gestiones en Término Legal">
+    <svg viewBox="0 0 32 32" aria-hidden="true" role="img">
+      <rect x="3" y="4" width="26" height="25" rx="5" fill="currentColor" opacity=".12"></rect>
+      <rect x="4.5" y="5.5" width="23" height="23" rx="4" fill="none" stroke="currentColor" stroke-width="1.6"></rect>
+      <path d="M10 3.5v5M22 3.5v5M5 11h22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+      <text x="16" y="22" text-anchor="middle" font-size="8" font-family="Arial,sans-serif" font-weight="800" fill="currentColor">TL</text>
+    </svg>
+  </a>
+  <a href="https://web.facebook.com/terminolegal" target="_blank" rel="noopener noreferrer" class="tl-social-btn" aria-label="Facebook de Término Legal" title="Facebook">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+  <path d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06C2 17.06 5.66 21.2 10.44 22v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.47h-1.26c-1.24 0-1.63.78-1.63 1.57v1.87h2.78l-.45 2.91h-2.33V22C18.34 21.2 22 17.06 22 12.06z"/>
+</svg>
+  </a>
+  <a href="https://www.instagram.com/terminolegal/" target="_blank" rel="noopener noreferrer" class="tl-social-btn" aria-label="Instagram de Término Legal" title="Instagram">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+  <path d="M12 2c2.7 0 3.05.01 4.12.06 1.06.05 1.79.22 2.43.47.66.26 1.22.6 1.77 1.15.55.55.9 1.11 1.15 1.77.25.64.42 1.37.47 2.43.05 1.07.06 1.42.06 4.12s-.01 3.05-.06 4.12c-.05 1.06-.22 1.79-.47 2.43-.26.66-.6 1.22-1.15 1.77-.55.55-1.11.9-1.77 1.15-.64.25-1.37.42-2.43.47-1.07.05-1.42.06-4.12.06s-3.05-.01-4.12-.06c-1.06-.05-1.79-.22-2.43-.47-.66-.26-1.22-.6-1.77-1.15-.55-.55-.9-1.11-1.15-1.77-.25-.64-.42-1.37-.47-2.43C2.01 15.05 2 14.7 2 12s.01-3.05.06-4.12c.05-1.06.22-1.79.47-2.43.25-.64.6-1.22 1.15-1.77.55-.55 1.11-.9 1.77-1.15.64-.25 1.37-.42 2.43-.47C8.95 2.01 9.3 2 12 2zm0 5a5 5 0 100 10 5 5 0 000-10zm0 8.2a3.2 3.2 0 110-6.4 3.2 3.2 0 010 6.4zM17.4 6.6a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4z"/>
+</svg>
+  </a>
+  <a href="https://www.linkedin.com/company/terminolegal" target="_blank" rel="noopener noreferrer" class="tl-social-btn" aria-label="LinkedIn de Término Legal" title="LinkedIn">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+  <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.61 0 4.28 2.38 4.28 5.47v6.27zM5.34 7.43a2.07 2.07 0 110-4.13 2.07 2.07 0 010 4.13zM7.12 20.45H3.56V9h3.56v11.45z"/>
+</svg>
+  </a>
+  <a href="https://www.tiktok.com/@terminole" target="_blank" rel="noopener noreferrer" class="tl-social-btn" aria-label="TikTok de Término Legal" title="TikTok">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+  <path d="M15.7 3.2c.5 2.1 1.7 3.4 3.8 3.7v3.1c-1.4-.1-2.7-.5-3.8-1.2v5.9c0 3.6-2.8 5.5-5.6 5.5-2.6 0-4.7-1.9-4.7-4.5 0-2.9 2.4-4.8 5.4-4.8.4 0 .8 0 1.2.1v3.1c-.4-.1-.8-.2-1.2-.2-1.2 0-2.2.7-2.2 1.8 0 .9.7 1.5 1.6 1.5 1.1 0 2.2-.7 2.2-2.5V3.2h3.3z"/>
+</svg>
+  </a>
+  <a href="https://x.com/Terminole" target="_blank" rel="noopener noreferrer" class="tl-social-btn" aria-label="X de Término Legal" title="X">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817-5.963 6.817H1.684l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/>
+</svg>
+  </a>
+<a href="https://www.youtube.com/@Terminolegal" target="_blank" rel="noopener noreferrer" class="tl-social-btn tl-youtube" aria-label="Canal de YouTube de Término Legal" title="YouTube de Término Legal">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z"/>
+    </svg>
+  </a>
+  </div>
+</main>
+
+<script>
+const DATA_URL="/calendarios/calendarios.json";
+const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const DAYS=["lu","ma","mi","ju","vi","sá","do"];
+const DAY_NAMES=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+let DATA=null;
+let currentYear=new Date().getFullYear();
+let selectedDate=null;
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function pad(n){return String(n).padStart(2,"0")}
+function iso(y,m,d){return `${y}-${pad(m+1)}-${pad(d)}`}
+function pathCountry(){
+  // La URL explícita tiene prioridad; luego la última selección guardada;
+  // finalmente usamos la región del navegador y Colombia como respaldo.
+  const m=location.pathname.match(/^\/calendario\/([a-z]{2})\/?$/i);
+  if(m) return m[1].toUpperCase();
+  try {
+    const saved=localStorage.getItem("tl_calendar_country");
+    if(saved && /^[a-z]{2}$/i.test(saved)) return saved.toUpperCase();
+  } catch(_) {}
+  const locale=(navigator.languages && navigator.languages[0]) || navigator.language || "";
+  const region=locale.match(/[-_]([a-z]{2})$/i);
+  return region ? region[1].toUpperCase() : "CO";
+}
+function dateObj(key){return new Date(key+"T12:00:00")}
+function dateLabel(key){
+  return new Intl.DateTimeFormat("es-CO",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(dateObj(key));
+}
+function addHoliday(list, date, name, source, type="Festivo nacional"){
+  const key=iso(date.getFullYear(),date.getMonth(),date.getDate());
+  list.push({date:key,name,source,type});
+}
+function addFixed(list,year,month,day,name,source,type="Festivo nacional"){
+  addHoliday(list,new Date(year,month-1,day),name,source,type);
+}
+function moveToMonday(date){
+  const d=new Date(date.getFullYear(),date.getMonth(),date.getDate());
+  const day=d.getDay();
+  if(day===0)d.setDate(d.getDate()+1);
+  else if(day!==1)d.setDate(d.getDate()+(8-day));
+  return d;
+}
+function easterSunday(year){
+  const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31)-1,day=((h+l-7*m+114)%31)+1;
+  return new Date(year,month,day);
+}
+function getColombiaHolidays(year){
+  const list=[],src="https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=4954";
+  addFixed(list,year,1,1,"Año Nuevo",src); addFixed(list,year,5,1,"Día del Trabajo",src);
+  addFixed(list,year,7,20,"Independencia de Colombia",src); addFixed(list,year,8,7,"Batalla de Boyacá",src);
+  addFixed(list,year,12,8,"Inmaculada Concepción",src); addFixed(list,year,12,25,"Navidad",src);
+  [[1,6,"Día de los Reyes Magos"],[3,19,"Día de San José"],[6,29,"San Pedro y San Pablo"],[8,15,"Asunción de la Virgen"],[10,12,"Día de la Raza"],[11,1,"Todos los Santos"],[11,11,"Independencia de Cartagena"]].forEach(([m,d,n])=>addHoliday(list,moveToMonday(new Date(year,m-1,d)),n,src));
+  const e=easterSunday(year);
+  addHoliday(list,new Date(e.getFullYear(),e.getMonth(),e.getDate()-3),"Jueves Santo",src);
+  addHoliday(list,new Date(e.getFullYear(),e.getMonth(),e.getDate()-2),"Viernes Santo",src);
+  addHoliday(list,new Date(e.getFullYear(),e.getMonth(),e.getDate()+43),"Ascensión del Señor",src);
+  addHoliday(list,new Date(e.getFullYear(),e.getMonth(),e.getDate()+64),"Corpus Christi",src);
+  addHoliday(list,new Date(e.getFullYear(),e.getMonth(),e.getDate()+71),"Sagrado Corazón de Jesús",src);
+  addHoliday(list,moveToMonday(new Date(year,6,9)),"Nuestra Señora del Rosario de Chiquinquirá",src);
+  return list;
+}
+function getArgentinaHolidays(year){
+  const list=[],src="https://www.argentina.gob.ar/normativa/nacional/ley-27399-281835/texto";
+  addFixed(list,year,1,1,"Año Nuevo",src); addFixed(list,year,3,24,"Día Nacional de la Memoria por la Verdad y la Justicia",src);
+  addFixed(list,year,4,2,"Día del Veterano y de los Caídos en la Guerra de Malvinas",src); addFixed(list,year,5,1,"Día del Trabajo",src);
+  addFixed(list,year,5,25,"Revolución de Mayo",src); addFixed(list,year,6,20,"Paso a la Inmortalidad del General Manuel Belgrano",src);
+  addFixed(list,year,7,9,"Día de la Independencia",src); addFixed(list,year,12,8,"Inmaculada Concepción de María",src); addFixed(list,year,12,25,"Navidad",src);
+  const e=easterSunday(year);
+  addHoliday(list,new Date(year,e.getMonth(),e.getDate()-2),"Viernes Santo",src);
+  const ash=new Date(year,e.getMonth(),e.getDate()-46);
+  addHoliday(list,new Date(year,ash.getMonth(),ash.getDate()-2),"Carnaval",src);
+  addHoliday(list,new Date(year,ash.getMonth(),ash.getDate()-1),"Carnaval",src);
+  [[6,17,"Paso a la Inmortalidad del General Martín Miguel de Güemes"],[8,17,"Paso a la Inmortalidad del General José de San Martín"],[10,12,"Día del Respeto a la Diversidad Cultural"],[11,20,"Día de la Soberanía Nacional"]].forEach(([m,d,n])=>addHoliday(list,moveTransferableArgentina(new Date(year,m-1,d)),n,src));
+  return list;
+}
+function moveTransferableArgentina(date){
+  const day=date.getDay();
+  if(day===2||day===3)date.setDate(date.getDate()-day+1);
+  else if(day===4||day===5)date.setDate(date.getDate()+(8-day));
+  return date;
+}
+function getSpainHolidays(year){
+  const list=[],src="https://www.boe.es/buscar/act.php?id=BOE-A-1983-20906";
+  // Base estatal: no incorpora fiestas autonómicas ni locales. Algunas fiestas nacionales
+  // opcionales se determinan cada año por el calendario laboral oficial.
+  [[1,1,"Año Nuevo"],[5,1,"Fiesta del Trabajo"],[8,15,"Asunción de la Virgen"],[10,12,"Fiesta Nacional de España"],[11,1,"Todos los Santos"],[12,6,"Día de la Constitución Española"],[12,8,"Inmaculada Concepción"],[12,25,"Navidad"]].forEach(([m,d,n])=>addHoliday(list,observedSpain(new Date(year,m-1,d)),n,src));
+  const e=easterSunday(year);
+  addHoliday(list,new Date(year,e.getMonth(),e.getDate()-2),"Viernes Santo",src);
+  addHoliday(list,observedSpain(new Date(year,0,6)),"Epifanía del Señor",src);
+  return list;
+}
+function observedSpain(date){
+  const d=new Date(date.getFullYear(),date.getMonth(),date.getDate());
+  if(d.getDay()===0)d.setDate(d.getDate()+1);
+  return d;
+}
+/*
+ * Calendario perpetuo: la cuadrícula no depende de una base anual.
+ * Los festivos se calculan mediante reglas compactas por país. Así el calendario
+ * puede recorrer décadas y siglos sin almacenar miles de fechas.
+ *
+ * Nota de producto: las reglas nacionales cambian históricamente y algunos
+ * países tienen fiestas regionales/locales. Para esos casos el motor muestra
+ * únicamente las reglas nacionales validadas que aquí estén definidas.
+ */
+const HOLIDAY_RULES={
+  CO:getColombiaHolidays,
+  AR:getArgentinaHolidays,
+  ES:getSpainHolidays,
+  // Reglas nacionales compactas de referencia. Los países que no requieren
+  // una regla móvil pueden usar fixedHolidayRules() sin aumentar el peso anual.
+  US:(y)=>fixedHolidayRules(y,"https://www.law.cornell.edu/uscode/text/5/6103",[
+    [1,1,"New Year's Day"],[6,19,"Juneteenth National Independence Day"],[7,4,"Independence Day"],[11,11,"Veterans Day"],[12,25,"Christmas Day"]
+  ]),
+  BR:(y)=>fixedHolidayRules(y,"https://www.planalto.gov.br/ccivil_03/leis/l0662.htm",[
+    [1,1,"Confraternização Universal"],[4,21,"Tiradentes"],[5,1,"Dia Mundial do Trabalho"],[9,7,"Independência do Brasil"],[10,12,"Nossa Senhora Aparecida"],[11,2,"Finados"],[11,15,"Proclamação da República"],[12,25,"Natal"]
+  ]),
+  CL:(y)=>fixedHolidayRules(y,"https://www.bcn.cl/leychile/navegar?idNorma=30667",[
+    [1,1,"Año Nuevo"],[5,1,"Día del Trabajo"],[5,21,"Glorias Navales"],[6,29,"San Pedro y San Pablo"],[7,16,"Virgen del Carmen"],[8,15,"Asunción de la Virgen"],[9,18,"Independencia Nacional"],[9,19,"Glorias del Ejército"],[10,12,"Encuentro de Dos Mundos"],[10,31,"Día de las Iglesias Evangélicas y Protestantes"],[11,1,"Todos los Santos"],[12,8,"Inmaculada Concepción"],[12,25,"Navidad"]
+  ]),
+  PE:(y)=>fixedHolidayRules(y,"https://www.gob.pe/institucion/minjus/normas-legales",[
+    [1,1,"Año Nuevo"],[4,17,"Viernes Santo"],[5,1,"Día del Trabajo"],[6,29,"San Pedro y San Pablo"],[7,28,"Independencia del Perú"],[7,29,"Fiestas Patrias"],[8,30,"Santa Rosa de Lima"],[10,8,"Combate de Angamos"],[11,1,"Todos los Santos"],[12,8,"Inmaculada Concepción"],[12,25,"Navidad"]
+  ]),
+  UY:(y)=>fixedHolidayRules(y,"https://www.impo.com.uy/bases/leyes/6997-1919",[
+    [1,1,"Año Nuevo"],[4,19,"Desembarco de los Treinta y Tres Orientales"],[5,1,"Día de los Trabajadores"],[6,19,"Natalicio de Artigas"],[7,18,"Jura de la Constitución"],[8,25,"Declaratoria de la Independencia"],[10,12,"Día de la Raza"],[11,2,"Día de los Difuntos"],[12,25,"Día de la Familia"]
+  ]),
+  PY:(y)=>fixedHolidayRules(y,"https://www.bacn.gov.py/leyes-paraguayas/",[
+    [1,1,"Año Nuevo"],[3,1,"Día de los Héroes"],[5,1,"Día de los Trabajadores"],[5,14,"Independencia Nacional"],[5,15,"Independencia Nacional"],[6,12,"Paz del Chaco"],[8,15,"Fundación de Asunción"],[9,29,"Batalla de Boquerón"],[12,8,"Virgen de Caacupé"],[12,25,"Navidad"]
+  ]),
+  BO:(y)=>fixedHolidayRules(y,"https://www.lexivox.org/norms/BO-L-1962.html",[
+    [1,1,"Año Nuevo"],[1,22,"Estado Plurinacional de Bolivia"],[5,1,"Día del Trabajo"],[6,21,"Año Nuevo Aymara"],[8,6,"Independencia de Bolivia"],[11,2,"Todos los Santos"],[12,25,"Navidad"]
+  ]),
+  EC:(y)=>fixedHolidayRules(y,"https://www.funcionjudicial.gob.ec/",[
+    [1,1,"Año Nuevo"],[5,1,"Día del Trabajo"],[5,24,"Batalla de Pichincha"],[8,10,"Primer Grito de Independencia"],[10,9,"Independencia de Guayaquil"],[11,2,"Día de los Difuntos"],[11,3,"Independencia de Cuenca"],[12,25,"Navidad"]
+  ]),
+  CR:(y)=>fixedHolidayRules(y,"https://www.pgrweb.go.cr/scij/",[
+    [1,1,"Año Nuevo"],[4,11,"Batalla de Rivas"],[5,1,"Día del Trabajo"],[7,25,"Anexión del Partido de Nicoya"],[8,2,"Virgen de los Ángeles"],[8,15,"Día de la Madre"],[9,15,"Independencia"],[10,12,"Día de las Culturas"],[12,25,"Navidad"]
+  ]),
+  PA:(y)=>fixedHolidayRules(y,"https://www.gacetaoficial.gob.pa/",[
+    [1,1,"Año Nuevo"],[1,9,"Día de los Mártires"],[5,1,"Día del Trabajo"],[11,3,"Separación de Panamá de Colombia"],[11,5,"Consolidación de la Independencia"],[11,10,"Primer Grito de Independencia"],[11,28,"Independencia de Panamá de España"],[12,8,"Día de la Madre"],[12,25,"Navidad"]
+  ]),
+  DO:(y)=>fixedHolidayRules(y,"https://www.consultoria.gov.do/",[
+    [1,1,"Año Nuevo"],[1,6,"Día de los Reyes Magos"],[1,21,"Nuestra Señora de la Altagracia"],[1,26,"Día de Duarte"],[5,1,"Día del Trabajo"],[8,16,"Restauración"],[9,24,"Nuestra Señora de las Mercedes"],[11,6,"Constitución"],[12,25,"Navidad"]
+  ]),
+  CA:(y)=>fixedHolidayRules(y,"https://laws-lois.justice.gc.ca/eng/acts/h-6/",[
+    [1,1,"New Year's Day"],[7,1,"Canada Day"],[9,30,"National Day for Truth and Reconciliation"],[11,11,"Remembrance Day"],[12,25,"Christmas Day"]
+  ]),
+  AU:(y)=>fixedHolidayRules(y,"https://www.fairwork.gov.au/employment-conditions/public-holidays",[
+    [1,1,"New Year's Day"],[1,26,"Australia Day"],[4,25,"Anzac Day"],[12,25,"Christmas Day"],[12,26,"Boxing Day"]
+  ]),
+  NZ:(y)=>fixedHolidayRules(y,"https://www.employment.govt.nz/leave-and-holidays/public-holidays",[
+    [1,1,"New Year's Day"],[2,6,"Waitangi Day"],[4,25,"ANZAC Day"],[6,5,"King's Birthday"],[10,28,"Labour Day"],[12,25,"Christmas Day"],[12,26,"Boxing Day"]
+  ]),
+  JP:(y)=>fixedHolidayRules(y,"https://www8.cao.go.jp/chosei/shukujitsu/gaiyou.html",[
+    [1,1,"元日"],[2,11,"建国記念の日"],[2,23,"天皇誕生日"],[4,29,"昭和の日"],[5,3,"憲法記念日"],[5,4,"みどりの日"],[5,5,"こどもの日"],[8,11,"山の日"],[11,3,"文化の日"],[11,23,"勤労感謝の日"]
+  ]),
+  KR:(y)=>fixedHolidayRules(y,"https://elaw.klri.re.kr/eng_service/main.do",[
+    [1,1,"New Year's Day"],[3,1,"Independence Movement Day"],[5,5,"Children's Day"],[6,6,"Memorial Day"],[8,15,"Liberation Day"],[10,3,"National Foundation Day"],[10,9,"Hangul Day"],[12,25,"Christmas Day"]
+  ]),
+  IN:(y)=>fixedHolidayRules(y,"https://www.indiacode.nic.in/",[
+    [1,26,"Republic Day"],[5,1,"Labour Day"],[8,15,"Independence Day"],[10,2,"Gandhi Jayanti"]
+  ]),
+  FR:(y)=>fixedHolidayRules(y,"https://www.legifrance.gouv.fr/codes/id/LEGISCTA000006177698",[
+    [1,1,"Jour de l'An"],[5,1,"Fête du Travail"],[5,8,"Victoire 1945"],[7,14,"Fête nationale"],[8,15,"Assomption"],[11,1,"Toussaint"],[11,11,"Armistice"],[12,25,"Noël"]
+  ]),
+  DE:(y)=>fixedHolidayRules(y,"https://www.gesetze-im-internet.de/",[
+    [1,1,"Neujahrstag"],[5,1,"Tag der Arbeit"],[10,3,"Tag der Deutschen Einheit"],[12,25,"Erster Weihnachtstag"],[12,26,"Zweiter Weihnachtstag"]
+  ]),
+  IT:(y)=>fixedHolidayRules(y,"https://www.normattiva.it/",[
+    [1,1,"Capodanno"],[1,6,"Epifania"],[4,25,"Festa della Liberazione"],[5,1,"Festa del Lavoro"],[6,2,"Festa della Repubblica"],[8,15,"Ferragosto"],[11,1,"Ognissanti"],[12,8,"Immacolata Concezione"],[12,25,"Natale"],[12,26,"Santo Stefano"]
+  ]),
+  PT:(y)=>fixedHolidayRules(y,"https://diariodarepublica.pt/",[
+    [1,1,"Ano Novo"],[4,25,"Dia da Liberdade"],[5,1,"Dia do Trabalhador"],[6,10,"Dia de Portugal"],[8,15,"Assunção de Nossa Senhora"],[10,5,"Implantação da República"],[11,1,"Todos os Santos"],[12,1,"Restauração da Independência"],[12,8,"Imaculada Conceição"],[12,25,"Natal"]
+  ]),
+  GB:(y)=>fixedHolidayRules(y,"https://www.gov.uk/bank-holidays",[
+    [1,1,"New Year's Day"],[12,25,"Christmas Day"],[12,26,"Boxing Day"]
+  ])
+};
+function fixedHolidayRules(year,source,rules){
+  return rules.map(([m,d,name])=>{const dt=new Date(year,m-1,d);return {date:iso(year,m-1,d),name,source,type:"Festivo nacional"};});
+}
+function eventsFor(code,year){
+  const fn=HOLIDAY_RULES[code];
+  return fn?dedupeEvents(fn(year)):[];
+}
+function dedupeEvents(events){
+  const map=new Map();
+  events.forEach(e=>{if(!map.has(e.date))map.set(e.date,e);else map.get(e.date).name += " · "+e.name;});
+  return [...map.values()];
+}
+function eventMap(events){
+  return new Map(events.map(e=>[e.date,e]));
+}
+function countryByCode(code){
+  return DATA.countries.find(c=>c.code===code)||DATA.countries[0];
+}
+function applyTheme(theme){
+  document.documentElement.dataset.theme=theme;
+  localStorage.setItem("tl_calendar_theme",theme);
+}
+function initTheme(){
+  const saved=localStorage.getItem("tl_calendar_theme");
+  const theme=saved||((window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light");
+  applyTheme(theme);
+  const btn=document.getElementById("contrastBtn");
+  if(btn)btn.setAttribute("aria-pressed",String(theme==="dark"));
+}
+function setUrlCountry(code){
+  const normalized=String(code||"CO").toUpperCase();
+  try { localStorage.setItem("tl_calendar_country",normalized); } catch(_) {}
+  // GitHub Pages publica una única página base; conservamos /calendario/
+  // y guardamos el país elegido en el almacenamiento local del navegador.
+  history.pushState({},"","/calendario/");
+}
+function render(){
+  const code=selectedCountry().code;
+  const country=countryByCode(code);
+  const events=eventsFor(code,currentYear);
+  const map=eventMap(events);
+  const today=iso(new Date().getFullYear(),new Date().getMonth(),new Date().getDate());
+
+  $("#title").textContent=`${country.name} · ${currentYear}`;
+  $("#year").textContent=currentYear;
+  document.title=`Calendario legal ${country.name} ${currentYear} | Término Legal`;
+  const supported=!!HOLIDAY_RULES[code];
+  $("#intro").textContent=supported
+    ? `${events.length} festivos nacionales calculados para ${currentYear}`
+    : `Calendario perpetuo · festivos nacionales pendientes de validación`;
+
+
+  const root=$("#months");
+  root.innerHTML="";
+  for(let m=0;m<12;m++){
+    const first=new Date(currentYear,m,1);
+    const total=new Date(currentYear,m+1,0).getDate();
+    const offset=(first.getDay()+6)%7;
+    const monthEvents=events.filter(e=>Number(e.date.slice(5,7))===m+1);
+    const workdays=Array.from({length:total},(_,i)=>new Date(currentYear,m,i+1))
+      .filter(d=>d.getDay()!==0&&d.getDay()!==6).length;
+
+    let cells="";
+    for(let i=0;i<offset;i++) cells+=`<span class="day blank" aria-hidden="true"></span>`;
+    for(let d=1;d<=total;d++){
+      const key=iso(currentYear,m,d);
+      const dt=new Date(currentYear,m,d);
+      const ev=map.get(key);
+      const weekend=dt.getDay()===0||dt.getDay()===6;
+      const isToday=key===today;
+      const isSelected=key===selectedDate;
+      cells+=`<button type="button" class="day ${weekend?"weekend ":""}${ev?"event ":""}${isToday?"today ":""}${isSelected?"selected":""}"
+        data-date="${key}" aria-label="${dateLabel(key)}${ev?" — "+esc(ev.name):""}" title="${ev?esc(ev.name):"Seleccionar fecha"}">${d}</button>`;
+    }
+
+    const card=document.createElement("article");
+    card.className="month";
+    card.innerHTML=`
+      <div class="month-head">
+        <div class="month-title">${MONTHS[m]}</div>
+        <div class="month-meta">${workdays} días hábiles · ${monthEvents.length?monthEvents.length+" fecha"+(monthEvents.length===1?"":"s"):"sin fechas"}</div>
+      </div>
+      <div class="week">
+        ${DAYS.map(d=>`<span class="weekday">${d}</span>`).join("")}
+        ${cells}
+      </div>`;
+    root.appendChild(card);
+  }
+
+  root.querySelectorAll("[data-date]").forEach(btn=>{
+    btn.addEventListener("click",()=>showDate(btn.dataset.date));
+  });
+
+  if(selectedDate && !selectedDate.startsWith(String(currentYear)+"-")){
+    selectedDate=null;
+    $("#dateInfo").classList.remove("show");
+  }
+  if(textScaleStep!==0) applyTextScale();
+}
+function showDate(key){
+  selectedDate=key;
+  const code=selectedCountry().code;
+  const events=eventsFor(code,currentYear);
+  const ev=events.find(e=>e.date===key);
+  const dt=dateObj(key);
+  const weekend=dt.getDay()===0||dt.getDay()===6;
+
+  $("#infoDate").textContent=dateLabel(key);
+  $("#infoKind").textContent=ev
+    ? (ev.type||"Festivo nacional").replaceAll("_"," ")
+    : (weekend?"Fin de semana":"Fecha de referencia");
+
+  $("#infoText").textContent=ev
+    ? ev.name
+    : (weekend
+      ? "La fecha corresponde a sábado o domingo. Se muestra como referencia visual; su efecto jurídico depende de la regla aplicable."
+      : "No hay una fecha especial registrada para este día en la base de datos actual.");
+
+  $("#infoSource").innerHTML=ev?.source
+    ? `Fuente: <a href="${esc(ev.source)}" target="_blank" rel="noopener noreferrer">consultar fuente oficial</a>`
+    : "";
+
+  $("#dateInfo").classList.add("show");
+  renderSelectionOnly();
+  $("#dateInfo").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+let decadeStart=Math.floor(currentYear/10)*10;
+function renderYearPicker(){
+  $("#decadeLabel").textContent=`${decadeStart}–${decadeStart+9}`;
+  $("#yearInput").value=currentYear;
+  const now=new Date().getFullYear();
+  $("#yearGrid").innerHTML=Array.from({length:12},(_,i)=>decadeStart-1+i).map(y=>`<button type="button" class="year-cell ${y===currentYear?"selected ":""}${y===now?"current":""}" data-year="${y}">${y}</button>`).join("");
+  $("#yearGrid").querySelectorAll("[data-year]").forEach(b=>b.onclick=()=>selectYear(Number(b.dataset.year)));
+}
+function selectYear(year){
+  year=Math.trunc(Number(year));
+  if(!Number.isFinite(year)||year<1||year>9999)return;
+  currentYear=year;
+  decadeStart=Math.floor(currentYear/10)*10;
+  selectedDate=null;
+  $("#dateInfo").classList.remove("show");
+  closeYearPicker();
+  render();
+}
+function goYearFromInput(){selectYear($("#yearInput").value)}
+function openYearPicker(){renderYearPicker();$("#yearPicker").classList.add("open");$("#yearButton").setAttribute("aria-expanded","true")}
+function closeYearPicker(){$("#yearPicker").classList.remove("open");$("#yearButton").setAttribute("aria-expanded","false")}
+function openCountryMenu(){$("#countryMenu").classList.add("open");$("#countryButton").setAttribute("aria-expanded","true");$("#countrySearch").value="";renderCountryList("");setTimeout(()=>$("#countrySearch").focus(),0)}
+function closeCountryMenu(){$("#countryMenu").classList.remove("open");$("#countryButton").setAttribute("aria-expanded","false")}
+
+function renderSelectionOnly(){
+  document.querySelectorAll(".day.selected").forEach(x=>x.classList.remove("selected"));
+  if(!selectedDate)return;
+  const btn=document.querySelector(`[data-date="${selectedDate}"]`);
+  if(btn)btn.classList.add("selected");
+}
+function selectedCountry(){
+  const wanted=pathCountry();
+  return DATA.countries.find(c=>c.code===wanted)||DATA.countries.find(c=>c.code==="CO")||DATA.countries[0];
+}
+function setCountryUI(c){
+  $("#countryFlag").textContent=c?.flag||"🌐";
+  $("#countryName").textContent=c?.name||c?.code||"País";
+}
+function renderCountryList(filter=""){
+  const current=selectedCountry(),q=filter.trim().toLocaleLowerCase("es");
+  const list=DATA.countries.slice().sort((a,b)=>a.name.localeCompare(b.name,"es"))
+    .filter(c=>!q||c.name.toLocaleLowerCase("es").includes(q)||c.code.toLowerCase().includes(q));
+  $("#countryList").innerHTML=list.length?list.map(c=>`<button type="button" class="country-option ${c.code===current.code?"active":""}" data-country="${esc(c.code)}"><span class="flag">${esc(c.flag||"🌐")}</span><span>${esc(c.name)}</span>${c.code===current.code?'<span class="check">✓</span>':""}</button>`).join(""):'<div class="country-empty">No encontramos ese país.</div>';
+  $("#countryList").querySelectorAll("[data-country]").forEach(b=>b.onclick=()=>{
+    setUrlCountry(b.dataset.country);selectedDate=null;$("#dateInfo").classList.remove("show");closeCountryMenu();render();
+  });
+}
+function populateCountries(){
+  setCountryUI(selectedCountry());
+  renderCountryList("");
+}
+async function init(){
+  initTheme();
+  applyTextScale();
+  contrastBtn.setAttribute("aria-pressed",String(document.documentElement.dataset.theme==="dark"));
+  $("#prevYear").addEventListener("click",()=>{currentYear--;selectedDate=null;$("#dateInfo").classList.remove("show");render();});
+  $("#nextYear").addEventListener("click",()=>{currentYear++;selectedDate=null;$("#dateInfo").classList.remove("show");render();});
+  $("#yearButton").addEventListener("click",()=>$("#yearPicker").classList.contains("open")?closeYearPicker():openYearPicker());
+  $("#decadePrev").addEventListener("click",()=>{decadeStart-=10;renderYearPicker();});
+  $("#decadeNext").addEventListener("click",()=>{decadeStart+=10;renderYearPicker();});
+  $("#centuryPrev").addEventListener("click",()=>{decadeStart-=100;renderYearPicker();});
+  $("#centuryNext").addEventListener("click",()=>{decadeStart+=100;renderYearPicker();});
+  $("#yearGo").addEventListener("click",goYearFromInput);
+  $("#yearInput").addEventListener("keydown",e=>{if(e.key==="Enter")goYearFromInput();});
+  $("#yearToday").addEventListener("click",()=>selectYear(new Date().getFullYear()));
+  $("#countryButton").addEventListener("click",()=>$("#countryMenu").classList.contains("open")?closeCountryMenu():openCountryMenu());
+  $("#countrySearch").addEventListener("input",e=>renderCountryList(e.target.value));
+  document.addEventListener("click",e=>{if(!$("#countryPicker").contains(e.target))closeCountryMenu();if(!$(".year-nav").contains(e.target))closeYearPicker()});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeCountryMenu();closeYearPicker()}});
+  $("#closeInfo").addEventListener("click",()=>{$("#dateInfo").classList.remove("show");selectedDate=null;renderSelectionOnly();});
+
+  DATA=await fetch(DATA_URL,{cache:"no-store"}).then(r=>{
+    if(!r.ok) throw new Error("No se pudo cargar calendarios.json");
+    return r.json();
+  });
+  populateCountries();
+  window.addEventListener("popstate",()=>{
+    setCountryUI(selectedCountry());
+    renderCountryList("");
+    selectedDate=null;
+    $("#dateInfo").classList.remove("show");
+    render();
+  });
+  render();
+}
+/* ACCESIBILIDAD — mismo comportamiento que Término Legal */
+const contrastBtn=document.getElementById("contrastBtn");
+const decreaseTextBtn=document.getElementById("decreaseTextBtn");
+const increaseTextBtn=document.getElementById("increaseTextBtn");
+let textScaleStep=0;
+const MIN_STEP=-2;
+const MAX_STEP=3;
+function applyTextScale(){
+  const scale=1+(textScaleStep*0.08);
+  document.documentElement.style.setProperty("--text-scale",String(scale));
+  document.body.classList.add("text-scale-active");
+
+  document.querySelectorAll("body *").forEach(el=>{
+    if(el.classList.contains("a11y-bar") || el.closest(".a11y-bar")) return;
+    if(!el.dataset.tlBaseFont) {
+      const px=parseFloat(getComputedStyle(el).fontSize);
+      if(Number.isFinite(px)) el.dataset.tlBaseFont=String(px);
+    }
+    const base=parseFloat(el.dataset.tlBaseFont);
+    if(Number.isFinite(base)) el.style.fontSize=(base*scale)+"px";
+  });
+}
+contrastBtn.addEventListener("click",()=>{
+  const isDark=document.documentElement.dataset.theme!=="dark";
+  applyTheme(isDark?"dark":"light");
+  contrastBtn.setAttribute("aria-pressed",String(isDark));
+});
+decreaseTextBtn.addEventListener("click",()=>{
+  textScaleStep=Math.max(MIN_STEP,textScaleStep-1);
+  applyTextScale();
+});
+increaseTextBtn.addEventListener("click",()=>{
+  textScaleStep=Math.min(MAX_STEP,textScaleStep+1);
+  applyTextScale();
+});
+
+init().catch(err=>{
+  console.error(err);
+  const st=$("#status");if(st)st.textContent="No fue posible cargar los datos del calendario.";
+  $("#months").innerHTML=`<div class="empty">Revisa que el archivo <strong>/calendarios/calendarios.json</strong> exista en el repositorio y que su ruta coincida con la configuración del calendario.</div>`;
+});
+</script>
+</body>
+</html>
