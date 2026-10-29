@@ -5358,11 +5358,13 @@ dateIconBadge.addEventListener(
   }
 );
 
-/* Desde el calendario mensual, abre el calendario legal externo. */
+/* Desde el calendario mensual, abre el calendario legal anual (única página: /calendario/).
+   El país no va en la ruta: se comparte con esa página mediante localStorage. */
 calendarFullViewBtn?.addEventListener("click",()=>{
-  const code=String(currentCountry||DEFAULT_COUNTRY).toLowerCase();
+  const code=String(currentCountry||DEFAULT_COUNTRY).toUpperCase();
   closeCalendar();
-  window.location.href=`/calendario/${code}`;
+  try{localStorage.setItem("tl_calendar_country",code);}catch{}
+  window.location.href="/calendario/";
 });
 
 

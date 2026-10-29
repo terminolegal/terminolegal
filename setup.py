@@ -270,7 +270,7 @@ No requiere instalación.
 
 ## Publicación gratuita
 
-Puedes subir estos archivos a un repositorio de GitHub y conectarlo con Vercel para publicarlo.
+Puedes subir estos archivos a un repositorio de GitHub y publicarlo con GitHub Pages.
 
 ## Próxima versión propuesta
 
