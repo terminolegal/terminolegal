@@ -2841,7 +2841,7 @@ body.dark .usage-guide-panel{
   <!-- GESTIONES (sutil, debajo de Guardar PDF / Compartir) -->
 <div class="advice-cta gx-help-card" id="gxWidget" hidden>
 
-  <a href="index.html" class="gx-help-single" aria-label="Requiero ayuda">
+  <a href="gestion.html" class="gx-help-single" aria-label="Requiero ayuda">
     <strong>REQUIERO AYUDA</strong>
   </a>
 
@@ -2854,7 +2854,7 @@ body.dark .usage-guide-panel{
       <span>BUSCAR AYUDA</span>
     </button>
 
-    <a href="index.html" class="advice-link gx-help-secondary">
+    <a href="gestion.html" class="advice-link gx-help-secondary">
       <span>PUBLICAR UNA GESTIÓN</span>
     </a>
   </div>
@@ -2916,7 +2916,7 @@ body.dark .usage-guide-panel{
     </svg>
   </a>
 
-  <a href="/" class="footer-social-btn tl-home-logo" aria-label="Ir a Gestiones en Término Legal" title="Gestiones en Término Legal">
+  <a href="gestion.html" class="footer-social-btn tl-home-logo" aria-label="Ir a Gestiones en Término Legal" title="Gestiones en Término Legal">
     <svg viewBox="0 0 32 32" aria-hidden="true" role="img" fill="none">
       <rect x="3" y="5" width="26" height="24" rx="4" stroke="currentColor" stroke-width="2.2"/>
       <path d="M3 11h26" stroke="currentColor" stroke-width="2.2"/>
@@ -7008,7 +7008,7 @@ countrySelect.addEventListener(
    GESTIONES — vista previa dinámica
    Muestra, bajo "Publicar una gestión", cuántos profesionales
    cubren la zona del usuario y cuántas gestiones hay abiertas
-   cerca, usando el mismo backend (Apps Script) del marketplace (index.html).
+   cerca, usando el mismo backend (Apps Script) del marketplace (gestion.html).
    Disponible por ahora solo donde opera Gestiones (Colombia).
    ========================================================= */
 
@@ -7120,7 +7120,7 @@ function gxRenderStats(place,data){
   if(!data||!data.ok){
 
     gxWidgetStats.innerHTML=
-      `No pudimos consultar tu zona en este momento. <a href="index.html">Buscar ayuda</a>`;
+      `No pudimos consultar tu zona en este momento. <a href="gestion.html">Buscar ayuda</a>`;
 
     return;
 
@@ -7146,7 +7146,7 @@ function gxRenderStats(place,data){
         ?"gestión abierta"
         :"gestiones abiertas"
     } cerca de ti. `+
-    `<a href="index.html">Ver gestiones o publicar una gestión</a>`;
+    `<a href="gestion.html">Ver gestiones o publicar una gestión</a>`;
 
 }
 
@@ -7161,7 +7161,7 @@ async function gxDetectAndShowStats(){
     gxWidgetStats.hidden=false;
 
     gxWidgetStats.innerHTML=
-      `Tu navegador no permite detectar tu ubicación. <a href="index.html">Busca ayuda directamente</a>.`;
+      `Tu navegador no permite detectar tu ubicación. <a href="gestion.html">Busca ayuda directamente</a>.`;
 
     return;
 
@@ -7208,7 +7208,7 @@ async function gxDetectAndShowStats(){
       gxWidgetStats.hidden=false;
 
       gxWidgetStats.innerHTML=
-        `Activa la ubicación para buscar gestiones cerca, o <a href="index.html">entra al marketplace</a>.`;
+        `Activa la ubicación para buscar gestiones cerca, o <a href="gestion.html">entra al marketplace</a>.`;
 
     },
 
